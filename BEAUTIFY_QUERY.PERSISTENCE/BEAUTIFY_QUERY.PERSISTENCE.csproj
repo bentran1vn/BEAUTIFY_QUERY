@@ -6,4 +6,10 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.0.20" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.7" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
+    </ItemGroup>
+
 </Project>
