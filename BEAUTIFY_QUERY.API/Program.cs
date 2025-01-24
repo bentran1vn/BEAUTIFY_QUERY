@@ -104,6 +104,9 @@ finally
     await app.DisposeAsync();
 }
 
-public partial class Program
+namespace BEAUTIFY_QUERY.API
 {
+    public partial class Program
+    {
+    }
 }

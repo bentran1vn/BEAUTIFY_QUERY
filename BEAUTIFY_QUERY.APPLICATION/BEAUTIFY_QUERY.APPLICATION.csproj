@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-      <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.0.18" />
+      <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.0.25" />
       <PackageReference Include="FluentValidation" Version="11.10.0" />
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
       <PackageReference Include="MediatR" Version="12.4.1" />
@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BEAUTIFY_QUERY.CONTRACT\BEAUTIFY_QUERY.CONTRACT.csproj" />
+      <ProjectReference Include="..\BEAUTIFY_QUERY.DOMAIN\BEAUTIFY_QUERY.DOMAIN.csproj" />
     </ItemGroup>
 
 </Project>
