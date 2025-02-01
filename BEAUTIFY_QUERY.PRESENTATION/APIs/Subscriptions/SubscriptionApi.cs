@@ -1,0 +1,35 @@
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Extensions;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.PRESENTATION.Abstractions;
+using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
+using Carter;
+using MediatR;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+
+namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Subscriptions;
+public class SubscriptionApi : ApiEndpoint, ICarterModule
+{
+    private const string BaseUrl = "/api/v{version:apiVersion}/subscriptions";
+
+    public void AddRoutes(IEndpointRouteBuilder app)
+    {
+        var group1 = app.NewVersionedApi("Subscriptions")
+            .MapGroup(BaseUrl).HasApiVersion(1);
+
+        group1.MapGet(string.Empty, GetSubscriptions);
+
+    }
+
+    private static async Task<IResult> GetSubscriptions(ISender sender, string? searchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        int pageIndex = 1,
+        int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.GetSubscription(searchTerm,
+            sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageIndex, pageSize));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+}

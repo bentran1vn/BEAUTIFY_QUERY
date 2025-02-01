@@ -91,7 +91,7 @@ public static class ServiceCollectionExtensions
 
                 // ===================== Setup for Consumer =====================
 
-                // Importantce to create Echange and Queue
+                // Important to create Exchange and Queue
                 bus.ConfigureEndpoints(context);
             });
         });

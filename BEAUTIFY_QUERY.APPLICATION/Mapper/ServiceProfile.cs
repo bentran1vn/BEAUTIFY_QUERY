@@ -1,10 +1,17 @@
 using AutoMapper;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Shared;
+using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
+using BEAUTIFY_QUERY.DOMAIN.Documents;
 
 namespace BEAUTIFY_QUERY.APPLICATION.Mapper;
 public class ServiceProfile : Profile
 {
     public ServiceProfile()
     {
+        CreateMap<SubscriptionProjection, Response.GetSubscriptionResponse>();
+        CreateMap<PagedResult<SubscriptionProjection>, PagedResult<Response.GetSubscriptionResponse>>();
+
+
         // ==================SkillMapping=====================
         // CreateMap<Skill, SkillResponse.GetSkillsQuery>().ReverseMap();
         //
