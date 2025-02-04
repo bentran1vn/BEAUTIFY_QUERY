@@ -26,8 +26,9 @@ public class ClinicApi: ApiEndpoint, ICarterModule
         var result = await sender.Send(new Query.GetAllApplyRequestQuery(pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
-    private static async Task<IResult> GetDetailApplyRequest(ISender sender)
+    private static async Task<IResult> GetDetailApplyRequest(ISender sender, Guid id)
     {
-        return Results.Ok("Hello");
+        var result = await sender.Send(new Query.GetDetailApplyRequestQuery(id));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }
