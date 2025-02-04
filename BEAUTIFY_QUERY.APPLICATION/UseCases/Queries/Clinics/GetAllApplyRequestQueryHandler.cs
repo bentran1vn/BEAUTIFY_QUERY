@@ -10,12 +10,9 @@ namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 public class GetAllApplyRequestQueryHandler : IQueryHandler<Query.GetAllApplyRequestQuery, PagedResult<Response.GetApplyRequest>>
 {
     private readonly IRepositoryBase<ClinicOnBoardingRequest, Guid> _clinicOnBoardingRequestRepository;
-    private readonly IMapper _mapper;
-
-    public GetAllApplyRequestQueryHandler(IRepositoryBase<ClinicOnBoardingRequest, Guid> clinicOnBoardingRequestRepository, IMapper mapper)
+    public GetAllApplyRequestQueryHandler(IRepositoryBase<ClinicOnBoardingRequest, Guid> clinicOnBoardingRequestRepository)
     {
         _clinicOnBoardingRequestRepository = clinicOnBoardingRequestRepository;
-        _mapper = mapper;
     }
 
     public async Task<Result<PagedResult<Response.GetApplyRequest>>> Handle(Query.GetAllApplyRequestQuery request, CancellationToken cancellationToken)
