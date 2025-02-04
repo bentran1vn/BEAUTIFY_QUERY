@@ -1,4 +1,5 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.PRESENTATION.Abstractions;
+using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -9,18 +10,23 @@ namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Clinics;
 
 public class ClinicApi: ApiEndpoint, ICarterModule
 {
-    private const string BaseUrl = "/api/v{version:apiVersion}/user";
+    private const string BaseUrl = "/api/v{version:apiVersion}/clinics";
 
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var gr1 = app.NewVersionedApi("Clinics")
             .MapGroup(BaseUrl).HasApiVersion(1);
 
-        gr1.MapGet("", CreateUser);
-
+        gr1.MapGet("apply", GetAllApplyRequest);
+        gr1.MapGet("apply/{id}", GetDetailApplyRequest);
     }
 
-    private static async Task<IResult> CreateUser(ISender sender)
+    private static async Task<IResult> GetAllApplyRequest(ISender sender, int pageIndex = 1, int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.GetAllApplyRequestQuery(pageIndex, pageSize));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+    private static async Task<IResult> GetDetailApplyRequest(ISender sender)
     {
         return Results.Ok("Hello");
     }

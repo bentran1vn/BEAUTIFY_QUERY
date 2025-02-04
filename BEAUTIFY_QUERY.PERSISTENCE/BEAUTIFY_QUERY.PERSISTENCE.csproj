@@ -12,4 +12,8 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\BEAUTIFY_QUERY.DOMAIN\BEAUTIFY_QUERY.DOMAIN.csproj" />
+    </ItemGroup>
+
 </Project>

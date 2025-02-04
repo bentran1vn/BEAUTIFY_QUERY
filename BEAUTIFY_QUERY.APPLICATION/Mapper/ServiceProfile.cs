@@ -10,6 +10,28 @@ public class ServiceProfile : Profile
     {
         CreateMap<SubscriptionProjection, Response.GetSubscriptionResponse>();
         CreateMap<PagedResult<SubscriptionProjection>, PagedResult<Response.GetSubscriptionResponse>>();
+        
+        // CreateMap<ClinicOnBoardingRequest, CONTRACT.Services.Clinics.Response.GetApplyRequest>()
+        //     .ForMember(dest => dest.Id,
+        //         opt 
+        //             => opt.MapFrom(src => src.Id))
+        //     .ForMember(dest => dest.Name,
+        //         opt 
+        //             => opt.MapFrom(src => src.Clinic!.Name))
+        //     .ForMember(dest => dest.Email,
+        //         opt 
+        //             => opt.MapFrom(src => src.Clinic!.Email))
+        //     .ForMember(dest => dest.Address,
+        //         opt 
+        //             => opt.MapFrom(src => src.Clinic!.Address))
+        //     .ForMember(dest => dest.TotalApply,
+        //         opt 
+        //             => opt.MapFrom(src => src.Clinic!.TotalApply));
+        //
+        // CreateMap<List<ClinicOnBoardingRequest>, List<CONTRACT.Services.Clinics.Response.GetApplyRequest>>();
+        //
+        // CreateMap<PagedResult<ClinicOnBoardingRequest>, PagedResult<CONTRACT.Services.Clinics.Response.GetApplyRequest>>()
+        //     .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
 
 
         // ==================SkillMapping=====================
