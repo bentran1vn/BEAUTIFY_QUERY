@@ -1,5 +1,12 @@
 ﻿namespace BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
 public static class Response
 {
-    public record GetSubscriptionResponse(Guid DocumentId, string? Name, string? Description, decimal Price, int Duration, bool IsActivated, bool IsDeleted);
+    public class GetSubscriptionResponse()
+    {
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public string? Price { get; set; }
+        public int Duration { get; set; }
+        public bool IsActivated { get; set; }
+    }
 }
