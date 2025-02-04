@@ -3,6 +3,7 @@ public static class Response
 {
     public class GetSubscriptionResponse()
     {
+        public string? DocumentId { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? Price { get; set; }
