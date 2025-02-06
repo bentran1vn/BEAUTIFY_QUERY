@@ -7,9 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.1.4" />
+      <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.2.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.7" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     </ItemGroup>
 
     <ItemGroup>

@@ -8,9 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.1.5" />
+        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.2.1" />
         <PackageReference Include="Carter" Version="7.2.0" />
         <PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="6.1.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
     </ItemGroup>
 
@@ -21,7 +26,6 @@
     <ItemGroup>
       <ProjectReference Include="..\BEAUTIFY_QUERY.APPLICATION\BEAUTIFY_QUERY.APPLICATION.csproj" />
       <ProjectReference Include="..\BEAUTIFY_QUERY.CONTRACT\BEAUTIFY_QUERY.CONTRACT.csproj" />
-      <ProjectReference Include="..\BEAUTIFY_QUERY.DOMAIN\BEAUTIFY_QUERY.DOMAIN.csproj" />
       <ProjectReference Include="..\BEAUTIFY_QUERY.INFRASTRUCTURE\BEAUTIFY_QUERY.INFRASTRUCTURE.csproj" />
       <ProjectReference Include="..\BEAUTIFY_QUERY.PERSISTENCE\BEAUTIFY_QUERY.PERSISTENCE.csproj" />
       <ProjectReference Include="..\BEAUTIFY_QUERY.PRESENTATION\BEAUTIFY_QUERY.PRESENTATION.csproj" />
