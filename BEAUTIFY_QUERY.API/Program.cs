@@ -44,9 +44,20 @@ builder.Services.AddMediatRApplication();
 builder.Services.AddAutoMapperApplication();
 
 // Persistence Layer
+
+// =====================>
 builder.Services.ConfigureSqlServerRetryOptionsPersistence(
-    builder.Configuration.GetSection(nameof(SqlServerRetryOptions)));
+    builder.Configuration.GetSection(nameof(SqlServerRetryOptions))
+);
+
+// builder.Services.ConfigurePostgreSqlRetryOptionsPersistence(
+//     builder.Configuration.GetSection(nameof(PostgreSqlRetryOptions))
+// );
+
+// =====================>
 builder.Services.AddSqlServerPersistence();
+// builder.Services.AddPostgreSqlPersistence();
+
 builder.Services.AddRepositoryPersistence();
 builder.Services.ConfigureServicesInfrastructure(builder.Configuration);
 
