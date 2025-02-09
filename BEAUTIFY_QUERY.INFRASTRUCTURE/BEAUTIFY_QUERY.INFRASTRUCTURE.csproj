@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.2.1" />
+      <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.2.2" />
     </ItemGroup>
 
 </Project>
