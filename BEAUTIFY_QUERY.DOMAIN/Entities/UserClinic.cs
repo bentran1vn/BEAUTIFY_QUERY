@@ -7,6 +7,6 @@ public class UserClinic : AggregateRoot<Guid>, IAuditableEntity
     public virtual User? User { get; set; }
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? ModifiedOnUtc { get; set; }
-    public virtual ICollection<UserClinic> UserClinics { get; set; }
+    public virtual ICollection<WorkingSchedule>? WorkingSchedules { get; set; }
     public virtual ICollection<CustomerSchedule>? CustomerSchedules { get; set; }
 }
