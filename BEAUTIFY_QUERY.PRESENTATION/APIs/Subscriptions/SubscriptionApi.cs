@@ -18,6 +18,7 @@ public class SubscriptionApi : ApiEndpoint, ICarterModule
             .MapGroup(BaseUrl).HasApiVersion(1);
 
         group1.MapGet(string.Empty, GetSubscriptions);
+        group1.MapGet("{id:guid}", GetSubscriptionById);
 
     }
 
@@ -30,6 +31,12 @@ public class SubscriptionApi : ApiEndpoint, ICarterModule
         var result = await sender.Send(new Query.GetSubscription(searchTerm,
             sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex, pageSize));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+    
+    private static async Task<IResult> GetSubscriptionById(ISender sender, Guid id)
+    {
+        var result = await sender.Send(new Query.GetSubscriptionById(id));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }
