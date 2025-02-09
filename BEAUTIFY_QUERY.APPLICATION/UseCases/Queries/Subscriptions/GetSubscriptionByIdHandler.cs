@@ -26,7 +26,7 @@ public class GetSubscriptionByIdHandler : IQueryHandler<Query.GetSubscriptionByI
             DocumentId = subscription.DocumentId,
             Name = subscription.Name,
             Description = subscription.Description,
-            Price = subscription.Price.ToString("C0", new CultureInfo("vi-VN")),
+            Price = subscription.Price,
             Duration = subscription.Duration
         };
         return Result.Success(response);
