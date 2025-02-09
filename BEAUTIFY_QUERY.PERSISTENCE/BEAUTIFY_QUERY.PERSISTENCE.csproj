@@ -7,9 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.2.2" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.7" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7" />
+        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.2.2"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.7"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.7"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BEAUTIFY_QUERY.DOMAIN\BEAUTIFY_QUERY.DOMAIN.csproj" />
     </ItemGroup>
 
 </Project>

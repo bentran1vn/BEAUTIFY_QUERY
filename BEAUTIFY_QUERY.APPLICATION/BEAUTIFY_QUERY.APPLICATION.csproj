@@ -19,6 +19,7 @@
     <ItemGroup>
       <ProjectReference Include="..\BEAUTIFY_QUERY.CONTRACT\BEAUTIFY_QUERY.CONTRACT.csproj" />
       <ProjectReference Include="..\BEAUTIFY_QUERY.DOMAIN\BEAUTIFY_QUERY.DOMAIN.csproj" />
+      <ProjectReference Include="..\BEAUTIFY_QUERY.PERSISTENCE\BEAUTIFY_QUERY.PERSISTENCE.csproj" />
     </ItemGroup>
 
 </Project>
