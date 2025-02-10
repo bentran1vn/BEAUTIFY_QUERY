@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
+//using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace BEAUTIFY_QUERY.PERSISTENCE.DependencyInjection.Extensions;
 

@@ -59,15 +59,6 @@ internal sealed class
 
         // 6. Map to the response DTO and return
         var result = _mapper.Map<PagedResult<Response.GetSubscriptionResponse>>(subscriptions);
-        //format the price into VND currency
-        foreach (var item in result.Items)
-        {
-            if (decimal.TryParse(item.Price, out var price))
-            {
-                item.Price = price.ToString("C0", new CultureInfo("vi-VN"));
-            }
-        }
-        
         return Result.Success(result);
     }
 

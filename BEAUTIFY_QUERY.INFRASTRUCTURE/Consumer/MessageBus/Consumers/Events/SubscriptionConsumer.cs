@@ -16,9 +16,6 @@ public static class SubscriptionConsumer
     public class SubscriptionDeletedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.SubscriptionDeleted>(sender, repository);
 
-    public class SubscriptionActivatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
-        : Consumer<DomainEvents.SubscriptionActivated>(sender, repository);
-
-    public class SubscriptionDeactivatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
-        : Consumer<DomainEvents.SubscriptionDeactivated>(sender, repository);
+    public class SubscriptionStatusActivationChangedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.SubscriptionStatusActivationChanged>(sender, repository);
 }
