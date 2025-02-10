@@ -7,9 +7,9 @@ namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 
 public class GetClinicDetailQueryHandler :  IQueryHandler<Query.GetClinicDetailQuery, Response.GetClinicDetail>
 {
-    private readonly IRepositoryBase<DOMAIN.Entities.Clinics, Guid> _clinicRepository;
+    private readonly IRepositoryBase<DOMAIN.Entities.Clinic, Guid> _clinicRepository;
 
-    public GetClinicDetailQueryHandler(IRepositoryBase<DOMAIN.Entities.Clinics, Guid> clinicRepository)
+    public GetClinicDetailQueryHandler(IRepositoryBase<DOMAIN.Entities.Clinic, Guid> clinicRepository)
     {
         _clinicRepository = clinicRepository;
     }

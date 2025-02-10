@@ -9,9 +9,9 @@ namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 
 public class GetClinicsQueryHandler : IQueryHandler<Query.GetClinicsQuery, PagedResult<Response.GetClinics>>
 {
-    private readonly IRepositoryBase<DOMAIN.Entities.Clinics, Guid> _clinicRepository;
+    private readonly IRepositoryBase<DOMAIN.Entities.Clinic, Guid> _clinicRepository;
 
-    public GetClinicsQueryHandler(IRepositoryBase<DOMAIN.Entities.Clinics, Guid> clinicRepository)
+    public GetClinicsQueryHandler(IRepositoryBase<DOMAIN.Entities.Clinic, Guid> clinicRepository)
     {
         _clinicRepository = clinicRepository;
     }
@@ -31,7 +31,7 @@ public class GetClinicsQueryHandler : IQueryHandler<Query.GetClinicsQuery, Paged
             ? clinicsQuery.OrderByDescending(GetSortProperty(request))
             : clinicsQuery.OrderBy(GetSortProperty(request));
         
-        var clinics = await PagedResult<DOMAIN.Entities.Clinics>.CreateAsync(clinicsQuery,
+        var clinics = await PagedResult<DOMAIN.Entities.Clinic>.CreateAsync(clinicsQuery,
             request.PageIndex,
             request.PageSize);
         
@@ -44,7 +44,7 @@ public class GetClinicsQueryHandler : IQueryHandler<Query.GetClinicsQuery, Paged
         return Result.Success(result);
     }
     
-    private static Expression<Func<DOMAIN.Entities.Clinics, object>> GetSortProperty(Query.GetClinicsQuery request)
+    private static Expression<Func<DOMAIN.Entities.Clinic, object>> GetSortProperty(Query.GetClinicsQuery request)
         => request.SortColumn?.ToLower() switch
         {
             "name" => clinics => clinics.Name,
