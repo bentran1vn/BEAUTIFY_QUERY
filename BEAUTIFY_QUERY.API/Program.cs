@@ -1,5 +1,6 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.API.DependencyInjection.Extensions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.PERSISTENCE.DependencyInjection.Options;
+using BEAUTIFY_QUERY.API.DependencyInjection.Extensions;
 using BEAUTIFY_QUERY.API.Middlewares;
 using BEAUTIFY_QUERY.APPLICATION.DependencyInjection.Extensions;
 using BEAUTIFY_QUERY.INFRASTRUCTURE.DependencyInjection.Extensions;
@@ -67,16 +68,11 @@ builder.Services.AddRedisInfrastructure(builder.Configuration);
 builder.Services.AddMediatRInfrastructure();
 builder.Services.AddMasstransitRabbitMqInfrastructure(builder.Configuration);
 // builder.Services.ConfigureHealthChecks(builder.Configuration);
-builder.Services.AddJwtAuthenticationAPI(builder.Configuration);
+builder.Services.AddJwtAuthenticationAPI1(builder.Configuration);
 
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 // builder.Services.AddTransient<ICurrentUserService, CurrentUserService>();
 builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -90,9 +86,11 @@ app.UseSwaggerAPI(); // => After MapCarter => Show Version
 app.UseCors("CorsPolicy");
 
 // app.UseHttpsRedirection();
-app.UseRouting();
+// app.UseRouting();
+
 app.UseAuthentication(); // Need to be before app.UseAuthorization();
 app.UseAuthorization();
+
 // app.MapDefaultHealthChecks();
 // app.MapDefaultHealthChecksUI();
 
