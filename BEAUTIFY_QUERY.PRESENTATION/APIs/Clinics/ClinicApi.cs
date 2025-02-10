@@ -22,6 +22,7 @@ public class ClinicApi: ApiEndpoint, ICarterModule
         gr1.MapGet("{id}", GetClinicDetail);
         gr1.MapGet("apply", GetAllApplyRequest);
         gr1.MapGet("apply/{id}", GetDetailApplyRequest);
+        gr1.MapGet("{clinicId}/employees", GetAllAccountOfEmployee);
     }
     
     private static async Task<IResult> GetAllClinics(
@@ -51,6 +52,11 @@ public class ClinicApi: ApiEndpoint, ICarterModule
     private static async Task<IResult> GetDetailApplyRequest(ISender sender, Guid id)
     {
         var result = await sender.Send(new Query.GetDetailApplyRequestQuery(id));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+    private static async Task<IResult> GetAllAccountOfEmployee(ISender sender, Guid clinicId)
+    {
+        var result = await sender.Send(new Query.GetAllAccountOfEmployeeQuery(clinicId));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }
