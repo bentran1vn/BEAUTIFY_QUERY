@@ -2,7 +2,6 @@ using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.PERSISTENCE;
-
 public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -28,6 +27,7 @@ public class ApplicationDbContext : DbContext
 
         builder.Entity<SubscriptionPackage>()
             .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<DoctorCertificate>()
+            .HasQueryFilter(x => !x.IsDeleted);
     }
-    
 }

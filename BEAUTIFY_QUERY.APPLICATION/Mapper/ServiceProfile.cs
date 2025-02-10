@@ -2,6 +2,7 @@ using AutoMapper;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Shared;
 using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
+using BEAUTIFY_QUERY.DOMAIN.Entities;
 
 namespace BEAUTIFY_QUERY.APPLICATION.Mapper;
 public class ServiceProfile : Profile
@@ -10,7 +11,9 @@ public class ServiceProfile : Profile
     {
         CreateMap<SubscriptionProjection, Response.GetSubscriptionResponse>();
         CreateMap<PagedResult<SubscriptionProjection>, PagedResult<Response.GetSubscriptionResponse>>();
-        
+
+       
+
         // CreateMap<ClinicOnBoardingRequest, CONTRACT.Services.Clinics.Response.GetApplyRequest>()
         //     .ForMember(dest => dest.Id,
         //         opt 
