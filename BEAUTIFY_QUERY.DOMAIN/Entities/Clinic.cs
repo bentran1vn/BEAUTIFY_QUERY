@@ -29,8 +29,10 @@ public class Clinic : AggregateRoot<Guid>, IAuditableEntity
 
 
     public virtual ICollection<UserClinic>? UserClinics { get; set; }
+    public virtual ICollection<Service>? ClinicServices { get; set; }
+    
     public virtual ICollection<LivestreamRoom>? LivestreamRooms { get; set; }
-    public virtual ICollection<Category>? Categories { get; set; }
+    // public virtual ICollection<Category>? Categories { get; set; }
     public virtual ICollection<ClinicVoucher>? ClinicVouchers { get; set; }
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? ModifiedOnUtc { get; set; }

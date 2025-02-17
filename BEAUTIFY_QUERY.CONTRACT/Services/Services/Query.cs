@@ -1,0 +1,18 @@
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Messages;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Shared;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+
+namespace BEAUTIFY_QUERY.CONTRACT.Services.Services;
+
+public class Query
+{
+    public record GetClinicServicesQuery(string? SearchTerm,
+        string? SortColumn,
+        SortOrder SortOrder,
+        int PageNumber,
+        int PageSize)
+        : IQuery<PagedResult<Response.GetAllServiceResponse>>;
+    
+    public record GetClinicServicesByIdQuery(Guid ServiceId)
+        : IQuery<Response.GetAllServiceByIdResponse>;
+}
