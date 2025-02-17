@@ -21,4 +21,7 @@ public class Query
 
     public record GetAllAccountOfEmployeeQuery(Guid ClinicId)
         : IQuery<List<Response.GetAccountOfEmployee>>;
+    
+    
+    
 }

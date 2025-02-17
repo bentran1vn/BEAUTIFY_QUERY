@@ -7,8 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.3.3" />
+        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.3.6" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BEAUTIFY_QUERY.DOMAIN\BEAUTIFY_QUERY.DOMAIN.csproj" />
     </ItemGroup>
 
 </Project>
