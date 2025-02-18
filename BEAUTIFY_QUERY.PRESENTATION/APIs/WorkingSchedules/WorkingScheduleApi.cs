@@ -15,7 +15,7 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var gr1 = app.NewVersionedApi("Working Schedules").MapGroup(BaseUrl).HasApiVersion(1);
-        gr1.MapGet(string.Empty, GetWorkingSchedules).WithSummary("Search Dang Loi Ti hihi");
+        gr1.MapGet(string.Empty, GetWorkingSchedules).WithSummary("Search theo Date : Date1 to Date2 or Time : Time1 to Time2|| search by DoctorName");
     }
 
     private static async Task<IResult> GetWorkingSchedules(ISender sender, string? searchTerm = null,

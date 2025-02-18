@@ -5,12 +5,11 @@ using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 using MongoDB.Driver.Linq;
 using System.Linq.Expressions;
-using AutoMapper;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
 internal sealed class GetWorkingScheduleQueryHandler(
-    IMongoRepository<WorkingScheduleProjection> repository,IMapper mapper)
+    IMongoRepository<WorkingScheduleProjection> repository)
     : IQueryHandler<Query.GetWorkingSchedule, PagedResult<Response.GetWorkingScheduleResponse>>
 {
     public async Task<Result<PagedResult<Response.GetWorkingScheduleResponse>>> Handle(Query.GetWorkingSchedule request,
@@ -20,12 +19,59 @@ internal sealed class GetWorkingScheduleQueryHandler(
         var query = repository.AsQueryable(x => !x.IsDeleted);
         if (!string.IsNullOrEmpty(searchTerm))
         {
-            query = query.Where(x =>
-                x.DoctorName.Contains(searchTerm) ||
-                x.Date.ToString().Contains(searchTerm) ||
-                x.StartTime.ToString().Contains(searchTerm) ||
-                x.EndTime.ToString().Contains(searchTerm));
+            // If the search term appears to be a range (e.g. "2025-02-01 to 2025-02-15" or "08:00 to 17:00")
+            if (searchTerm.IndexOf("to", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                var parts = searchTerm.Split(["to"], StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length == 2)
+                {
+                    var part1 = parts[0].Trim();
+                    var part2 = parts[1].Trim();
+
+                    // Try to parse as a date range
+                    if (DateOnly.TryParse(part1, out var dateFrom) &&
+                        DateOnly.TryParse(part2, out var dateTo))
+                    {
+                        query = query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
+                    }
+                    // Otherwise, try to parse as a time range
+                    else if (TimeSpan.TryParse(part1, out TimeSpan timeFrom) &&
+                             TimeSpan.TryParse(part2, out TimeSpan timeTo))
+                    {
+                        query = query.Where(x => x.StartTime >= timeFrom && x.EndTime <= timeTo);
+                    }
+                    else
+                    {
+                        // If the range parts can't be parsed, fall back to a standard contains search.
+                        query = query.Where(x =>
+                            x.Id.ToString().Contains(searchTerm) ||
+                            x.DoctorName!.Contains(searchTerm) ||
+                            x.Date.ToString().Contains(searchTerm) ||
+                            x.StartTime.ToString().Contains(searchTerm) ||
+                            x.EndTime.ToString().Contains(searchTerm));
+                    }
+                }
+                else
+                {
+                    // If "to" is present but splitting doesn't yield exactly two parts,
+                    // use the standard search.
+                    query = query.Where(x =>
+                        x.Id.ToString().Contains(searchTerm) ||
+                        x.DoctorName!.Contains(searchTerm) ||
+                        x.Date.ToString().Contains(searchTerm) ||
+                        x.StartTime.ToString().Contains(searchTerm) ||
+                        x.EndTime.ToString().Contains(searchTerm));
+                }
+            }
+            else
+            {
+                query = query.Where(x =>
+                    x.DocumentId.ToString().Contains(searchTerm) ||
+                    x.DoctorName!.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
+                    );
+            }
         }
+
 
         query = request.SortOrder == SortOrder.Descending
             ? query.OrderByDescending(GetSortProperty(request))
