@@ -9,9 +9,6 @@ public class Service : AggregateRoot<Guid>, IAuditableEntity
     [Column(TypeName = "decimal(18,2)")] public decimal Price { get; set; }
     public int NumberOfCustomersUsed { get; set; } = 0;
     
-    public Guid ClinicId { get; set; }
-    public virtual Clinic Clinics { get; set; }
-    
     public Guid CategoryId { get; set; }
     public virtual Category Category { get; set; }
     
@@ -19,6 +16,7 @@ public class Service : AggregateRoot<Guid>, IAuditableEntity
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? ModifiedOnUtc { get; set; }
 
+    public virtual ICollection<ClinicService>? ClinicServices { get; set; }
     public virtual ICollection<ServiceMedia>? ServiceMedias { get; set; }
     public virtual ICollection<Promotion>? Promotions { get; set; }
     public virtual ICollection<Procedure>? Procedures { get; set; }

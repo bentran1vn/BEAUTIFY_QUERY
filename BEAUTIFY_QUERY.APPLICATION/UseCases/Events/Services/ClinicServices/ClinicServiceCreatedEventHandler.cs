@@ -31,10 +31,9 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
                 serviceRequest.Category.Id,serviceRequest.Category.Name,
                 serviceRequest.Category.Description
             ),
-            Clinic = new Clinic(
-                serviceRequest.Clinic.Id, serviceRequest.Clinic.Name,
-                serviceRequest.Clinic.Email, serviceRequest.Clinic.Address,
-                serviceRequest.Clinic.PhoneNumber, serviceRequest.Clinic.ProfilePictureUrl),
+            Clinic = serviceRequest.Clinic.Select(x => new Clinic(
+                x.Id, x.Name, x.Email, x.Address, x.PhoneNumber,
+                x.ProfilePictureUrl, x.IsParent, x.ParentId)).ToList(),
             Procedures = []
         };
         

@@ -45,8 +45,8 @@ public class GetClinicServicesQueryHandler: IQueryHandler<Query.GetClinicService
         
         var mapList = services.Items.Select(x => new Response.GetAllServiceResponse(
             x.DocumentId, x.Name, x.Price, x.CoverImage,
-            new Response.Clinic(x.Clinic.Id, x.Clinic.Name, x.Clinic.Email,
-                x.Clinic.Address, x.Clinic.PhoneNumber, x.Clinic.ProfilePictureUrl),
+            x.Clinic.Select(y => new Response.Clinic(y.Id, y.Name, y.Email,
+                y.Address, y.PhoneNumber, y.ProfilePictureUrl, y.IsParent, y.ParentId)).ToList(),
             new Response.Category(x.Category.Id, x.Category.Name, x.Category.Description))
         ).ToList();
         

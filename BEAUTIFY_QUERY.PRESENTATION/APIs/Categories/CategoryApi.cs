@@ -18,12 +18,20 @@ public class CategoryApi: ApiEndpoint, ICarterModule
             .MapGroup(BaseUrl).HasApiVersion(1);
         
         gr1.MapGet(string.Empty, GetAllCategories);
+        gr1.MapGet("{id}", GetCategoryId);
     }
     
     private static async Task<IResult> GetAllCategories(
         ISender sender)
     {
         var result = await sender.Send(new Query.GetAllCategoriesQuery());
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+    
+    private static async Task<IResult> GetCategoryId(
+        ISender sender, Guid id)
+    {
+        var result = await sender.Send(new Query.GetCategoryByIdQuery(id));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }
