@@ -12,7 +12,7 @@ public class ClinicServiceProjection: Document
     public ICollection<string> DescriptionImage { get; set; }
     public decimal Price { get; set; }
     public Category Category { get; set; }
-    public Clinic Clinic { get; set; }
+    public ICollection<Clinic> Clinic { get; set; }
     
     public ICollection<Procedure> Procedures { get; set; } = Array.Empty<Procedure>();
 }
@@ -20,7 +20,8 @@ public class ClinicServiceProjection: Document
 public record Category(Guid Id, string Name, string Description);
     
 public record Clinic(Guid Id, string Name, string Email, string Address,
-    string PhoneNumber, string? ProfilePictureUrl);
+    string PhoneNumber, string? ProfilePictureUrl, bool? IsParent,
+    Guid? ParentId);
     
 public record Procedure(Guid Id, string Name, string Description,
     int StepIndex, string[] coverImage, ICollection<ProcedurePriceType> procedurePriceTypes

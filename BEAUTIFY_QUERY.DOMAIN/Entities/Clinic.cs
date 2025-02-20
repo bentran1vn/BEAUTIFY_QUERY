@@ -27,9 +27,8 @@ public class Clinic : AggregateRoot<Guid>, IAuditableEntity
     public virtual ICollection<ClinicOnBoardingRequest>? ClinicOnBoardingRequests { get; set; }
     public virtual ICollection<SystemTransaction>? SystemTransaction { get; set; }
 
-
+    public virtual ICollection<ClinicService>? ClinicServices { get; set; }
     public virtual ICollection<UserClinic>? UserClinics { get; set; }
-    public virtual ICollection<Service>? ClinicServices { get; set; }
     
     public virtual ICollection<LivestreamRoom>? LivestreamRooms { get; set; }
     // public virtual ICollection<Category>? Categories { get; set; }
