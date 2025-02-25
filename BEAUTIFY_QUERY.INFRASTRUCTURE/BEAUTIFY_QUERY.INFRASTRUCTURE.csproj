@@ -10,7 +10,6 @@
     <ItemGroup>
         <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.4.2" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4"/>
-        <PackageReference Remove="BEAUTIFY_PACKAGES.SHARE" />
         <PackageReference Update="BEAUTIFY_PACKAGES.SHARE" Version="1.4.6" />
     </ItemGroup>
 

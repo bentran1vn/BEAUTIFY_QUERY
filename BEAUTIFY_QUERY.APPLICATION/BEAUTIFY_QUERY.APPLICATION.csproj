@@ -15,7 +15,6 @@
       <PackageReference Include="MediatR" Version="12.4.1" />
       <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
       <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="8.0.0" />
-      <PackageReference Remove="BEAUTIFY_PACKAGES.SHARE" />
       <PackageReference Update="BEAUTIFY_PACKAGES.SHARE" Version="1.4.6" />
     </ItemGroup>
 
