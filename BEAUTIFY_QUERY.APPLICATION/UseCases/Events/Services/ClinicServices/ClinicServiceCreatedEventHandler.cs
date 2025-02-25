@@ -24,9 +24,18 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
             DocumentId = serviceRequest.Id,
             Name = serviceRequest.Name,
             Description = serviceRequest.Description,
-            CoverImage = serviceRequest.CoverImage,
-            DescriptionImage = serviceRequest.DescriptionImage,
-            Price = serviceRequest.Price,
+            CoverImage = serviceRequest.CoverImages.Select(x => new Image()
+            {
+                Id = x.Id,
+                Index = x.Index,
+                Url = x.Url
+            }).ToList(),
+            DescriptionImage = serviceRequest.DescriptionImages.Select(x => new Image()
+            {
+                Id = x.Id,
+                Index = x.Index,
+                Url = x.Url
+            }).ToList(),
             Category = new Category(
                 serviceRequest.Category.Id,serviceRequest.Category.Name,
                 serviceRequest.Category.Description

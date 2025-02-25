@@ -10,7 +10,8 @@ public class Query
         string? SortColumn,
         SortOrder SortOrder,
         int PageNumber,
-        int PageSize)
+        int PageSize,
+        Guid? MainClinicId)
         : IQuery<PagedResult<Response.GetAllServiceResponse>>;
     
     public record GetClinicServicesByIdQuery(Guid ServiceId)

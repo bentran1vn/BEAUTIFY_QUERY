@@ -27,6 +27,15 @@ public class GetClinicServicesQueryHandler: IQueryHandler<Query.GetClinicService
         var query = _clinicServiceRepository.AsQueryable();
         
         // 3. If a search term was provided, filter further
+        if (request.MainClinicId.HasValue)
+        {
+            query = query.Where(x => x.Clinic.Any(
+                c => c.Id == request.MainClinicId.Value ||
+                     c.ParentId == request.MainClinicId.Value)
+            );
+        }
+        
+        // 3. If a search term was provided, filter further
         if (!string.IsNullOrEmpty(searchTerm))
         {
             query = query.Where(x => x.Name.Contains(searchTerm) || x.Description.Contains(searchTerm));
@@ -44,7 +53,9 @@ public class GetClinicServicesQueryHandler: IQueryHandler<Query.GetClinicService
         );
         
         var mapList = services.Items.Select(x => new Response.GetAllServiceResponse(
-            x.DocumentId, x.Name, x.Price, x.CoverImage,
+            x.DocumentId, x.Name, x.MaxPrice, x.MinPrice, (x.DiscountPercent * 100).ToString(),
+            x.DiscountMaxPrice, x.DiscountMinPrice,
+            x.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
             x.Clinic.Select(y => new Response.Clinic(y.Id, y.Name, y.Email,
                 y.Address, y.PhoneNumber, y.ProfilePictureUrl, y.IsParent, y.ParentId)).ToList(),
             new Response.Category(x.Category.Id, x.Category.Name, x.Category.Description))
@@ -60,7 +71,7 @@ public class GetClinicServicesQueryHandler: IQueryHandler<Query.GetClinicService
         return request.SortColumn?.ToLower() switch
         {
             "name" => projection => projection.Name,
-            "price" => projection => projection.Price,
+            "price" => projection => projection.DiscountMaxPrice,
             _ => projection => projection.CreatedOnUtc
         };
     }
