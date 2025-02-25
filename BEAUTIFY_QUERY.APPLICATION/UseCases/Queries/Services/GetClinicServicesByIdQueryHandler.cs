@@ -26,7 +26,9 @@ public class GetClinicServicesByIdQueryHandler: IQueryHandler<Query.GetClinicSer
 
         var result = new Response.GetAllServiceByIdResponse(
             isServiceExisted.DocumentId, isServiceExisted.Name, isServiceExisted.Description,
-            isServiceExisted.Price, isServiceExisted.CoverImage, isServiceExisted.DescriptionImage,
+            isServiceExisted.MaxPrice, isServiceExisted.MinPrice, isServiceExisted.DiscountMaxPrice, isServiceExisted.DiscountMinPrice,
+            isServiceExisted.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
+            isServiceExisted.DescriptionImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
             isServiceExisted.Clinic.Select(y => new Response.Clinic(y.Id, y.Name, y.Email,
                 y.Address, y.PhoneNumber, y.ProfilePictureUrl, y.IsParent, y.ParentId)).ToList(),
             new Response.Category(isServiceExisted.Category.Id, isServiceExisted.Category.Name,

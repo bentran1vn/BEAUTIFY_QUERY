@@ -1,3 +1,4 @@
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Shared;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.PRESENTATION.Abstractions;
 using BEAUTIFY_QUERY.CONTRACT.Services.Categories;
 using Carter;
@@ -22,9 +23,12 @@ public class CategoryApi: ApiEndpoint, ICarterModule
     }
     
     private static async Task<IResult> GetAllCategories(
-        ISender sender)
+        ISender sender, int? pageIndex = 1,
+    int? pageSize = 10)
     {
-        var result = await sender.Send(new Query.GetAllCategoriesQuery());
+        Result result;
+        if(pageIndex != null && pageSize == null) result = await sender.Send(new Query.GetAllCategoriesQuery());
+        else result = await sender.Send(new Query.GetAllCategoriesPagingQuery((int)pageIndex!, (int)pageSize!));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
     

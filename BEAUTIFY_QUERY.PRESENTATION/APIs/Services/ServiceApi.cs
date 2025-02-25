@@ -24,15 +24,17 @@ public class ServiceApi: ApiEndpoint, ICarterModule
     }
     
     private static async Task<IResult> GetAllServices(
-        ISender sender, string? searchTerm = null,
+        ISender sender,  HttpContext httpContext, string? searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,
         int pageIndex = 1,
         int pageSize = 10)
     {
+        var mainClinicId = httpContext.User.FindFirst(c => c.Type == "ClinicId")?.Value;
+        
         var result = await sender.Send(new Query.GetClinicServicesQuery(searchTerm,
             sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
-            pageIndex, pageSize));
+            pageIndex, pageSize, !string.IsNullOrEmpty(mainClinicId) ? new Guid(mainClinicId) : null));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
     

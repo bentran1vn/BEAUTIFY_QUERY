@@ -38,6 +38,12 @@ public class ProcedureCreatedEventHandler: ICommandHandler<DomainEvents.Procedur
         
         isServiceExisted.Procedures = procedures;
         
+        isServiceExisted.MinPrice = createRequest.MinPrice;
+        isServiceExisted.MaxPrice = createRequest.MaxPrice;
+        
+        isServiceExisted.DiscountMinPrice = createRequest.DiscountMinPrice ?? createRequest.MinPrice;
+        isServiceExisted.DiscountMaxPrice = createRequest.DiscountMaxPrice ?? createRequest.MaxPrice;
+        
         await _clinicServiceRepository.ReplaceOneAsync(isServiceExisted);
         
         return Result.Success();

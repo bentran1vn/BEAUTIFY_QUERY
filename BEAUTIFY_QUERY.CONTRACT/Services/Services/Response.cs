@@ -3,8 +3,11 @@ namespace BEAUTIFY_QUERY.CONTRACT.Services.Services;
 public class Response
 {
     public record GetAllServiceResponse(
-        Guid Id, string Name, decimal Price,
-        ICollection<string> CoverImage,
+        Guid Id, string Name,
+        decimal MaxPrice, decimal MinPrice,
+        string discountPercent,
+        decimal DiscountMaxPrice, decimal DiscountMinPrice,
+        ICollection<Image> CoverImage,
         ICollection<Clinic> Clinics, Category Category);
     
     public record Category(Guid Id, string Name, string Description);
@@ -13,8 +16,10 @@ public class Response
         string PhoneNumber, string? ProfilePictureUrl, bool? IsParent, Guid? ParentId);
     
     public record GetAllServiceByIdResponse(
-        Guid Id, string Name, string Description, decimal Price,
-        ICollection<string> CoverImage, ICollection<string> DescriptionImage,
+        Guid Id, string Name, string Description,
+        decimal MaxPrice, decimal MinPrice,
+        decimal DiscountMaxPrice, decimal DiscountMinPrice,
+        ICollection<Image> CoverImage, ICollection<Image> DescriptionImage,
         ICollection<Clinic> Clinics, Category Category, ICollection<Procedure> Procedures);
     
     public record Procedure(Guid Id, string Name, string Description,
@@ -22,4 +27,6 @@ public class Response
     );
 
     public record ProcedurePriceType(Guid Id, string Name, decimal Price);
+    
+    public record Image(Guid Id, int Index, string Url);
 }
