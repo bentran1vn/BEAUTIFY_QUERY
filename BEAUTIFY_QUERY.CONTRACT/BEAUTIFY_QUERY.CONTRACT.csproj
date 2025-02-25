@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+    <Import Project="..\Directory.Packages.props" />
+    
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -8,6 +9,8 @@
 
     <ItemGroup>
       <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.4.1" />
+      <PackageReference Remove="BEAUTIFY_PACKAGES.SHARE" />
+      <PackageReference Update="BEAUTIFY_PACKAGES.SHARE" Version="1.4.6" />
     </ItemGroup>
 
 </Project>
