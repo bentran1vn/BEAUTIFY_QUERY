@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+    <Import Project="..\Directory.Packages.props" />
+    
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -10,6 +11,8 @@
       <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
       <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.4.1" />
       <PackageReference Include="Carter" Version="7.2.0" />
+      <PackageReference Remove="BEAUTIFY_PACKAGES.SHARE" />
+      <PackageReference Update="BEAUTIFY_PACKAGES.SHARE" Version="1.4.6" />
     </ItemGroup>
 
     <ItemGroup>
