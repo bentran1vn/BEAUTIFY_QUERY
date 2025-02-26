@@ -43,7 +43,8 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
             Clinic = serviceRequest.Clinic.Select(x => new Clinic(
                 x.Id, x.Name, x.Email, x.Address, x.PhoneNumber,
                 x.ProfilePictureUrl, x.IsParent, x.ParentId)).ToList(),
-            Procedures = []
+            Procedures = [],
+            
         };
         
         await _clinicServiceRepository.InsertOneAsync(service);

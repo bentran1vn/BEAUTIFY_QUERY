@@ -17,5 +17,5 @@ public class Category : AggregateRoot<Guid>, IAuditableEntity
 
     public virtual ICollection<Service> Services { get; set; } = [];
 
-    public virtual ICollection<DoctorService>? DoctorServices { get; set; }
+ //   public virtual ICollection<DoctorService>? DoctorServices { get; set; }
 }
