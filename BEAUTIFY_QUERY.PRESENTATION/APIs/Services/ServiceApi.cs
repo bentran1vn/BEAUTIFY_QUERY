@@ -39,9 +39,11 @@ public class ServiceApi: ApiEndpoint, ICarterModule
     }
     
     private static async Task<IResult> GetServicesById(
-        ISender sender, Guid id)
+        ISender sender, HttpContext httpContext, Guid id)
     {
-        var result = await sender.Send(new Query.GetClinicServicesByIdQuery(id));
+        var mainClinicId = httpContext.User.FindFirst(c => c.Type == "ClinicId")?.Value;
+        
+        var result = await sender.Send(new Query.GetClinicServicesByIdQuery(id, !string.IsNullOrEmpty(mainClinicId) ? new Guid(mainClinicId) : null));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }
