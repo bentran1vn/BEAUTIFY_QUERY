@@ -8,7 +8,7 @@ public class Response
         string Name,
         decimal MaxPrice,
         decimal MinPrice,
-        string discountPercent,
+        string DiscountPercent,
         decimal DiscountMaxPrice,
         decimal DiscountMinPrice,
         ICollection<Image> CoverImage,
@@ -60,6 +60,7 @@ public class Response
         string Description,
         decimal MaxPrice,
         decimal MinPrice,
+        string DiscountPercent,
         decimal DiscountMaxPrice,
         decimal DiscountMinPrice,
         ICollection<Image> CoverImage,
@@ -67,6 +68,7 @@ public class Response
         ICollection<Clinic> Clinics,
         Category Category,
         ICollection<Procedure> Procedures,
+        ICollection<Promotion>? Promotions,
         ICollection<DoctorService>? DoctorServices);
 
     public record Procedure(
@@ -81,4 +83,13 @@ public class Response
     public record ProcedurePriceType(Guid Id, string Name, decimal Price);
 
     public record Image(Guid Id, int Index, string Url);
+
+    public class Promotion(
+        Guid Id,
+        string Name,
+        double DiscountPercent,
+        string ImageUrl,
+        DateTimeOffset StartDay,
+        DateTimeOffset EndDate,
+        bool IsActivated);
 }

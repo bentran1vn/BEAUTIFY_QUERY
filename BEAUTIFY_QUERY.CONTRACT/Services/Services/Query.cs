@@ -14,6 +14,6 @@ public class Query
         Guid? MainClinicId)
         : IQuery<PagedResult<Response.GetAllServiceResponse>>;
     
-    public record GetClinicServicesByIdQuery(Guid ServiceId)
+    public record GetClinicServicesByIdQuery(Guid ServiceId, Guid? MainClinicId)
         : IQuery<Response.GetAllServiceByIdResponse>;
 }
