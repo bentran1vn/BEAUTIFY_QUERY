@@ -22,7 +22,7 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         gr1.MapGet("apply", GetAllApplyRequest);
         gr1.MapGet("apply/{id}", GetDetailApplyRequest);
         gr1.MapGet("{clinicId}/employees", GetAllAccountOfEmployee);
-        gr1.MapGet("{clinicId}/branches", GetAllClinicBranch);
+        gr1.MapGet("branches", GetAllClinicBranch);
     }
 
     private static async Task<IResult> GetAllClinics(
