@@ -8,8 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Clinics;
-
-public class ClinicApi: ApiEndpoint, ICarterModule
+public class ClinicApi : ApiEndpoint, ICarterModule
 {
     private const string BaseUrl = "/api/v{version:apiVersion}/clinics";
 
@@ -23,8 +22,9 @@ public class ClinicApi: ApiEndpoint, ICarterModule
         gr1.MapGet("apply", GetAllApplyRequest);
         gr1.MapGet("apply/{id}", GetDetailApplyRequest);
         gr1.MapGet("{clinicId}/employees", GetAllAccountOfEmployee);
+        gr1.MapGet("{clinicId}/branches", GetAllClinicBranch);
     }
-    
+
     private static async Task<IResult> GetAllClinics(
         ISender sender,
         string? serchTerm = null,
@@ -38,25 +38,34 @@ public class ClinicApi: ApiEndpoint, ICarterModule
             pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
+
     private static async Task<IResult> GetClinicDetail(ISender sender, Guid id)
     {
         var result = await sender.Send(new Query.GetClinicDetailQuery(id));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
-    
+
     private static async Task<IResult> GetAllApplyRequest(ISender sender, int pageIndex = 1, int pageSize = 10)
     {
         var result = await sender.Send(new Query.GetAllApplyRequestQuery(pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
+
     private static async Task<IResult> GetDetailApplyRequest(ISender sender, Guid id)
     {
         var result = await sender.Send(new Query.GetDetailApplyRequestQuery(id));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
+
     private static async Task<IResult> GetAllAccountOfEmployee(ISender sender, Guid clinicId)
     {
         var result = await sender.Send(new Query.GetAllAccountOfEmployeeQuery(clinicId));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetAllClinicBranch(ISender sender, Guid clinicId)
+    {
+        var result = await sender.Send(new Query.GetAllClinicBranchQuery(clinicId));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }

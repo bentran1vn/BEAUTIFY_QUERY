@@ -21,7 +21,7 @@ public class Query
 
     public record GetAllAccountOfEmployeeQuery(Guid ClinicId)
         : IQuery<List<Response.GetAccountOfEmployee>>;
-    
-    
-    
+
+    public record GetAllClinicBranchQuery(Guid ClinicId)
+        : IQuery<List<Response.GetClinicDetail>>;
 }
