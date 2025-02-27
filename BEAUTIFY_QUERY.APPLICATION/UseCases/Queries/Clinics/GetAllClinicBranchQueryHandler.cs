@@ -7,20 +7,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 public class GetAllClinicBranchQueryHandler(IRepositoryBase<Clinic, Guid> _clinicRepository)
-    : IQueryHandler<Query.GetAllClinicBranchQuery, List<Response.GetClinicDetail>>
+    : IQueryHandler<Query.GetAllClinicBranchQuery, List<Response.GetClinics>>
 {
-    public async Task<Result<List<Response.GetClinicDetail>>> Handle(Query.GetAllClinicBranchQuery request,
+    public async Task<Result<List<Response.GetClinics>>> Handle(Query.GetAllClinicBranchQuery request,
         CancellationToken cancellationToken)
     {
         var clinic = await _clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken);
-        if (clinic == null) return Result.Failure<List<Response.GetClinicDetail>>(new Error("404", "Clinic not found"));
+        if (clinic == null) return Result.Failure<List<Response.GetClinics>>(new Error("404", "Clinic not found"));
         var clinicBranches =
             await _clinicRepository.FindAll(x => x.ParentId == clinic.Id).ToListAsync(cancellationToken);
         var result = clinicBranches.Select(x =>
-            new Response.GetClinicDetail
+            new Response.GetClinics
             (x.Id,
-                x.Name, x.Email, x.PhoneNumber, x.Address, x.TaxCode, x.BusinessLicenseUrl, x.OperatingLicenseUrl,
-                x.OperatingLicenseExpiryDate, x.ProfilePictureUrl, clinic.TotalBranches.Value, x.IsActivated)).ToList();
+                x.Name, x.Email, x.Address, clinic.TotalBranches ?? 0, x.IsActivated)).ToList();
 
         return Result.Success(result);
     }

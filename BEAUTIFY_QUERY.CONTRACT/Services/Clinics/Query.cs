@@ -23,5 +23,5 @@ public class Query
         : IQuery<List<Response.GetAccountOfEmployee>>;
 
     public record GetAllClinicBranchQuery(Guid ClinicId)
-        : IQuery<List<Response.GetClinicDetail>>;
+        : IQuery<List<Response.GetClinics>>;
 }
