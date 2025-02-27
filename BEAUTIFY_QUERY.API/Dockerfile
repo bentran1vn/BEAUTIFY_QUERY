@@ -17,7 +17,7 @@ COPY ["BEAUTIFY_QUERY.PRESENTATION/BEAUTIFY_QUERY.PRESENTATION.csproj", "BEAUTIF
 RUN dotnet restore "BEAUTIFY_QUERY.API/BEAUTIFY_QUERY.API.csproj"
 COPY . .
 WORKDIR "/src/BEAUTIFY_QUERY.API"
-RUN dotnet build "BEAUTIFY_QUERY.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "BEAUTIFY_QUERY.API.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore -p:TreatWarningsAsErrors=false -p:NoWarn=all
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
