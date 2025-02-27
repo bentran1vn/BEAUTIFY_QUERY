@@ -63,9 +63,17 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
-    private static async Task<IResult> GetAllClinicBranch(ISender sender, Guid clinicId)
+    private static async Task<IResult> GetAllClinicBranch(
+        ISender sender,
+        string? searchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        int pageIndex = 1,
+        int pageSize = 10)
     {
-        var result = await sender.Send(new Query.GetAllClinicBranchQuery(clinicId));
+        var result = await sender.Send(new Query.GetAllClinicBranchQuery(searchTerm,
+            sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }

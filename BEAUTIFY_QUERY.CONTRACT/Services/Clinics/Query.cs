@@ -22,6 +22,9 @@ public class Query
     public record GetAllAccountOfEmployeeQuery(Guid ClinicId)
         : IQuery<List<Response.GetAccountOfEmployee>>;
 
-    public record GetAllClinicBranchQuery(Guid ClinicId)
-        : IQuery<List<Response.GetClinics>>;
+    public record GetAllClinicBranchQuery(string? SearchTerm,
+        string? SortColumn,
+        SortOrder? SortOrder,
+        int PageIndex,
+        int PageSize) : IQuery<PagedResult<Response.GetClinics>>;
 }
