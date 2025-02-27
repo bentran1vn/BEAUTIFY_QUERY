@@ -1,4 +1,5 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.API.DependencyInjection.Extensions;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.PERSISTENCE.DependencyInjection.Options;
 using BEAUTIFY_QUERY.API.DependencyInjection.Extensions;
 using BEAUTIFY_QUERY.API.Middlewares;
@@ -71,7 +72,7 @@ builder.Services.AddMasstransitRabbitMqInfrastructure(builder.Configuration);
 builder.Services.AddJwtAuthenticationAPI1(builder.Configuration);
 
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
-// builder.Services.AddTransient<ICurrentUserService, CurrentUserService>();
+builder.Services.AddTransient<ICurrentUserService, CurrentUserService>();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
