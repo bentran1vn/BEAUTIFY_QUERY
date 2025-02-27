@@ -7,8 +7,8 @@ using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 internal sealed class GetClinicsQueryHandler(
-    IRepositoryBase<DOMAIN.Entities.Clinic, Guid> clinicRepository,
-    ICurrentUserService currentUserService)
+    IRepositoryBase<DOMAIN.Entities.Clinic, Guid> clinicRepository
+    )
     : IQueryHandler<Query.GetClinicsQuery, PagedResult<Response.GetClinics>>
 {
     public async Task<Result<PagedResult<Response.GetClinics>>> Handle(Query.GetClinicsQuery request,
