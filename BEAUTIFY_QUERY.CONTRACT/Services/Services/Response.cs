@@ -18,6 +18,7 @@ public class Response
 
 
     public record DoctorService(
+        Guid Id,
         Guid ServiceId,
         UserEntity Doctor);
 
@@ -65,7 +66,8 @@ public class Response
         ICollection<Image> DescriptionImage,
         ICollection<Clinic> Clinics,
         Category Category,
-        ICollection<Procedure> Procedures);
+        ICollection<Procedure> Procedures,
+        ICollection<DoctorService>? DoctorServices);
 
     public record Procedure(
         Guid Id,

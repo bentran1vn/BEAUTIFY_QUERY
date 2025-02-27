@@ -61,7 +61,7 @@ public class
             x.Clinic.Select(y => new Response.Clinic(y.Id, y.Name, y.Email,
                 y.Address, y.PhoneNumber, y.ProfilePictureUrl, y.IsParent, y.ParentId)).ToList(),
             new Response.Category(x.Category.Id, x.Category.Name, x.Category.Description), x.DoctorServices.Select(y =>
-                new Response.DoctorService(y.ServiceId,
+                new Response.DoctorService(y.Id,y.ServiceId,
                     new Response.UserEntity(y.Doctor.Id, y.Doctor.FullName, y.Doctor.Email, y.Doctor.PhoneNumber,
                         y.Doctor.ProfilePictureUrl, []))).ToList())
         ).ToList();

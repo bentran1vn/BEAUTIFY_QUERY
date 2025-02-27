@@ -9,4 +9,7 @@ public class DoctorServicesConsumer
 {
     public class DoctorServiceCreatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.DoctorServiceCreated>(sender, repository);
+
+    public class DoctorServiceDeletedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.DoctorServiceDeleted>(sender, repository);
 }
