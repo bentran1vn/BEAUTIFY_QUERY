@@ -8,10 +8,12 @@ using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
-public class GetAllClinicBranchQueryHandler(IRepositoryBase<Clinic, Guid> _clinicRepository)
-    : IQueryHandler<Query.GetAllClinicBranchQuery, PagedResult<Response.GetClinics>>
+public class GetAllClinicBranchQueryHandler(
+    IRepositoryBase<Clinic, Guid> _clinicRepository,
+    ICurrentUserService _currentUserService)
+    : IQueryHandler<Query.GetAllClinicBranchQuery, PagedResult<Response.GetClinicBranches>>
 {
-    public async Task<Result<PagedResult<Response.GetClinics>>> Handle(Query.GetAllClinicBranchQuery request,
+    public async Task<Result<PagedResult<Response.GetClinicBranches>>> Handle(Query.GetAllClinicBranchQuery request,
         CancellationToken cancellationToken)
     {
         /* var clinic = await _clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken);
@@ -26,7 +28,7 @@ public class GetAllClinicBranchQueryHandler(IRepositoryBase<Clinic, Guid> _clini
          return Result.Success(result);*/
 
         var searchTerm = request.SearchTerm?.Trim() ?? string.Empty;
-        var query = _clinicRepository.FindAll();
+        var query = _clinicRepository.FindAll(x => x.ParentId == _currentUserService.ClinicId);
 
         if (!string.IsNullOrEmpty(searchTerm))
         {
@@ -43,11 +45,21 @@ public class GetAllClinicBranchQueryHandler(IRepositoryBase<Clinic, Guid> _clini
         var result = await PagedResult<Clinic>.CreateAsync(query, request.PageIndex, request.PageSize);
 
         var mapped = result.Items.Select(x =>
-            new Response.GetClinics(x.Id, x.Name, x.Email, x.Address,
-                x.TotalBranches ?? 0, x.IsActivated)).ToList();
+            new Response.GetClinicBranches(
+                x.Id,
+                x.Name,
+                x.Email,
+                x.Address,
+                x.TaxCode,
+                x.BusinessLicenseUrl,
+                x.OperatingLicenseUrl,
+                x.OperatingLicenseExpiryDate,
+                x.ProfilePictureUrl,
+                x.IsActivated)
+        ).ToList();
 
         return Result.Success(
-            new PagedResult<Response.GetClinics>(mapped, result.TotalCount, result.PageIndex, result.PageSize));
+            new PagedResult<Response.GetClinicBranches>(mapped, result.TotalCount, result.PageIndex, result.PageSize));
     }
 
     private static Expression<Func<Clinic, object>> GetSortProperty(Query.GetAllClinicBranchQuery request)

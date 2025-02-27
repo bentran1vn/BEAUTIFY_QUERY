@@ -3,6 +3,18 @@ public static class Response
 {
     public record GetClinics(Guid Id, string Name, string Email, string Address, int TotalBranches, bool IsActivated);
 
+    public record GetClinicBranches(
+        Guid Id,
+        string Name,
+        string Email,
+        string Address,
+        string TaxCode,
+        string BusinessLicenseUrl,
+        string OperatingLicenseUrl,
+        DateTimeOffset? OperatingLicenseExpiryDate,
+        string? ProfilePictureUrl,
+        bool IsActivated);
+
     public record GetClinicDetail(
         Guid Id,
         string Name,

@@ -26,5 +26,5 @@ public class Query
         string? SortColumn,
         SortOrder? SortOrder,
         int PageIndex,
-        int PageSize) : IQuery<PagedResult<Response.GetClinics>>;
+        int PageSize) : IQuery<PagedResult<Response.GetClinicBranches>>;
 }
