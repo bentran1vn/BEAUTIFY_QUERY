@@ -16,17 +16,7 @@ public class GetAllClinicBranchQueryHandler(
     public async Task<Result<PagedResult<Response.GetClinicBranches>>> Handle(Query.GetAllClinicBranchQuery request,
         CancellationToken cancellationToken)
     {
-        /* var clinic = await _clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken);
-         if (clinic == null) return Result.Failure<List<Response.GetClinics>>(new Error("404", "Clinic not found"));
-         var clinicBranches =
-             await _clinicRepository.FindAll(x => x.ParentId == clinic.Id).ToListAsync(cancellationToken);
-         var result = clinicBranches.Select(x =>
-             new Response.GetClinics
-             (x.Id,
-                 x.Name, x.Email, x.Address, clinic.TotalBranches ?? 0, x.IsActivated)).ToList();
-
-         return Result.Success(result);*/
-
+       
         var searchTerm = request.SearchTerm?.Trim() ?? string.Empty;
         var query = _clinicRepository.FindAll(x => x.ParentId == _currentUserService.ClinicId);
 
