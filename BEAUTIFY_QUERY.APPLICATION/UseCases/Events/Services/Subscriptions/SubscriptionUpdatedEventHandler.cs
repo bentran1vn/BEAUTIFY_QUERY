@@ -16,7 +16,8 @@ internal sealed class SubscriptionUpdatedEventHandler : ICommandHandler<DomainEv
 
     public async Task<Result> Handle(DomainEvents.SubscriptionUpdated request, CancellationToken cancellationToken)
     {
-        var currentSubscription = await _subscriptionRepository.FindOneAsync(x=>x.DocumentId == request.subscription.Id);
+        var currentSubscription =
+            await _subscriptionRepository.FindOneAsync(x => x.DocumentId == request.subscription.Id);
         if (currentSubscription is null)
         {
             return Result.Failure(new Error("404", "Subscription not found"));
@@ -28,6 +29,8 @@ internal sealed class SubscriptionUpdatedEventHandler : ICommandHandler<DomainEv
         currentSubscription.Duration = request.subscription.Duration;
         currentSubscription.IsActivated = request.subscription.IsActivated;
         currentSubscription.IsDeleted = request.subscription.IsDeleted;
+        currentSubscription.LimitBranch = request.subscription.LimitBranch;
+        currentSubscription.LimitLiveStream = request.subscription.LimitLiveStream;
         await _subscriptionRepository.ReplaceOneAsync(currentSubscription);
         return Result.Success();
     }

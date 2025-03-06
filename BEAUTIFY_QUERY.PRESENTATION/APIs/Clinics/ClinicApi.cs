@@ -1,5 +1,4 @@
 using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
-using Microsoft.AspNetCore.Http;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Clinics;
 public class ClinicApi : ApiEndpoint, ICarterModule
@@ -21,13 +20,13 @@ public class ClinicApi : ApiEndpoint, ICarterModule
 
     private static async Task<IResult> GetAllClinics(
         ISender sender,
-        string? serchTerm = null,
+        string? searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,
         int pageIndex = 1,
         int pageSize = 10)
     {
-        var result = await sender.Send(new Query.GetClinicsQuery(serchTerm,
+        var result = await sender.Send(new Query.GetClinicsQuery(searchTerm,
             sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);

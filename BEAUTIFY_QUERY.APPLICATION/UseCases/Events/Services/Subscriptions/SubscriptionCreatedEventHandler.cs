@@ -24,7 +24,9 @@ internal sealed class SubscriptionCreatedEventHandler : ICommandHandler<DomainEv
             Price = request.subscription.Price,
             Duration = request.subscription.Duration,
             IsActivated = request.subscription.IsActivated,
-            IsDeleted = request.subscription.IsDeleted
+            IsDeleted = request.subscription.IsDeleted,
+            LimitBranch = request.subscription.LimitBranch,
+            LimitLiveStream = request.subscription.LimitLiveStream,
         };
         await _subscriptionRepository.InsertOneAsync(subscription);
         return Result.Success();

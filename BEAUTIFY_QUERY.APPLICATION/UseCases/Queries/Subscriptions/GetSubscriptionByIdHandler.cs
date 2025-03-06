@@ -27,7 +27,9 @@ public class GetSubscriptionByIdHandler : IQueryHandler<Query.GetSubscriptionByI
             Name = subscription.Name,
             Description = subscription.Description,
             Price = subscription.Price,
-            Duration = subscription.Duration
+            Duration = subscription.Duration,
+            LimitBranch = subscription.LimitBranch,
+            LimitLiveStream = subscription.LimitLiveStream,
         };
         return Result.Success(response);
     }
