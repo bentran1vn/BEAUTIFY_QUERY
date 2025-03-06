@@ -27,7 +27,8 @@ public static class Response
         DateTimeOffset? OperatingLicenseExpiryDate,
         string? ProfilePictureUrl,
         int TotalBranches,
-        bool IsActivated);
+        bool IsActivated,
+        List<GetClinicDetail>? Branches = null);
 
     public record GetApplyRequest(Guid Id, string Name, string Email, string Address, int TotalApply);
 
