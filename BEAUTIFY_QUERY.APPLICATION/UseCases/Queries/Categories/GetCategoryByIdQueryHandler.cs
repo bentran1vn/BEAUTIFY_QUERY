@@ -1,10 +1,8 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Messages;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Shared;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Categories;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Categories;
 public class GetCategoryByIdQueryHandler(
@@ -17,9 +15,7 @@ public class GetCategoryByIdQueryHandler(
         var category = await categoryRepository.FindByIdAsync(request.Id, cancellationToken, x => x.Children);
 
         if (category == null || category.IsDeleted)
-        {
             return Result.Failure<Response.GetAllCategoriesWithSubCategories>(new Error("404", "Category not found"));
-        }
 
         var subCategories = category.Children?.Select(MapToResponse).ToList() ?? [];
 

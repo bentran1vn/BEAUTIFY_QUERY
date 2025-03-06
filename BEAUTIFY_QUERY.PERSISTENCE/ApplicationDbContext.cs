@@ -11,6 +11,8 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.Entity<Category>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Order>().HasQueryFilter(x => !x.IsDeleted);
         builder.ApplyConfigurationsFromAssembly(AssemblyReference.Assembly);
         builder.Entity<CustomerSchedule>()
             .HasOne(cs => cs.Customer)

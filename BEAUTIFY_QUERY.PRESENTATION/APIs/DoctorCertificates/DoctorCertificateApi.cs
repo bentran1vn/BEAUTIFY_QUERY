@@ -1,12 +1,5 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Extensions;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.PRESENTATION.Abstractions;
-using BEAUTIFY_QUERY.CONTRACT.Services.DoctorCertificates;
-using Carter;
-using MediatR;
-using Microsoft.AspNetCore.Builder;
+﻿using BEAUTIFY_QUERY.CONTRACT.Services.DoctorCertificates;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.DoctorCertificates;
 public class DoctorCertificateApi : ApiEndpoint, ICarterModule

@@ -1,11 +1,7 @@
 ﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Extensions;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.PRESENTATION.Abstractions;
 using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
-using Carter;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.WorkingSchedules;
 public class WorkingScheduleApi : ApiEndpoint, ICarterModule

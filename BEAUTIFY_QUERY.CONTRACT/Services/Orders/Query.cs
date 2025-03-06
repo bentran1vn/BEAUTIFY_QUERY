@@ -1,0 +1,14 @@
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Messages;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Shared;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+
+namespace BEAUTIFY_QUERY.CONTRACT.Services.Orders;
+public static class Query
+{
+    public record GetOrdersByCustomerId(
+        string? SearchTerm,
+        string? SortColumn,
+        SortOrder? SortOrder,
+        int PageIndex,
+        int PageSize) : IQuery<PagedResult<Response.Order>>;
+}
