@@ -3,29 +3,30 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Shared;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Categories;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Categories;
-
-public class GetCategoryByIdQueryHandler: IQueryHandler<Query.GetCategoryByIdQuery,Response.GetAllCategories>
+public class
+    GetCategoryByIdQueryHandler(IRepositoryBase<Category, Guid> categoryRepository)
+    : IQueryHandler<Query.GetCategoryByIdQuery, Response.GetAllCategoriesWithSubCategories>
 {
-    private readonly IRepositoryBase<Category, Guid> _categoryRepository;
-
-    public GetCategoryByIdQueryHandler(IRepositoryBase<Category, Guid> categoryRepository)
+    public async Task<Result<Response.GetAllCategoriesWithSubCategories>> Handle(Query.GetCategoryByIdQuery request,
+        CancellationToken cancellationToken)
     {
-        _categoryRepository = categoryRepository;
-    }
-
-    public async Task<Result<Response.GetAllCategories>> Handle(Query.GetCategoryByIdQuery request, CancellationToken cancellationToken)
-    {
-        var category = await _categoryRepository.FindByIdAsync(request.Id, cancellationToken);
+        var category = await categoryRepository.FindByIdAsync(request.Id, cancellationToken,x=>x.Children);
 
         if (category == null || category.IsDeleted)
         {
-            return Result.Failure<Response.GetAllCategories>(new Error("400", "Category not found"));
+            return Result.Failure<Response.GetAllCategoriesWithSubCategories>(new Error("400", "Category not found"));
         }
 
-        var result = new Response.GetAllCategories(category.Id, category.Name, category.Description ?? "",
-            category.IsParent, category.ParentId, category.IsDeleted);
+        var subCategories =
+            await categoryRepository.FindAll(x => x.ParentId == request.Id).ToListAsync(cancellationToken);
+        var result = new Response.GetAllCategoriesWithSubCategories(category.Id, category.Name,
+            category.Description ?? "",
+            category.IsParent, category.ParentId, category.IsDeleted, subCategories.Select(x =>
+                new Response.GetAllCategories(x.Id, x.Name, x.Description ?? "",
+                    x.IsParent, x.ParentId, x.IsDeleted)).ToList());
 
         return Result.Success(result);
     }
