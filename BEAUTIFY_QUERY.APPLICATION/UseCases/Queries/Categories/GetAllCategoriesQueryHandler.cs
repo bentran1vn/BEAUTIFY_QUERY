@@ -6,8 +6,7 @@ using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Categories;
-
-public class GetAllCategoriesQueryHandler: IQueryHandler<Query.GetAllCategoriesQuery,
+public class GetAllCategoriesQueryHandler : IQueryHandler<Query.GetAllCategoriesQuery,
     List<Response.GetAllCategories>>
 {
     private readonly IRepositoryBase<Category, Guid> _categoryRepository;
@@ -17,12 +16,14 @@ public class GetAllCategoriesQueryHandler: IQueryHandler<Query.GetAllCategoriesQ
         _categoryRepository = categoryRepository;
     }
 
-    public async Task<Result<List<Response.GetAllCategories>>> Handle(Query.GetAllCategoriesQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<Response.GetAllCategories>>> Handle(Query.GetAllCategoriesQuery request,
+        CancellationToken cancellationToken)
     {
-        var categories = await _categoryRepository.FindAll().ToListAsync(cancellationToken);
+        var categories = await _categoryRepository.FindAll(x => x.IsParent).ToListAsync(cancellationToken);
 
-        var result = categories.Select(x => 
-            new Response.GetAllCategories(x.Id, x.Name, x.Description ?? "", x.IsParent, x.ParentId, x.IsDeleted)).ToList();
+        var result = categories.Select(x =>
+                new Response.GetAllCategories(x.Id, x.Name, x.Description ?? "", x.IsParent, x.ParentId, x.IsDeleted))
+            .ToList();
 
         return Result.Success(result);
     }
