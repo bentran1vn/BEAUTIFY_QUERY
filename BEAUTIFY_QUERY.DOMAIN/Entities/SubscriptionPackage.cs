@@ -7,7 +7,11 @@ public class SubscriptionPackage : AggregateRoot<Guid>, IAuditableEntity
     public required string Description { get; set; }
     [Column(TypeName = "decimal(18,2)")] public required decimal Price { get; set; }
     public required int Duration { get; set; }
-    public bool IsActivated { get; set; } = false;
+    public bool IsActivated { get; set; }
+    public int LimitBranch { get; set; }
+    public int LimitLiveStream { get; set; }
+
+    public int EnhancedViewer { get; set; }
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? ModifiedOnUtc { get; set; }
 }

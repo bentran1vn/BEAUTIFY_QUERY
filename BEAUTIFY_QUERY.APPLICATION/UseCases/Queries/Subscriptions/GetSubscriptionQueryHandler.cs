@@ -1,26 +1,16 @@
-﻿using MongoDB.Driver.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using AutoMapper;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Messages;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Shared;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
+using BEAUTIFY_QUERY.DOMAIN.Entities;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Subscriptions;
 internal sealed class
-    GetSubscriptionQueryHandler : IQueryHandler<Query.GetSubscription, PagedResult<Response.GetSubscriptionResponse>>
+    GetSubscriptionQueryHandler(IMapper mapper, IRepositoryBase<SubscriptionPackage, Guid> mongoRepository)
+    : IQueryHandler<Query.GetSubscription, PagedResult<Response.GetSubscriptionResponse>>
 {
-    private readonly IMapper _mapper;
-    private readonly IMongoRepository<SubscriptionProjection> _mongoRepository;
-
-    public GetSubscriptionQueryHandler(IMapper mapper, IMongoRepository<SubscriptionProjection> mongoRepository)
-    {
-        _mapper = mapper;
-        _mongoRepository = mongoRepository;
-    }
-
     public async Task<Result<PagedResult<Response.GetSubscriptionResponse>>> Handle(Query.GetSubscription request,
         CancellationToken cancellationToken)
     {
@@ -28,7 +18,7 @@ internal sealed class
         var searchTerm = request.searchTerm?.Trim() ?? string.Empty;
 
         // 2. Base query: only return non-deleted records
-        var query = _mongoRepository.AsQueryable(x => !x.IsDeleted);
+        var query = mongoRepository.FindAll(x => !x.IsDeleted);
 
         // 3. If a search term was provided, filter further
         if (!string.IsNullOrEmpty(searchTerm))
@@ -48,20 +38,19 @@ internal sealed class
             : query.OrderBy(GetSortProperty(request));
 
         // 5. Apply pagination
-        var subscriptions = await PagedResult<SubscriptionProjection>.CreateAsyncMongoLinq(
+        var subscriptions = await PagedResult<SubscriptionPackage>.CreateAsync(
             query,
             request.PageNumber,
             request.PageSize
         );
-        
-        
+
 
         // 6. Map to the response DTO and return
-        var result = _mapper.Map<PagedResult<Response.GetSubscriptionResponse>>(subscriptions);
+        var result = mapper.Map<PagedResult<Response.GetSubscriptionResponse>>(subscriptions);
         return Result.Success(result);
     }
 
-    private static Expression<Func<SubscriptionProjection, object>> GetSortProperty(Query.GetSubscription request)
+    private static Expression<Func<SubscriptionPackage, object>> GetSortProperty(Query.GetSubscription request)
     {
         return request.SortColumn?.ToLower() switch
         {
@@ -70,5 +59,4 @@ internal sealed class
             _ => projection => projection.CreatedOnUtc
         };
     }
-
 }

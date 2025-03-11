@@ -1,5 +1,4 @@
 using AutoMapper;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Abstractions.Shared;
 using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
@@ -9,10 +8,9 @@ public class ServiceProfile : Profile
 {
     public ServiceProfile()
     {
-        CreateMap<SubscriptionProjection, Response.GetSubscriptionResponse>();
-        CreateMap<PagedResult<SubscriptionProjection>, PagedResult<Response.GetSubscriptionResponse>>();
+        CreateMap<SubscriptionPackage, Response.GetSubscriptionResponse>();
+        CreateMap<PagedResult<SubscriptionPackage>, PagedResult<Response.GetSubscriptionResponse>>();
 
-       
 
         // CreateMap<ClinicOnBoardingRequest, CONTRACT.Services.Clinics.Response.GetApplyRequest>()
         //     .ForMember(dest => dest.Id,
