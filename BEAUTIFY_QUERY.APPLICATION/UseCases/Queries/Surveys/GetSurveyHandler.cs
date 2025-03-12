@@ -57,7 +57,7 @@ internal sealed class GetSurveyHandler(IRepositoryBase<Survey, Guid> surveyRepos
                     QuestionType = q.QuestionType.ToString(),
                     Options = q.SurveyQuestionOptions
                         .SelectMany(opt => opt.Option
-                            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                            .Split(';', StringSplitOptions.RemoveEmptyEntries)
                             .Select(option => new Response.SurveyQuestionOptionResponse
                             {
                                 Option = option.Trim()
