@@ -7,7 +7,7 @@ public class SurveyResponse : AggregateRoot<Guid>, IAuditableEntity
     public virtual User? Customer { get; set; }
 
 
-    public virtual ICollection<SurveyResponse> SurveyResponses { get; set; } = [];
+    public virtual ICollection<SurveyAnswer> SurveyAnswers { get; set; } = [];
 
 
     public DateTimeOffset CreatedOnUtc { get; set; }
