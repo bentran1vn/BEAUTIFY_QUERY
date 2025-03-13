@@ -22,6 +22,7 @@ public class GetSubscriptionByIdHandler(IRepositoryBase<SubscriptionPackage, Gui
             LimitBranch = subscription.LimitBranch,
             LimitLiveStream = subscription.LimitLiveStream,
             EnhancedViewer = subscription.EnhancedViewer,
+            IsActivated = subscription.IsActivated,
         };
         return Result.Success(response);
     }
