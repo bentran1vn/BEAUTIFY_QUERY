@@ -1,5 +1,4 @@
 using BEAUTIFY_QUERY.CONTRACT.Services.Categories;
-using Microsoft.AspNetCore.Http;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Categories;
 public class CategoryApi : ApiEndpoint, ICarterModule

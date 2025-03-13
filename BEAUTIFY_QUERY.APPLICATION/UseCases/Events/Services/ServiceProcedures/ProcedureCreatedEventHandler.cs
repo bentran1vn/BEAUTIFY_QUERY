@@ -3,8 +3,7 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.ServiceProcedures;
-
-public class ProcedureCreatedEventHandler: ICommandHandler<DomainEvents.ProcedureCreated>
+public class ProcedureCreatedEventHandler : ICommandHandler<DomainEvents.ProcedureCreated>
 {
     private readonly IMongoRepository<ClinicServiceProjection> _clinicServiceRepository;
 
@@ -19,8 +18,8 @@ public class ProcedureCreatedEventHandler: ICommandHandler<DomainEvents.Procedur
 
         var isServiceExisted = await _clinicServiceRepository
             .FindOneAsync(p => p.DocumentId.Equals(createRequest.ServiceId));
-        
-        if(isServiceExisted == null) throw new Exception($"Service {createRequest.ServiceId} not found");
+
+        if (isServiceExisted == null) throw new Exception($"Service {createRequest.ServiceId} not found");
 
         var procedure = new Procedure(
             createRequest.Id,
@@ -29,21 +28,21 @@ public class ProcedureCreatedEventHandler: ICommandHandler<DomainEvents.Procedur
             createRequest.StepIndex,
             createRequest.coverImage,
             createRequest.procedurePriceTypes.Select(x => new ProcedurePriceType(x.Id, x.Name, x.Price)).ToList());
-        
+
         var procedures = isServiceExisted.Procedures?.ToList() ?? new List<Procedure>();
-        
+
         procedures.Add(procedure);
-        
+
         isServiceExisted.Procedures = procedures;
-        
+
         isServiceExisted.MinPrice = createRequest.MinPrice;
         isServiceExisted.MaxPrice = createRequest.MaxPrice;
-        
+
         isServiceExisted.DiscountMinPrice = createRequest.DiscountMinPrice ?? createRequest.MinPrice;
         isServiceExisted.DiscountMaxPrice = createRequest.DiscountMaxPrice ?? createRequest.MaxPrice;
-        
+
         await _clinicServiceRepository.ReplaceOneAsync(isServiceExisted);
-        
+
         return Result.Success();
     }
 }

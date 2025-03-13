@@ -6,7 +6,6 @@ using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Surveys;
-
 internal sealed class GetSurveyHandler(IRepositoryBase<Survey, Guid> surveyRepositoryBase)
     : IQueryHandler<Query.GetSurvey, PagedResult<Response.SurveyResponse>>
 {
@@ -21,12 +20,10 @@ internal sealed class GetSurveyHandler(IRepositoryBase<Survey, Guid> surveyRepos
             .AsNoTracking();
 
         if (!string.IsNullOrEmpty(searchTerm))
-        {
             query = query.Where(x =>
                 x.Name.Contains(searchTerm) ||
                 x.Description.Contains(searchTerm) ||
                 x.Id.ToString().Contains(searchTerm));
-        }
 
         query = query
             .Include(x => x.SurveyQuestions)! // Include only if needed
@@ -73,11 +70,13 @@ internal sealed class GetSurveyHandler(IRepositoryBase<Survey, Guid> surveyRepos
         return Result.Success(result);
     }
 
-    private static Expression<Func<Survey, object>> GetSortProperty(string? sortColumn) =>
-        sortColumn?.ToLower() switch
+    private static Expression<Func<Survey, object>> GetSortProperty(string? sortColumn)
+    {
+        return sortColumn?.ToLower() switch
         {
             "name" => x => x.Name,
             "description" => x => x.Description,
             _ => x => x.CreatedOnUtc
         };
+    }
 }

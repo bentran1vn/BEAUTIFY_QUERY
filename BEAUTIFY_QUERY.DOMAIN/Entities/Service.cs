@@ -14,8 +14,6 @@ public class Service : AggregateRoot<Guid>, IAuditableEntity
     public virtual Category? Category { get; set; }
 
     [Column(TypeName = "decimal(18,2)")] public decimal? DiscountPrice { get; set; }
-    public DateTimeOffset CreatedOnUtc { get; set; }
-    public DateTimeOffset? ModifiedOnUtc { get; set; }
 
     public virtual ICollection<ClinicService>? ClinicServices { get; set; }
     public virtual ICollection<ServiceMedia>? ServiceMedias { get; set; }
@@ -24,4 +22,6 @@ public class Service : AggregateRoot<Guid>, IAuditableEntity
     public virtual ICollection<CustomerSchedule>? CustomerSchedules { get; set; }
     public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
     public virtual ICollection<ClinicVoucher>? ClinicVouchers { get; set; }
+    public DateTimeOffset CreatedOnUtc { get; set; }
+    public DateTimeOffset? ModifiedOnUtc { get; set; }
 }

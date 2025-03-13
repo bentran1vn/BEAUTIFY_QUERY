@@ -62,9 +62,9 @@ public class Promotion
 
 public record ProcedurePriceType(Guid Id, string Name, decimal Price);
 
-public class Image()
+public class Image
 {
     public Guid Id { get; set; }
     public int Index { get; set; }
     public string Url { get; set; }
-};
+}

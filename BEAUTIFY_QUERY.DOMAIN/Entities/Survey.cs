@@ -8,7 +8,7 @@ public class Survey : AggregateRoot<Guid>, IAuditableEntity
     public virtual Category? Category { get; set; }
 
     public virtual ICollection<SurveyQuestion>? SurveyQuestions { get; set; } = [];
-    
+
     public virtual SurveyResponse? SurveyResponse { get; set; }
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? ModifiedOnUtc { get; set; }

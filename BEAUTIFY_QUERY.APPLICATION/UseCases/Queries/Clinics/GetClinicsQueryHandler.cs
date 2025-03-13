@@ -2,18 +2,19 @@ using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
+using BEAUTIFY_QUERY.DOMAIN.Entities;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 internal sealed class GetClinicsQueryHandler(
-    IRepositoryBase<DOMAIN.Entities.Clinic, Guid> clinicRepository
-    )
+    IRepositoryBase<Clinic, Guid> clinicRepository
+)
     : IQueryHandler<Query.GetClinicsQuery, PagedResult<Response.GetClinics>>
 {
     public async Task<Result<PagedResult<Response.GetClinics>>> Handle(Query.GetClinicsQuery request,
         CancellationToken cancellationToken)
     {
         var clinicsQuery = string.IsNullOrWhiteSpace(request.SearchTerm)
-            ? clinicRepository.FindAll(x => !x.IsDeleted)
+            ? clinicRepository.FindAll(x => !x.IsDeleted && x.IsParent.Value)
             : clinicRepository.FindAll(
                 x => (x.Name.ToLower().Contains(request.SearchTerm.ToLower())
                       || x.Email.ToLower().Contains(request.SearchTerm.ToLower())
@@ -25,7 +26,7 @@ internal sealed class GetClinicsQueryHandler(
             ? clinicsQuery.OrderByDescending(GetSortProperty(request))
             : clinicsQuery.OrderBy(GetSortProperty(request));
 
-        var clinics = await PagedResult<DOMAIN.Entities.Clinic>.CreateAsync(clinicsQuery,
+        var clinics = await PagedResult<Clinic>.CreateAsync(clinicsQuery,
             request.PageIndex,
             request.PageSize);
 
@@ -38,12 +39,14 @@ internal sealed class GetClinicsQueryHandler(
         return Result.Success(result);
     }
 
-    private static Expression<Func<DOMAIN.Entities.Clinic, object>> GetSortProperty(Query.GetClinicsQuery request)
-        => request.SortColumn?.ToLower() switch
+    private static Expression<Func<Clinic, object>> GetSortProperty(Query.GetClinicsQuery request)
+    {
+        return request.SortColumn?.ToLower() switch
         {
             "name" => clinics => clinics.Name,
             "totalBranches" => clinics => clinics.TotalBranches,
             _ => clinics => clinics.CreatedOnUtc
             //_ => product => product.CreatedDate // Default Sort Descending on CreatedDate column
         };
+    }
 }

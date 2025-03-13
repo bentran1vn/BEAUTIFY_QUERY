@@ -21,9 +21,7 @@ public class
             await _clinicOnBoardingRequestRepository.FindByIdAsync(request.ApplyRequestId, cancellationToken,
                 x => x.Clinic!);
         if (requestDetail == null || requestDetail.IsDeleted)
-        {
             return Result.Failure<Response.GetApplyRequestById>(new Error("404", "Clinic Apply Request Not Found"));
-        }
 
         var result = new Response.GetApplyRequestById(requestDetail.Id, requestDetail.Clinic!.Name,
             requestDetail.Clinic!.Email,

@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.6.7" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.6.7"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageVersion Update="BEAUTIFY_PACKAGES.SHARE" Version="1.6.0" />
+        <PackageVersion Update="BEAUTIFY_PACKAGES.SHARE" Version="1.6.0"/>
     </ItemGroup>
 
 </Project>

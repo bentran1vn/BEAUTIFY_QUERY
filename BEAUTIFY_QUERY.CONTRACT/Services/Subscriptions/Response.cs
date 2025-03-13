@@ -1,7 +1,7 @@
 ﻿namespace BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
 public static class Response
 {
-    public class GetSubscriptionResponse()
+    public class GetSubscriptionResponse
     {
         public Guid? Id { get; set; }
         public string? Name { get; set; }

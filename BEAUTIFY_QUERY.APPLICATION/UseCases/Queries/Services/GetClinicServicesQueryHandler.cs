@@ -3,7 +3,6 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Services;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
-using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Services;
@@ -28,18 +27,14 @@ public class
 
         // 3. If a search term was provided, filter further
         if (request.MainClinicId.HasValue)
-        {
             query = query.Where(x => x.Clinic.Any(
                 c => c.Id == request.MainClinicId.Value ||
                      c.ParentId == request.MainClinicId.Value)
             );
-        }
 
         // 3. If a search term was provided, filter further
         if (!string.IsNullOrEmpty(searchTerm))
-        {
             query = query.Where(x => x.Name.Contains(searchTerm) || x.Description.Contains(searchTerm));
-        }
 
         query = request.SortOrder == SortOrder.Descending
             ? query.OrderByDescending(GetSortProperty(request))
@@ -59,7 +54,7 @@ public class
             x.Clinic.Select(y => new Response.Clinic(y.Id, y.Name, y.Email,
                 y.Address, y.PhoneNumber, y.ProfilePictureUrl, y.IsParent, y.ParentId)).ToList(),
             new Response.Category(x.Category.Id, x.Category.Name, x.Category.Description), x.DoctorServices.Select(y =>
-                new Response.DoctorService(y.Id,y.ServiceId,
+                new Response.DoctorService(y.Id, y.ServiceId,
                     new Response.UserEntity(y.Doctor.Id, y.Doctor.FullName, y.Doctor.Email, y.Doctor.PhoneNumber,
                         y.Doctor.ProfilePictureUrl, []))).ToList())
         ).ToList();

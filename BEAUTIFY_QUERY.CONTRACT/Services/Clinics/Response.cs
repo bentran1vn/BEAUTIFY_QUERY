@@ -1,7 +1,13 @@
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 public static class Response
 {
-    public record GetClinics(Guid Id, string Name, string Email, string FullAddress, int TotalBranches, bool IsActivated);
+    public record GetClinics(
+        Guid Id,
+        string Name,
+        string Email,
+        string FullAddress,
+        int TotalBranches,
+        bool IsActivated);
 
     public record GetClinicBranches(
         Guid Id,

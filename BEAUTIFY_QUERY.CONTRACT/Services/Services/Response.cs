@@ -1,5 +1,3 @@
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.EntityEvents;
-
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Services;
 public class Response
 {

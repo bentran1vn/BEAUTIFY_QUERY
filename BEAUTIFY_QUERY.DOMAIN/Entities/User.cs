@@ -11,7 +11,9 @@ public class User : AggregateRoot<Guid>, IAuditableEntity
     [MaxLength(50)] public required string FirstName { get; set; }
     [MaxLength(50)] public required string LastName { get; set; }
     [MaxLength(255)] public required string Password { get; set; }
+
     [MaxLength(50)] public required int Status { get; set; }
+
     // 0 Pending 1 Approve 2 Reject 3 Banned
     public DateOnly? DateOfBirth { get; set; }
     public Guid? RoleId { get; set; }

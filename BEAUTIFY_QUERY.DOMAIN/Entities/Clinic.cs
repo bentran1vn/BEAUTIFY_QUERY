@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace BEAUTIFY_QUERY.DOMAIN.Entities;
-
 public class Clinic : AggregateRoot<Guid>, IAuditableEntity
 {
     [MaxLength(100)] public required string Name { get; set; }
@@ -16,7 +15,9 @@ public class Clinic : AggregateRoot<Guid>, IAuditableEntity
     [MaxLength(250)] public required string BusinessLicenseUrl { get; set; }
     [MaxLength(250)] public required string OperatingLicenseUrl { get; set; }
     public DateTimeOffset? OperatingLicenseExpiryDate { get; set; }
+
     public int Status { get; set; } = 0;
+
     // 0 Pending, 1 Approve, 2 Reject, 3 Banned
     public int TotalApply { get; set; } = 0;
     [MaxLength(250)] public string? ProfilePictureUrl { get; set; }
@@ -33,8 +34,9 @@ public class Clinic : AggregateRoot<Guid>, IAuditableEntity
 
     public virtual ICollection<ClinicService>? ClinicServices { get; set; }
     public virtual ICollection<UserClinic>? UserClinics { get; set; }
-    
+
     public virtual ICollection<LivestreamRoom>? LivestreamRooms { get; set; }
+
     // public virtual ICollection<Category>? Categories { get; set; }
     public virtual ICollection<ClinicVoucher>? ClinicVouchers { get; set; }
     public DateTimeOffset CreatedOnUtc { get; set; }

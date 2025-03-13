@@ -116,7 +116,7 @@ finally
 
 namespace BEAUTIFY_QUERY.API
 {
-    public partial class Program
+    public class Program
     {
     }
 }

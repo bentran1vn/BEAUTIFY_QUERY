@@ -5,7 +5,6 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BEAUTIFY_QUERY.APPLICATION.DependencyInjection.Extensions;
-
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddMediatRApplication(this IServiceCollection services)

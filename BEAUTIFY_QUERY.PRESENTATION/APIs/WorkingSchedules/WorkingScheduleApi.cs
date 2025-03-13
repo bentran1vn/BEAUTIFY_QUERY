@@ -1,7 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Extensions;
-using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
-using MediatR;
-using Microsoft.AspNetCore.Http;
+﻿using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.WorkingSchedules;
 public class WorkingScheduleApi : ApiEndpoint, ICarterModule
@@ -11,7 +8,8 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var gr1 = app.NewVersionedApi("Working Schedules").MapGroup(BaseUrl).HasApiVersion(1);
-        gr1.MapGet(string.Empty, GetWorkingSchedules).WithSummary("Search theo Date : Date1 to Date2 or Time : Time1 to Time2|| search by DoctorName");
+        gr1.MapGet(string.Empty, GetWorkingSchedules)
+            .WithSummary("Search theo Date : Date1 to Date2 or Time : Time1 to Time2|| search by DoctorName");
     }
 
     private static async Task<IResult> GetWorkingSchedules(ISender sender, string? searchTerm = null,

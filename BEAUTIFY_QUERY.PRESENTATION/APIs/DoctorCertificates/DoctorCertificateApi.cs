@@ -1,5 +1,4 @@
 ﻿using BEAUTIFY_QUERY.CONTRACT.Services.DoctorCertificates;
-using Microsoft.AspNetCore.Http;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.DoctorCertificates;
 public class DoctorCertificateApi : ApiEndpoint, ICarterModule
@@ -30,6 +29,7 @@ public class DoctorCertificateApi : ApiEndpoint, ICarterModule
         var result = await sender.Send(new Query.GetDoctorCertificateById(id));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
+
     private static async Task<IResult> GetAllDoctorCertificates(
         ISender sender,
         string? searchTerm = null,

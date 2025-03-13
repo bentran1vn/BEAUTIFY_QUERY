@@ -16,18 +16,18 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
     {
         var serviceRequest = request.entity;
 
-        var service = new ClinicServiceProjection()
+        var service = new ClinicServiceProjection
         {
             DocumentId = serviceRequest.Id,
             Name = serviceRequest.Name,
             Description = serviceRequest.Description,
-            CoverImage = serviceRequest.CoverImages.Select(x => new Image()
+            CoverImage = serviceRequest.CoverImages.Select(x => new Image
             {
                 Id = x.Id,
                 Index = x.Index,
                 Url = x.Url
             }).ToList(),
-            DescriptionImage = serviceRequest.DescriptionImages.Select(x => new Image()
+            DescriptionImage = serviceRequest.DescriptionImages.Select(x => new Image
             {
                 Id = x.Id,
                 Index = x.Index,
@@ -38,9 +38,9 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
                 serviceRequest.Category.Description
             ),
             Clinic = serviceRequest.Clinic.Select(x => new Clinic(
-                x.Id, x.Name, x.Email, x.City, x.Address, x.District, x.Ward,x.FullAddress, x.PhoneNumber,
+                x.Id, x.Name, x.Email, x.City, x.Address, x.District, x.Ward, x.FullAddress, x.PhoneNumber,
                 x.ProfilePictureUrl, x.IsParent, x.ParentId)).ToList(),
-            Procedures = [],
+            Procedures = []
         };
 
         await _clinicServiceRepository.InsertOneAsync(service);

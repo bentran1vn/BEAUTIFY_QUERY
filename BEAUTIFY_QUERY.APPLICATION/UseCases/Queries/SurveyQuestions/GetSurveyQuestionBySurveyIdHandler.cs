@@ -1,7 +1,6 @@
 ﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.SurveyQuestions;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.SurveyQuestions;
 internal sealed class GetSurveyQuestionBySurveyIdHandler(
@@ -16,9 +15,7 @@ internal sealed class GetSurveyQuestionBySurveyIdHandler(
         var survey =
             await surveyRepositoryBase.FindByIdAsync(request.SurveyId, cancellationToken, x => x.SurveyQuestions);
         if (survey == null)
-        {
             return Result.Failure<PagedResult<Response.SurveyQuestionResponse>>(new Error("404", "Survey not found"));
-        }
 
         var surveyQuestions = surveyQuestionRepositoryBase.FindAll(x => x.Id != request.SurveyId && !x.IsDeleted);
 

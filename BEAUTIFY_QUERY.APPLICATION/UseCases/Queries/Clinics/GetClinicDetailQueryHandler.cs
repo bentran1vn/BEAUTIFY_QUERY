@@ -15,11 +15,9 @@ public class GetClinicDetailQueryHandler(
     {
         var clinic = await clinicRepository.FindByIdAsync(request.id, cancellationToken);
         if (clinic == null || clinic.IsDeleted)
-        {
             return Result.Failure<Response.GetClinicDetail>(new Error("404", "Clinic not found."));
-        }
 
-        var branches = (currentUserService.Role == Constant.Role.CLINIC_ADMIN)
+        var branches = currentUserService.Role == Constant.Role.CLINIC_ADMIN
             ? await clinicRepository.FindAll(x => x.ParentId == request.id).ToListAsync(cancellationToken)
             : [];
 

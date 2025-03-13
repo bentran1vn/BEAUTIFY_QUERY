@@ -2,7 +2,6 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,17 +26,13 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
 
                 if (DateTimeOffset.TryParse(part1, out var dateFrom) &&
                     DateTimeOffset.TryParse(part2, out var dateTo))
-                {
                     query = query.Where(x => x.OrderDate >= dateFrom && x.OrderDate <= dateTo);
-                }
                 else if (decimal.TryParse(part1, out var priceFrom) &&
                          decimal.TryParse(part2, out var priceTo))
-                {
                     query = query.Where(x =>
-                        x.FinalAmount >= priceFrom && x.FinalAmount <= priceTo ||
-                        x.Discount >= priceFrom && x.Discount <= priceTo ||
-                        x.TotalAmount >= priceFrom && x.TotalAmount <= priceTo);
-                }
+                        (x.FinalAmount >= priceFrom && x.FinalAmount <= priceTo) ||
+                        (x.Discount >= priceFrom && x.Discount <= priceTo) ||
+                        (x.TotalAmount >= priceFrom && x.TotalAmount <= priceTo));
             }
         }
 

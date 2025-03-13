@@ -15,7 +15,6 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         gr1.MapGet("application", GetAllApplyRequest);
         gr1.MapGet("application/{id}", GetDetailApplyRequest);
         gr1.MapGet("{clinicId}/employees", GetAllAccountOfEmployee);
-        
     }
 
     private static async Task<IResult> GetAllClinics(
@@ -55,6 +54,4 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         var result = await sender.Send(new Query.GetAllAccountOfEmployeeQuery(clinicId));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
-
-    
 }

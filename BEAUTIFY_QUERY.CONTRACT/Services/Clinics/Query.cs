@@ -20,7 +20,8 @@ public class Query
     public record GetAllAccountOfEmployeeQuery(Guid ClinicId)
         : IQuery<List<Response.GetAccountOfEmployee>>;
 
-    public record GetAllClinicBranchQuery(string? SearchTerm,
+    public record GetAllClinicBranchQuery(
+        string? SearchTerm,
         string? SortColumn,
         SortOrder? SortOrder,
         int PageIndex,

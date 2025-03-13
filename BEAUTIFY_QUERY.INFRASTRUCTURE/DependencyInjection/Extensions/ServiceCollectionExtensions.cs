@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BEAUTIFY_QUERY.INFRASTRUCTURE.DependencyInjection.Extensions;
-
 public static class ServiceCollectionExtensions
 {
     public static void AddServicesInfrastructure(this IServiceCollection services)

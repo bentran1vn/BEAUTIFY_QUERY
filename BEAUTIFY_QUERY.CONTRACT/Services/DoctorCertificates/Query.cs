@@ -1,5 +1,4 @@
 ﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
-using MediatR;
 
 namespace BEAUTIFY_QUERY.CONTRACT.Services.DoctorCertificates;
 public static class Query

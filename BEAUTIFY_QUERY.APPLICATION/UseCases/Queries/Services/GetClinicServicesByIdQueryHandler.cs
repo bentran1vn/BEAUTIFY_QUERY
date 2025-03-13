@@ -1,7 +1,6 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Services;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
-using BEAUTIFY_QUERY.DOMAIN.Entities;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Services;
 public class
@@ -26,7 +25,6 @@ public class
         Response.GetAllServiceByIdResponse result;
 
         if (request.MainClinicId != null)
-        {
             result = new Response.GetAllServiceByIdResponse(
                 isServiceExisted.DocumentId, isServiceExisted.Name, isServiceExisted.Description,
                 isServiceExisted.MaxPrice, isServiceExisted.MinPrice,
@@ -56,9 +54,7 @@ public class
                         new Response.UserEntity(y.Doctor.Id, y.Doctor.FullName, y.Doctor.Email, y.Doctor.PhoneNumber,
                             y.Doctor.ProfilePictureUrl, []))).ToList()
             );
-        }
         else
-        {
             result = new Response.GetAllServiceByIdResponse(
                 isServiceExisted.DocumentId, isServiceExisted.Name, isServiceExisted.Description,
                 isServiceExisted.MaxPrice, isServiceExisted.MinPrice,
@@ -79,7 +75,6 @@ public class
                         new Response.UserEntity(y.Doctor.Id, y.Doctor.FullName, y.Doctor.Email, y.Doctor.PhoneNumber,
                             y.Doctor.ProfilePictureUrl, []))).ToList()
             );
-        }
 
         return Result.Success(result);
     }

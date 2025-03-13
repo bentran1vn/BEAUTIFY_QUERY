@@ -3,7 +3,6 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 public class GetAllClinicBranchQueryHandler(
@@ -18,12 +17,10 @@ public class GetAllClinicBranchQueryHandler(
         var query = _clinicRepository.FindAll(x => x.ParentId == _currentUserService.ClinicId);
 
         if (!string.IsNullOrEmpty(searchTerm))
-        {
             query = query.Where(x =>
                 x.Name.Contains(searchTerm) ||
                 x.Email.Contains(searchTerm) ||
                 x.Address.Contains(searchTerm));
-        }
 
         query = request.SortOrder == SortOrder.Descending
             ? query.OrderByDescending(GetSortProperty(request))

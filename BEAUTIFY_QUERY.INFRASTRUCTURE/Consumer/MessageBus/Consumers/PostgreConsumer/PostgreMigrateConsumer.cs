@@ -5,12 +5,11 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.INFRASTRUCTURE.Consumer.Abstractions.M
 using MediatR;
 
 namespace BEAUTIFY_QUERY.INFRASTRUCTURE.Consumer.MessageBus.Consumers.PostgreConsumer;
-
 public static class PostgreConsumer
 {
     // public class SubscriptionCreatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
     //     : Consumer<DomainEvents.SubscriptionCreated>(sender, repository);
-    
+
     public class PostgreMigrateConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.PostgreMigrate>(sender, repository);
 }

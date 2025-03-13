@@ -5,7 +5,6 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.INFRASTRUCTURE.Consumer.Abstractions.M
 using MediatR;
 
 namespace BEAUTIFY_QUERY.INFRASTRUCTURE.Consumer.MessageBus.Consumers.Events;
-
 public class ServiceProcedureConsumer
 {
     public class ProcedureCreatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)

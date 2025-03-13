@@ -13,5 +13,4 @@ public class SubscriptionProjection : Document
     public bool IsActivated { get; set; }
     public int LimitBranch { get; set; }
     public int LimitLiveStream { get; set; }
-    
 }

@@ -13,6 +13,7 @@ public class
     {
         _doctorCertificateRepository = doctorCertificateRepository;
     }
+
     public async Task<Result<Response.GetDoctorCertificateByResponse>> Handle(Query.GetDoctorCertificateById request,
         CancellationToken cancellationToken)
     {

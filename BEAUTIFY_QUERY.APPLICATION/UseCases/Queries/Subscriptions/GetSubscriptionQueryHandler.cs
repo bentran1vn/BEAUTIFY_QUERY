@@ -3,7 +3,6 @@ using AutoMapper;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Subscriptions;

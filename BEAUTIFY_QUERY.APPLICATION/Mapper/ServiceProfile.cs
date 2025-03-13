@@ -1,6 +1,5 @@
 using AutoMapper;
 using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 
 namespace BEAUTIFY_QUERY.APPLICATION.Mapper;

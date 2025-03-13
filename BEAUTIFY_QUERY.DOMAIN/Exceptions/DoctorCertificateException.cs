@@ -1,5 +1,5 @@
 ﻿namespace BEAUTIFY_QUERY.DOMAIN.Exceptions;
-public static class DoctorCertificateException 
+public static class DoctorCertificateException
 {
     public class DoctorCertificateNotFoundException : NotFoundException
     {
@@ -16,5 +16,4 @@ public static class DoctorCertificateException
         {
         }
     }
-    
 }

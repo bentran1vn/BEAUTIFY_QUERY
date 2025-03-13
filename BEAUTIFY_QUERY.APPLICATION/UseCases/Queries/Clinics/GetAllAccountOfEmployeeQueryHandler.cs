@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -17,9 +16,7 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
     {
         var clinic = await clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken, x => x.UserClinics);
         if (clinic == null)
-        {
             return Result.Failure<List<Response.GetAccountOfEmployee>>(new Error("404", "Clinic Not Found"));
-        }
 
         var userIds = clinic.UserClinics.Select(x => x.UserId).ToList();
         var users = await userRepository.FindAll(x => userIds.Contains(x.Id)).ToListAsync(cancellationToken);

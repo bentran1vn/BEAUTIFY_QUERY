@@ -1,9 +1,9 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+﻿using System.Linq.Expressions;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 using MongoDB.Driver.Linq;
-using System.Linq.Expressions;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
 internal sealed class GetWorkingScheduleQueryHandler(
@@ -29,17 +29,12 @@ internal sealed class GetWorkingScheduleQueryHandler(
                     // Try to parse as a date range
                     if (DateOnly.TryParse(part1, out var dateFrom) &&
                         DateOnly.TryParse(part2, out var dateTo))
-                    {
                         query = query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
-                    }
                     // Otherwise, try to parse as a time range
-                    else if (TimeSpan.TryParse(part1, out TimeSpan timeFrom) &&
-                             TimeSpan.TryParse(part2, out TimeSpan timeTo))
-                    {
+                    else if (TimeSpan.TryParse(part1, out var timeFrom) &&
+                             TimeSpan.TryParse(part2, out var timeTo))
                         query = query.Where(x => x.StartTime >= timeFrom && x.EndTime <= timeTo);
-                    }
                     else
-                    {
                         // If the range parts can't be parsed, fall back to a standard contains search.
                         query = query.Where(x =>
                             x.Id.ToString().Contains(searchTerm) ||
@@ -47,7 +42,6 @@ internal sealed class GetWorkingScheduleQueryHandler(
                             x.Date.ToString().Contains(searchTerm) ||
                             x.StartTime.ToString().Contains(searchTerm) ||
                             x.EndTime.ToString().Contains(searchTerm));
-                    }
                 }
                 else
                 {
@@ -66,7 +60,7 @@ internal sealed class GetWorkingScheduleQueryHandler(
                 query = query.Where(x =>
                     x.DocumentId.ToString().Contains(searchTerm) ||
                     x.DoctorName!.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
-                    );
+                );
             }
         }
 

@@ -1,45 +1,41 @@
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Extensions;
-using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
-using MediatR;
-using Microsoft.AspNetCore.Http;
 using Query = BEAUTIFY_QUERY.CONTRACT.Services.Services.Query;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Services;
-
-public class ServiceApi: ApiEndpoint, ICarterModule
+public class ServiceApi : ApiEndpoint, ICarterModule
 {
     private const string BaseUrl = "/api/v{version:apiVersion}/services";
-    
+
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var gr1 = app.NewVersionedApi("Services")
             .MapGroup(BaseUrl).HasApiVersion(1);
-        
+
         gr1.MapGet(string.Empty, GetAllServices);
         gr1.MapGet("{id}", GetServicesById);
     }
-    
+
     private static async Task<IResult> GetAllServices(
-        ISender sender,  HttpContext httpContext, string? searchTerm = null,
+        ISender sender, HttpContext httpContext, string? searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,
         int pageIndex = 1,
         int pageSize = 10)
     {
         var mainClinicId = httpContext.User.FindFirst(c => c.Type == "ClinicId")?.Value;
-        
+
         var result = await sender.Send(new Query.GetClinicServicesQuery(searchTerm,
             sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex, pageSize, !string.IsNullOrEmpty(mainClinicId) ? new Guid(mainClinicId) : null));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
-    
+
     private static async Task<IResult> GetServicesById(
         ISender sender, HttpContext httpContext, Guid id)
     {
         var mainClinicId = httpContext.User.FindFirst(c => c.Type == "ClinicId")?.Value;
-        
-        var result = await sender.Send(new Query.GetClinicServicesByIdQuery(id, !string.IsNullOrEmpty(mainClinicId) ? new Guid(mainClinicId) : null));
+
+        var result = await sender.Send(new Query.GetClinicServicesByIdQuery(id,
+            !string.IsNullOrEmpty(mainClinicId) ? new Guid(mainClinicId) : null));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }

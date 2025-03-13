@@ -1,7 +1,6 @@
 ﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Attributes;
 using BEAUTIFY_QUERY.DOMAIN.Constrants;
 
-
 namespace BEAUTIFY_QUERY.DOMAIN.Documents;
 [BsonCollection(TableNames.WorkingSchedule)]
 public class WorkingScheduleProjection : Document

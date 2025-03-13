@@ -3,13 +3,14 @@ using BEAUTIFY_QUERY.APPLICATION.Exceptions;
 using BEAUTIFY_QUERY.DOMAIN.Exceptions;
 
 namespace BEAUTIFY_QUERY.API.Middlewares;
-
 internal sealed class ExceptionHandlingMiddleware : IMiddleware
 {
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
     public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger)
-        => _logger = logger;
+    {
+        _logger = logger;
+    }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
@@ -34,7 +35,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
             title = GetTitle(exception),
             status = statusCode,
             detail = exception.Message,
-            errors = GetErrors(exception),
+            errors = GetErrors(exception)
         };
 
         httpContext.Response.ContentType = "application/json";
@@ -44,8 +45,9 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
         await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response));
     }
 
-    private static int GetStatusCode(Exception exception) =>
-        exception switch
+    private static int GetStatusCode(Exception exception)
+    {
+        return exception switch
         {
             // IdentityException.TokenException => StatusCodes.Status401Unauthorized,
             // ProductException.ProductFieldException => StatusCodes.Status406NotAcceptable, // Should be remove later
@@ -56,24 +58,23 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
             // FormatException => StatusCodes.Status422UnprocessableEntity,
             _ => StatusCodes.Status500InternalServerError
         };
+    }
 
-    private static string GetTitle(Exception exception) =>
-        exception switch
+    private static string GetTitle(Exception exception)
+    {
+        return exception switch
         {
             DomainException applicationException => applicationException.Title,
             _ => "Server Error"
         };
+    }
 
     private static IReadOnlyCollection<ValidationError>? GetErrors(Exception exception)
     {
         IReadOnlyCollection<ValidationError> errors = null;
 
-        if (exception is ValidationException validationException)
-        {
-            errors = validationException.Errors;
-        }
+        if (exception is ValidationException validationException) errors = validationException.Errors;
 
         return errors;
     }
-
 }

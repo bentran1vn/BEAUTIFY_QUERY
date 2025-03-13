@@ -2,7 +2,6 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Services.ClinicServices;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.EntityEvents;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
-using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.ClinicServices;
 public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.ClinicServiceUpdated>
@@ -34,17 +33,13 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
             x.ProfilePictureUrl, x.IsParent, x.ParentId)).ToList();
         // Update Cover Images
         if (serviceRequest.CoverImages?.Any() == true)
-        {
             isServiceExisted.CoverImage = UpdateImageCollection(isServiceExisted.CoverImage.ToList(),
                 serviceRequest.CoverImages.ToList());
-        }
 
         // Update Description Images
         if (serviceRequest.DescriptionImages?.Any() == true)
-        {
             isServiceExisted.DescriptionImage = UpdateImageCollection(isServiceExisted.DescriptionImage.ToList(),
                 serviceRequest.DescriptionImages.ToList());
-        }
 
         // Save updated service back to the database
         await _clinicServiceRepository.ReplaceOneAsync(isServiceExisted);
@@ -53,7 +48,7 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
     }
 
     /// <summary>
-    /// Updates an existing image collection with new images (updating URLs if index exists, adding new ones if not).
+    ///     Updates an existing image collection with new images (updating URLs if index exists, adding new ones if not).
     /// </summary>
     private static List<Image> UpdateImageCollection(List<Image> existingImages,
         List<ClinicServiceEvent.Image> newImages)
@@ -66,9 +61,7 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
 
         // ✅ Handle images that exist in existingImages
         foreach (var key in imageDict.Keys)
-        {
-            if (!newImageDict.TryGetValue(key, out var _))
-            {
+            if (!newImageDict.TryGetValue(key, out _))
                 // 🚀 Image exists in existingImages but not in newImages (KEEP IT)
                 newImagesReturn.Add(new Image
                 {
@@ -76,9 +69,7 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
                     Index = imageDict[key].Index,
                     Url = imageDict[key].Url
                 });
-            }
             else if (newImageDict.TryGetValue(key, out var image))
-            {
                 // 🚀 Update existing image URL
                 newImagesReturn.Add(new Image
                 {
@@ -86,14 +77,10 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
                     Index = image.Index,
                     Url = image.Url
                 });
-            }
-        }
 
         // ✅ Handle new images that exist in `newImages` but not in `existingImages`
         foreach (var key in newImageDict.Keys)
-        {
             if (!imageDict.ContainsKey(key))
-            {
                 // 🚀 New image with a new index (ADD IT)
                 newImagesReturn.Add(new Image
                 {
@@ -101,8 +88,6 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
                     Index = newImageDict[key].Index,
                     Url = newImageDict[key].Url
                 });
-            }
-        }
 
         return newImagesReturn;
     }

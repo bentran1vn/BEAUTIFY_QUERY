@@ -9,7 +9,7 @@ public class SurveyQuestion : AggregateRoot<Guid>, IAuditableEntity
 
     public Guid? SurveyId { get; set; }
     public virtual Survey? Survey { get; set; }
-    
+
     public virtual ICollection<SurveyQuestionOption>? SurveyQuestionOptions { get; set; } = [];
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? ModifiedOnUtc { get; set; }

@@ -1,7 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Extensions;
-using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
-using MediatR;
-using Microsoft.AspNetCore.Http;
+﻿using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Subscriptions;
 public class SubscriptionApi : ApiEndpoint, ICarterModule
@@ -15,7 +12,6 @@ public class SubscriptionApi : ApiEndpoint, ICarterModule
 
         group1.MapGet(string.Empty, GetSubscriptions);
         group1.MapGet("{id:guid}", GetSubscriptionById);
-
     }
 
     private static async Task<IResult> GetSubscriptions(ISender sender, string? searchTerm = null,
@@ -29,7 +25,7 @@ public class SubscriptionApi : ApiEndpoint, ICarterModule
             pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
-    
+
     private static async Task<IResult> GetSubscriptionById(ISender sender, Guid id)
     {
         var result = await sender.Send(new Query.GetSubscriptionById(id));

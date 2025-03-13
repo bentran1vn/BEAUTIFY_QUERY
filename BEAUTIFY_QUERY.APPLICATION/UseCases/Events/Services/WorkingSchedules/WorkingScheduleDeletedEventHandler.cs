@@ -8,7 +8,7 @@ internal sealed class WorkingScheduleDeletedEventHandler(IMongoRepository<Workin
 {
     public async Task<Result> Handle(DomainEvents.WorkingScheduleDeleted request, CancellationToken cancellationToken)
     {
-        var slot = await repository.FindOneAsync(x=>x.DocumentId==request.WorkingId);
+        var slot = await repository.FindOneAsync(x => x.DocumentId == request.WorkingId);
         slot.IsDeleted = true;
         await repository.ReplaceOneAsync(slot);
         return Result.Success();

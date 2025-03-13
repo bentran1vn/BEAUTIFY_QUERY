@@ -8,8 +8,8 @@ public class OrderDetail : AggregateRoot<Guid>, IAuditableEntity
     public Guid ProcedurePriceTypeId { get; set; }
     public virtual ProcedurePriceType? ProcedurePriceType { get; set; }
     [Column(TypeName = "decimal(18,2)")] public decimal Price { get; set; }
-    public DateTimeOffset CreatedOnUtc { get; set; }
-    public DateTimeOffset? ModifiedOnUtc { get; set; }
     public Guid? FeedbackId { get; set; }
     public virtual Feedback? Feedback { get; set; }
+    public DateTimeOffset CreatedOnUtc { get; set; }
+    public DateTimeOffset? ModifiedOnUtc { get; set; }
 }

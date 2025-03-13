@@ -5,15 +5,14 @@ using BEAUTIFY_QUERY.DOMAIN.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.DoctorCertificates;
-
-internal sealed class GetDoctorCertificateById : IQueryHandler<Query.GetDoctorCertificateByDoctorId, 
+internal sealed class GetDoctorCertificateById : IQueryHandler<Query.GetDoctorCertificateByDoctorId,
     IReadOnlyList<Response.GetDoctorCertificateByResponse>>
 {
-    private readonly IRepositoryBase<User, Guid> _userRepository;
     private readonly IRepositoryBase<DoctorCertificate, Guid> _doctorCertificateRepository;
+    private readonly IRepositoryBase<User, Guid> _userRepository;
 
     public GetDoctorCertificateById(
-        IRepositoryBase<User, Guid> userRepository, 
+        IRepositoryBase<User, Guid> userRepository,
         IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository)
     {
         _userRepository = userRepository;
@@ -21,16 +20,13 @@ internal sealed class GetDoctorCertificateById : IQueryHandler<Query.GetDoctorCe
     }
 
     public async Task<Result<IReadOnlyList<Response.GetDoctorCertificateByResponse>>> Handle(
-        Query.GetDoctorCertificateByDoctorId request, 
+        Query.GetDoctorCertificateByDoctorId request,
         CancellationToken cancellationToken)
     {
         var userExists = await _userRepository.FindAll(u => u.Id == request.DoctorId)
             .AnyAsync(cancellationToken);
 
-        if (!userExists)
-        {
-            throw new DoctorCertificateException.DoctorCertificateNotFoundException(request.DoctorId);
-        }
+        if (!userExists) throw new DoctorCertificateException.DoctorCertificateNotFoundException(request.DoctorId);
 
         var certificates = await _doctorCertificateRepository.FindAll(x => x.DoctorId == request.DoctorId)
             .Select(x => new Response.GetDoctorCertificateByResponse
@@ -39,7 +35,7 @@ internal sealed class GetDoctorCertificateById : IQueryHandler<Query.GetDoctorCe
                 CertificateName = x.CertificateName,
                 CertificateUrl = x.CertificateUrl,
                 DoctorName = $"{x.Doctor.FirstName} {x.Doctor.LastName}",
-                ExpiryDate = x.ExpiryDate,
+                ExpiryDate = x.ExpiryDate
             })
             .ToListAsync(cancellationToken);
 
