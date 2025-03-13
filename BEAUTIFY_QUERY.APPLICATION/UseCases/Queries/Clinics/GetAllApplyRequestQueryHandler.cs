@@ -22,7 +22,7 @@ public class GetAllApplyRequestQueryHandler : IQueryHandler<Query.GetAllApplyReq
             .CreateAsync(requestQuery, request.PageIndex, request.PageSize);
 
         PagedResult<Response.GetApplyRequest> result = new PagedResult<Response.GetApplyRequest>(applyRequest.Items
-            .Select(x => new Response.GetApplyRequest(x.Id, x.Clinic!.Name, x.Clinic.Email, x.Clinic.Address, x.Clinic.TotalApply)).ToList(), applyRequest.PageIndex, applyRequest.PageSize, applyRequest.TotalCount);
+            .Select(x => new Response.GetApplyRequest(x.Id, x.Clinic!.Name, x.Clinic.Email, x.Clinic.FullAddress, x.Clinic.TotalApply)).ToList(), applyRequest.PageIndex, applyRequest.PageSize, applyRequest.TotalCount);
         
         return Result.Success(result);
     }

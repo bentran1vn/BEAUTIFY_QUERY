@@ -29,14 +29,19 @@ public class GetClinicDetailQueryHandler(
         return Result.Success(result);
     }
 
-    private static Response.GetClinicDetail MapToResponse(Clinic clinic, List<Response.GetClinicDetail>? branches = null)
+    private static Response.GetClinicDetail MapToResponse(Clinic clinic,
+        List<Response.GetClinicDetail>? branches = null)
     {
         return new Response.GetClinicDetail(
             clinic.Id,
             clinic.Name,
             clinic.Email,
             clinic.PhoneNumber,
+            clinic.City,
             clinic.Address,
+            clinic.District,
+            clinic.Ward,
+            clinic.FullAddress,
             clinic.TaxCode,
             clinic.BusinessLicenseUrl,
             clinic.OperatingLicenseUrl,

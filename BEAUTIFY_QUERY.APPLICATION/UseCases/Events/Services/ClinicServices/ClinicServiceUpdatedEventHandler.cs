@@ -5,7 +5,6 @@ using BEAUTIFY_QUERY.DOMAIN.Documents;
 using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.ClinicServices;
-
 public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.ClinicServiceUpdated>
 {
     private readonly IMongoRepository<ClinicServiceProjection> _clinicServiceRepository;
@@ -21,9 +20,9 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
 
         // Fetch the existing service (throw exception if not found)
         var isServiceExisted = await _clinicServiceRepository
-            .FindOneAsync(p => p.DocumentId == serviceRequest.Id)
-            ?? throw new Exception($"Service {serviceRequest.Id} not found");
-        
+                                   .FindOneAsync(p => p.DocumentId == serviceRequest.Id)
+                               ?? throw new Exception($"Service {serviceRequest.Id} not found");
+
         isServiceExisted.Name = serviceRequest.Name;
         isServiceExisted.Description = serviceRequest.Description;
         isServiceExisted.Category = new Category(
@@ -31,18 +30,20 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
             serviceRequest.Category.Description
         );
         isServiceExisted.Clinic = serviceRequest.Clinic.Select(x => new Clinic(
-            x.Id, x.Name, x.Email, x.Address, x.PhoneNumber,
+            x.Id, x.Name, x.Email, x.City, x.Address, x.District, x.Ward, x.FullAddress, x.PhoneNumber,
             x.ProfilePictureUrl, x.IsParent, x.ParentId)).ToList();
         // Update Cover Images
         if (serviceRequest.CoverImages?.Any() == true)
         {
-            isServiceExisted.CoverImage = UpdateImageCollection(isServiceExisted.CoverImage.ToList(), serviceRequest.CoverImages.ToList());
+            isServiceExisted.CoverImage = UpdateImageCollection(isServiceExisted.CoverImage.ToList(),
+                serviceRequest.CoverImages.ToList());
         }
 
         // Update Description Images
         if (serviceRequest.DescriptionImages?.Any() == true)
         {
-            isServiceExisted.DescriptionImage = UpdateImageCollection(isServiceExisted.DescriptionImage.ToList(), serviceRequest.DescriptionImages.ToList());
+            isServiceExisted.DescriptionImage = UpdateImageCollection(isServiceExisted.DescriptionImage.ToList(),
+                serviceRequest.DescriptionImages.ToList());
         }
 
         // Save updated service back to the database
@@ -54,7 +55,8 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
     /// <summary>
     /// Updates an existing image collection with new images (updating URLs if index exists, adding new ones if not).
     /// </summary>
-    private static List<Image> UpdateImageCollection(List<Image> existingImages, List<ClinicServiceEvent.Image> newImages)
+    private static List<Image> UpdateImageCollection(List<Image> existingImages,
+        List<ClinicServiceEvent.Image> newImages)
     {
         // Convert existing images and new images into dictionaries for fast lookup (O(1) access)
         var newImageDict = newImages.ToDictionary(x => x.Index);
@@ -95,8 +97,8 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
                 // 🚀 New image with a new index (ADD IT)
                 newImagesReturn.Add(new Image
                 {
-                    Id = newImageDict[key].Id, 
-                    Index = newImageDict[key].Index, 
+                    Id = newImageDict[key].Id,
+                    Index = newImageDict[key].Index,
                     Url = newImageDict[key].Url
                 });
             }

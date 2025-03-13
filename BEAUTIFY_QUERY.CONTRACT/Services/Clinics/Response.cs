@@ -1,13 +1,17 @@
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 public static class Response
 {
-    public record GetClinics(Guid Id, string Name, string Email, string Address, int TotalBranches, bool IsActivated);
+    public record GetClinics(Guid Id, string Name, string Email, string FullAddress, int TotalBranches, bool IsActivated);
 
     public record GetClinicBranches(
         Guid Id,
         string Name,
         string Email,
-        string Address,
+        string? City,
+        string? Address,
+        string? District,
+        string? Ward,
+        string? FullAddress,
         string TaxCode,
         string BusinessLicenseUrl,
         string OperatingLicenseUrl,
@@ -20,7 +24,11 @@ public static class Response
         string Name,
         string Email,
         string PhoneNumber,
-        string Address,
+        string? City,
+        string? Address,
+        string? District,
+        string? Ward,
+        string? FullAddress,
         string TaxCode,
         string BusinessLicenseUrl,
         string OperatingLicenseUrl,
@@ -30,14 +38,18 @@ public static class Response
         bool IsActivated,
         List<GetClinicDetail>? Branches = null);
 
-    public record GetApplyRequest(Guid Id, string Name, string Email, string Address, int TotalApply);
+    public record GetApplyRequest(Guid Id, string Name, string Email, string? FullAddress, int TotalApply);
 
     public record GetApplyRequestById(
         Guid ApplyId,
         string Name,
         string Email,
         string PhoneNumber,
-        string Address,
+        string? City,
+        string? Address,
+        string? District,
+        string? Ward,
+        string? FullAddress,
         string TaxCode,
         string BusinessLicenseUrl,
         string OperatingLicenseUrl,

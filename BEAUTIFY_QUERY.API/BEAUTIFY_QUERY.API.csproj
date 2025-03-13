@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.6.5" />
+        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.6.7" />
         <PackageReference Include="Carter" Version="7.2.0" />
         <PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="6.1.0" />
         <PackageReference Include="Serilog" Version="4.2.0" />

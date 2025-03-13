@@ -3,7 +3,6 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.ClinicServices;
-
 public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.ClinicServiceCreated>
 {
     private readonly IMongoRepository<ClinicServiceProjection> _clinicServiceRepository;
@@ -16,7 +15,7 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
     public async Task<Result> Handle(DomainEvents.ClinicServiceCreated request, CancellationToken cancellationToken)
     {
         var serviceRequest = request.entity;
-        
+
         var service = new ClinicServiceProjection()
         {
             DocumentId = serviceRequest.Id,
@@ -35,18 +34,17 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
                 Url = x.Url
             }).ToList(),
             Category = new Category(
-                serviceRequest.Category.Id,serviceRequest.Category.Name,
+                serviceRequest.Category.Id, serviceRequest.Category.Name,
                 serviceRequest.Category.Description
             ),
             Clinic = serviceRequest.Clinic.Select(x => new Clinic(
-                x.Id, x.Name, x.Email, x.Address, x.PhoneNumber,
+                x.Id, x.Name, x.Email, x.City, x.Address, x.District, x.Ward,x.FullAddress, x.PhoneNumber,
                 x.ProfilePictureUrl, x.IsParent, x.ParentId)).ToList(),
             Procedures = [],
-            
         };
-        
+
         await _clinicServiceRepository.InsertOneAsync(service);
-        
+
         return Result.Success();
     }
 }

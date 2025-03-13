@@ -14,7 +14,6 @@ public class GetAllClinicBranchQueryHandler(
     public async Task<Result<PagedResult<Response.GetClinicBranches>>> Handle(Query.GetAllClinicBranchQuery request,
         CancellationToken cancellationToken)
     {
-       
         var searchTerm = request.SearchTerm?.Trim() ?? string.Empty;
         var query = _clinicRepository.FindAll(x => x.ParentId == _currentUserService.ClinicId);
 
@@ -37,7 +36,11 @@ public class GetAllClinicBranchQueryHandler(
                 x.Id,
                 x.Name,
                 x.Email,
+                x.City,
                 x.Address,
+                x.District,
+                x.Ward,
+                x.FullAddress,
                 x.TaxCode,
                 x.BusinessLicenseUrl,
                 x.OperatingLicenseUrl,
