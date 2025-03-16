@@ -42,7 +42,8 @@ public static class Response
         string? ProfilePictureUrl,
         int TotalBranches,
         bool IsActivated,
-        List<GetClinicDetail>? Branches = null);
+        List<GetClinicDetail>? Branches = null,
+        List<Services.Response.GetAllServiceInGetClinicById>? Services = null);
 
     public record GetApplyRequest(Guid Id, string Name, string Email, string? FullAddress, int TotalApply);
 

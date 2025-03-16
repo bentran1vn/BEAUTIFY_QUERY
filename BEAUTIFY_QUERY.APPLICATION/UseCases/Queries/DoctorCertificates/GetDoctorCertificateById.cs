@@ -1,4 +1,5 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+﻿
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.DoctorCertificates;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using BEAUTIFY_QUERY.DOMAIN.Exceptions;

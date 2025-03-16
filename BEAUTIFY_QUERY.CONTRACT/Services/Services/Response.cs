@@ -52,6 +52,20 @@ public class Response
         bool? IsParent,
         Guid? ParentId);
 
+    public class GetAllServiceInGetClinicById
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public decimal MaxPrice { get; set; }
+        public decimal MinPrice { get; set; }
+        public string DiscountPercent { get; set; }
+        public decimal DiscountMaxPrice { get; set; }
+        public decimal DiscountMinPrice { get; set; }
+        public ICollection<Image> CoverImage { get; set; }
+        public ICollection<Image> DescriptionImage { get; set; }
+    }
+
     public record GetAllServiceByIdResponse(
         Guid Id,
         string Name,
@@ -63,7 +77,7 @@ public class Response
         decimal DiscountMinPrice,
         ICollection<Image> CoverImage,
         ICollection<Image> DescriptionImage,
-        ICollection<Clinic> Clinics,
+        ICollection<Clinic>? Clinics,
         Category Category,
         ICollection<Procedure> Procedures,
         ICollection<Promotion>? Promotions,

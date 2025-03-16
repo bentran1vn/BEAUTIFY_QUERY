@@ -4,9 +4,12 @@ namespace BEAUTIFY_QUERY.DOMAIN.Entities;
 public class DoctorCertificate : AggregateRoot<Guid>, IAuditableEntity
 {
     public Guid DoctorId { get; set; }
-    public virtual User? Doctor { get; set; }
+    public virtual Staff? Doctor { get; set; }
     [MaxLength(250)] public required string CertificateUrl { get; set; }
     [MaxLength(100)] public required string CertificateName { get; set; }
+
+    public Guid? ServiceId { get; set; }
+    public virtual Service? Service { get; set; }
     public DateTimeOffset? ExpiryDate { get; set; }
     [MaxLength(100)] public string? Note { get; set; }
 
