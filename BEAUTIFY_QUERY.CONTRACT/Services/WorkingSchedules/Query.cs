@@ -9,4 +9,6 @@ public static class Query
         SortOrder SortOrder,
         int PageNumber,
         int PageSize) : IQuery<PagedResult<Response.GetWorkingScheduleResponse>>;
+
+    public record GetAllDoctorFreeTime(Guid DoctorId,Guid ClinicId,DateOnly Date) : IQuery<IReadOnlyList<Response.DoctorBusyTimeInADay>>;
 }

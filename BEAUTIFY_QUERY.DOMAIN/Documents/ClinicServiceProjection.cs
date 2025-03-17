@@ -60,7 +60,7 @@ public class Promotion
     public bool IsActivated { get; set; }
 }
 
-public record ProcedurePriceType(Guid Id, string Name, decimal Price);
+public record ProcedurePriceType(Guid Id, string Name, decimal Price, int Duration,bool IsDefault);
 
 public class Image
 {

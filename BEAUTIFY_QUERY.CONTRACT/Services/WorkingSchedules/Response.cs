@@ -10,4 +10,11 @@ public static class Response
         public Guid? DoctorId { get; set; }
         public string? DoctorName { get; set; }
     }
+
+    public class DoctorBusyTimeInADay
+    {
+        public TimeSpan? Start { get; set; }
+        public TimeSpan? End { get; set; }
+        public DateOnly? Date { get; set; }
+    }
 }
