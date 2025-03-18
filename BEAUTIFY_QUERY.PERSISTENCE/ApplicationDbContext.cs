@@ -4,13 +4,8 @@ using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.PERSISTENCE;
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options)
-    {
-    }
-
     public virtual DbSet<Survey> Surveys { get; set; }
     public virtual DbSet<SurveyQuestion> SurveyQuestions { get; set; }
     public virtual DbSet<SurveyAnswer> SurveyAnswers { get; set; }
@@ -54,5 +49,7 @@ public class ApplicationDbContext : DbContext
 
             method?.Invoke(null, [builder]);
         }
+
+        builder.Entity<CustomerSchedule>().HasQueryFilter(x => !x.IsDeleted);
     }
 }

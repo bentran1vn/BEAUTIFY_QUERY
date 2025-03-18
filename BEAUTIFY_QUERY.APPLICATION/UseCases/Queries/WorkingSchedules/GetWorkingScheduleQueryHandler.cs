@@ -18,7 +18,7 @@ internal sealed class GetWorkingScheduleQueryHandler(
         if (!string.IsNullOrEmpty(searchTerm))
         {
             // If the search term appears to be a range (e.g. "2025-02-01 to 2025-02-15" or "08:00 to 17:00")
-            if (searchTerm.IndexOf("to", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
             {
                 var parts = searchTerm.Split(["to"], StringSplitOptions.RemoveEmptyEntries);
                 if (parts.Length == 2)
