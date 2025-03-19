@@ -17,8 +17,9 @@ public class Query
     public record GetDetailApplyRequestQuery(Guid ApplyRequestId) : IQuery<Response.GetApplyRequestById>;
 
 
-    public record GetAllAccountOfEmployeeQuery(Guid ClinicId, Roles role)
-        : IQuery<List<Response.GetAccountOfEmployee>>;
+    public record GetAllAccountOfEmployeeQuery(Guid ClinicId, Roles? Role, string? SearchTerm,
+        int PageIndex, int PageSize)
+        : IQuery<PagedResult<Response.GetAccountOfEmployee>>;
 
     public enum Roles
     {
