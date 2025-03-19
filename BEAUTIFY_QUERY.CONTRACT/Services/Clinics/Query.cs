@@ -20,6 +20,9 @@ public class Query
     public record GetAllAccountOfEmployeeQuery(Guid ClinicId, Roles? Role, string? SearchTerm,
         int PageIndex, int PageSize)
         : IQuery<PagedResult<Response.GetAccountOfEmployee>>;
+    
+    public record GetDetailAccountOfEmployeeQuery(Guid ClinicId, Guid StaffId)
+        : IQuery<Response.GetAccountOfEmployee>;
 
     public enum Roles
     {
