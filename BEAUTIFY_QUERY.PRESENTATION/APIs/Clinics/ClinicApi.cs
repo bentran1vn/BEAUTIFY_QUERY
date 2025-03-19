@@ -49,9 +49,11 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
-    private static async Task<IResult> GetAllAccountOfEmployee(ISender sender, Guid clinicId,Query.Roles role)
+    private static async Task<IResult> GetAllAccountOfEmployee(ISender sender, Guid clinicId,
+        Query.Roles? role, string? searchTerm = null,
+        int pageIndex = 1, int pageSize = 10)
     {
-        var result = await sender.Send(new Query.GetAllAccountOfEmployeeQuery(clinicId,role));
+        var result = await sender.Send(new Query.GetAllAccountOfEmployeeQuery(clinicId, role, searchTerm, pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }
