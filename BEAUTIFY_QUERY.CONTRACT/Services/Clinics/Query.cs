@@ -17,8 +17,14 @@ public class Query
     public record GetDetailApplyRequestQuery(Guid ApplyRequestId) : IQuery<Response.GetApplyRequestById>;
 
 
-    public record GetAllAccountOfEmployeeQuery(Guid ClinicId)
+    public record GetAllAccountOfEmployeeQuery(Guid ClinicId, Roles role)
         : IQuery<List<Response.GetAccountOfEmployee>>;
+
+    public enum Roles
+    {
+        DOCTOR = 1,
+        CLINIC_STAFF = 2
+    }
 
     public record GetAllClinicBranchQuery(
         string? SearchTerm,
