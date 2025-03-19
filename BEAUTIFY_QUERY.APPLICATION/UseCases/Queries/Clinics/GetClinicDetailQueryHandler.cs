@@ -72,6 +72,8 @@ public class GetClinicDetailQueryHandler(
             clinic.ProfilePictureUrl,
             clinic.TotalBranches ?? 0,
             clinic.IsActivated,
+            clinic.BankName,
+            clinic.BankAccountNumber,
             branches,
             services);
     }

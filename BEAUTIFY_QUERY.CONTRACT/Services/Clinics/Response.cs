@@ -42,6 +42,8 @@ public static class Response
         string? ProfilePictureUrl,
         int TotalBranches,
         bool IsActivated,
+        string BankName,
+        string BankAccountNumber,
         List<GetClinicDetail>? Branches = null,
         List<Services.Response.GetAllServiceInGetClinicById>? Services = null);
 
