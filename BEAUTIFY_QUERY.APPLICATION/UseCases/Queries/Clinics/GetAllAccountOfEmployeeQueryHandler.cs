@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 internal sealed class GetAllAccountOfEmployeeQueryHandler(
-    IRepositoryBase<Staff, Guid> staffRepository,
     IRepositoryBase<Clinic, Guid> clinicRepository,
     IRepositoryBase<UserClinic, Guid> userClinicRepository,
     IRepositoryBase<Role, Guid> roleRepository)
@@ -67,6 +66,7 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
             {
                 Id = u.Id,
                 ClinicId = u.ClinicId,
+                StaffId = u.User!.Id,
                 FirstName = u.User.FirstName,
                 LastName = u.User.LastName,
                 Email = u.User.Email,

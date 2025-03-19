@@ -70,6 +70,7 @@ public static class Response
     {
         public Guid Id { get; set; }
         public Guid ClinicId { get; set; }
+        public Guid StaffId { get; set; }
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -77,10 +78,21 @@ public static class Response
         public string? City { get; set; }
         public string? District { get; set; }
         public string? Ward { get; set; }
-        public string Address { get; set; }
-        public string PhoneNumber { get; set; }
-        public string FullAddress { get; set; }
+        public string? Address { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? FullAddress { get; set; }
         public string? ProfilePictureUrl { get; set; }
         public string? Role { get; set; }
+        
+        public List<DoctorCertificates>? DoctorCertificates { get; set; }
+    }
+    
+    public class DoctorCertificates
+    {
+        public Guid Id { get; set; }
+        public string CertificateUrl { get; set; }
+        public string CertificateName { get; set; }
+        public DateTimeOffset? ExpiryDate { get; set; }
+        public string? Note { get; set; }
     }
 }
