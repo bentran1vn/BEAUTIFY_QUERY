@@ -1,35 +1,30 @@
-﻿
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.DoctorCertificates;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
-using BEAUTIFY_QUERY.DOMAIN.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.DoctorCertificates;
-internal sealed class GetDoctorCertificateById : IQueryHandler<Query.GetDoctorCertificateByDoctorId,
-    IReadOnlyList<Response.GetDoctorCertificateByResponse>>
+
+internal sealed class GetDoctorCertificatesByDoctorIdHandler(
+    IRepositoryBase<Staff, Guid> staffRepository,
+    IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository)
+    : IQueryHandler<Query.GetDoctorCertificateByDoctorId,
+        IReadOnlyList<Response.GetDoctorCertificateByResponse>>
 {
-    private readonly IRepositoryBase<DoctorCertificate, Guid> _doctorCertificateRepository;
-    private readonly IRepositoryBase<User, Guid> _userRepository;
-
-    public GetDoctorCertificateById(
-        IRepositoryBase<User, Guid> userRepository,
-        IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository)
-    {
-        _userRepository = userRepository;
-        _doctorCertificateRepository = doctorCertificateRepository;
-    }
-
     public async Task<Result<IReadOnlyList<Response.GetDoctorCertificateByResponse>>> Handle(
         Query.GetDoctorCertificateByDoctorId request,
         CancellationToken cancellationToken)
     {
-        var userExists = await _userRepository.FindAll(u => u.Id == request.DoctorId)
+        var doctorExists = await staffRepository.FindAll(u => u.Id == request.DoctorId)
             .AnyAsync(cancellationToken);
 
-        if (!userExists) throw new DoctorCertificateException.DoctorCertificateNotFoundException(request.DoctorId);
+        if (!doctorExists)
+            return Result.Failure<IReadOnlyList<Response.GetDoctorCertificateByResponse>>(
+                new Error("404", $"Doctor not found with ID: {request.DoctorId}"));
 
-        var certificates = await _doctorCertificateRepository.FindAll(x => x.DoctorId == request.DoctorId)
+        var certificateResponses = await doctorCertificateRepository
+            .FindAll(x => x.DoctorId == request.DoctorId)
+            .Include(x => x.Doctor)
             .Select(x => new Response.GetDoctorCertificateByResponse
             {
                 Id = x.Id,
@@ -40,6 +35,6 @@ internal sealed class GetDoctorCertificateById : IQueryHandler<Query.GetDoctorCe
             })
             .ToListAsync(cancellationToken);
 
-        return Result.Success<IReadOnlyList<Response.GetDoctorCertificateByResponse>>(certificates);
+        return Result.Success<IReadOnlyList<Response.GetDoctorCertificateByResponse>>(certificateResponses);
     }
 }

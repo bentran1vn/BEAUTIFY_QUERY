@@ -5,9 +5,9 @@ using BEAUTIFY_QUERY.CONTRACT.Services.DoctorCertificates;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.DoctorCertificates;
-public class GetAllDoctorCertificatesQueryHandler(IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository)
-    : IQueryHandler<Query.GetAllDoctorCertificates,
-        PagedResult<Response.GetDoctorCertificateByResponse>>
+public class GetAllDoctorCertificatesQueryHandler(
+    IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository)
+    : IQueryHandler<Query.GetAllDoctorCertificates, PagedResult<Response.GetDoctorCertificateByResponse>>
 {
     public async Task<Result<PagedResult<Response.GetDoctorCertificateByResponse>>> Handle(
         Query.GetAllDoctorCertificates request, CancellationToken cancellationToken)
@@ -15,58 +15,75 @@ public class GetAllDoctorCertificatesQueryHandler(IRepositoryBase<DoctorCertific
         var searchTerm = request.searchTerm?.Trim() ?? string.Empty;
         var query = doctorCertificateRepository.FindAll();
 
+        // Apply search filter
         if (!string.IsNullOrEmpty(searchTerm))
         {
-            var lowerSearchTerm = searchTerm.ToLower(); // Convert search term to lowercase
-
-            query = query.Where(x =>
-                x.CertificateName.ToLower().Contains(lowerSearchTerm)
-                || x.Doctor.FirstName.ToLower().Contains(lowerSearchTerm)
-                || x.Doctor.LastName.ToLower().Contains(lowerSearchTerm)
-            );
+            query = ApplySearchFilter(query, searchTerm);
         }
 
-
-        query = request.SortOrder == SortOrder.Descending
-            ? query.OrderByDescending(GetSortProperty(request))
-            : query.OrderBy(GetSortProperty(request));
+        // Apply sorting
+        query = ApplySorting(query, request);
 
         // Fetch paged result
-        var doctorCertificates = await PagedResult<DoctorCertificate>.CreateAsync(
+        var pagedCertificates = await PagedResult<DoctorCertificate>.CreateAsync(
             query,
             request.PageNumber,
             request.PageSize
         );
 
-
-        var mappedCertificates = doctorCertificates.Items.Select(dc => new Response.GetDoctorCertificateByResponse
-        {
-            Id = dc.Id,
-            CertificateName = dc.CertificateName,
-            CertificateUrl = dc.CertificateUrl,
-            ExpiryDate = dc.ExpiryDate,
-            Note = dc.Note,
-            DoctorName = $"{dc.Doctor.FirstName} {dc.Doctor.LastName}"
-        }).ToList();
-
+        // Map to response
+        var mappedCertificates = pagedCertificates.Items.Select(MapToResponse).ToList();
 
         var result = new PagedResult<Response.GetDoctorCertificateByResponse>(
             mappedCertificates,
-            doctorCertificates.PageIndex,
-            doctorCertificates.PageSize,
-            doctorCertificates.TotalCount
+            pagedCertificates.PageIndex,
+            pagedCertificates.PageSize,
+            pagedCertificates.TotalCount
         );
 
         return Result.Success(result);
     }
 
+    private static IQueryable<DoctorCertificate> ApplySearchFilter(
+        IQueryable<DoctorCertificate> query, string searchTerm)
+    {
+        var lowerSearchTerm = searchTerm.ToLower();
+        return query.Where(x =>
+            x.CertificateName.Contains(lowerSearchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+            x.Doctor.FirstName.Contains(lowerSearchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+            x.Doctor.LastName.Contains(lowerSearchTerm, StringComparison.CurrentCultureIgnoreCase)
+        );
+    }
 
-    private static Expression<Func<DoctorCertificate, object>> GetSortProperty(Query.GetAllDoctorCertificates request)
+    private static IQueryable<DoctorCertificate> ApplySorting(
+        IQueryable<DoctorCertificate> query, Query.GetAllDoctorCertificates request)
+    {
+        var sortProperty = GetSortProperty(request);
+        return request.SortOrder == SortOrder.Descending
+            ? query.OrderByDescending(sortProperty)
+            : query.OrderBy(sortProperty);
+    }
+
+    private static Expression<Func<DoctorCertificate, object>> GetSortProperty(
+        Query.GetAllDoctorCertificates request)
     {
         return request.SortColumn switch
         {
-            "DoctorName" => x => x.Doctor.FirstName,
-            _ => x => x.CertificateName
+            "doctor_name" => x => x.Doctor.FirstName,
+            _ => x => x.CreatedOnUtc
+        };
+    }
+
+    private static Response.GetDoctorCertificateByResponse MapToResponse(DoctorCertificate certificate)
+    {
+        return new Response.GetDoctorCertificateByResponse
+        {
+            Id = certificate.Id,
+            CertificateName = certificate.CertificateName,
+            CertificateUrl = certificate.CertificateUrl,
+            ExpiryDate = certificate.ExpiryDate,
+            Note = certificate.Note,
+            DoctorName = $"{certificate.Doctor.FirstName} {certificate.Doctor.LastName}"
         };
     }
 }
