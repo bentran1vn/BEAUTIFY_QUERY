@@ -28,10 +28,9 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
 
         if (isExist.IsParent == true)
         {
-            var clinicFinds = await clinicRepository
-                .FindAll(x => x.ParentId == request.ClinicId || x.Id == request.ClinicId)
-                .ToListAsync(cancellationToken);
-            query = query.Where(x => clinicFinds.Select(y => y.Id).Contains(x.ClinicId));
+            var childrenIds = isExist.Children.Select(x => x.Id).ToList();
+            childrenIds.Add(request.ClinicId);
+            query = query.Where(x => childrenIds.Contains(x.ClinicId));
         }
         else
         {
@@ -43,12 +42,12 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
         if (request.Role != null)
         {
             var roleName = request.Role.ToString() == "DOCTOR" ? "DOCTOR" : "CLINIC STAFF";
-            var role = roles.FirstOrDefault(x => x.Name == roleName);
+            var role = roles.FirstOrDefault(x => x.Name.ToUpper() == roleName);
             query = query.Where(x => x.User.RoleId == role.Id);
         }
         else
         {
-            var rolesRequire = roles.Where(x => x.Name == "DOCTOR" || x.Name == "CLINIC STAFF").ToList();
+            var rolesRequire = roles.Where(x => x.Name.ToUpper() == "DOCTOR" || x.Name.ToUpper() == "CLINIC STAFF").ToList();
             query = query.Where(x => rolesRequire.Select(r => r.Id).ToList().Contains((Guid)x.User.RoleId));
         }
         
