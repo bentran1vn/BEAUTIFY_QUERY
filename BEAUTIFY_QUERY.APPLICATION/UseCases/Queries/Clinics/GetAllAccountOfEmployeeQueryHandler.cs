@@ -28,9 +28,10 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
 
         if (isExist.IsParent == true)
         {
-            var childrenIds = isExist.Children.Select(x => x.Id).ToList();
-            childrenIds.Add(request.ClinicId);
-            query = query.Where(x => childrenIds.Contains(x.ClinicId));
+            var clinicFinds = await clinicRepository
+                .FindAll(x => x.ParentId == request.ClinicId || x.Id == request.ClinicId)
+                .ToListAsync(cancellationToken);
+            query = query.Where(x => clinicFinds.Select(y => y.Id).Contains(x.ClinicId));
         }
         else
         {
