@@ -68,8 +68,7 @@ public static class Response
 
     public class GetAccountOfEmployee
     {
-        public Guid Id { get; set; }
-        public Guid ClinicId { get; set; }
+        public Guid[] BranchIds { get; set; }
         public Guid EmployeeId { get; set; }
         public string Email { get; set; }
         public string FirstName { get; set; }
@@ -83,7 +82,6 @@ public static class Response
         public string? FullAddress { get; set; }
         public string? ProfilePictureUrl { get; set; }
         public string? Role { get; set; }
-        
         public List<DoctorCertificates>? DoctorCertificates { get; set; }
     }
     
