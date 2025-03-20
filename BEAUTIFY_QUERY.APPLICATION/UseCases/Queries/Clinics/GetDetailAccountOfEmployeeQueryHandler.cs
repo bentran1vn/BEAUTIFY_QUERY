@@ -27,7 +27,7 @@ public class GetDetailAccountOfEmployeeQueryHandler(
         {
             Id = isExist.Id,
             ClinicId = isExist.ClinicId,
-            StaffId = isExist.User!.Id,
+            EmployeeId = isExist.User!.Id,
             FirstName = isExist.User!.FirstName,
             LastName = isExist.User!.LastName,
             Email = isExist.User!.Email,

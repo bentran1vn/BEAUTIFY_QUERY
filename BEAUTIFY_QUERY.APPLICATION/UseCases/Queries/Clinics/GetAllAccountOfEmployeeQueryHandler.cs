@@ -66,7 +66,7 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
             {
                 Id = u.Id,
                 ClinicId = u.ClinicId,
-                StaffId = u.User!.Id,
+                EmployeeId = u.User!.Id,
                 FirstName = u.User.FirstName,
                 LastName = u.User.LastName,
                 Email = u.User.Email,

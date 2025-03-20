@@ -70,7 +70,7 @@ public static class Response
     {
         public Guid Id { get; set; }
         public Guid ClinicId { get; set; }
-        public Guid StaffId { get; set; }
+        public Guid EmployeeId { get; set; }
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
