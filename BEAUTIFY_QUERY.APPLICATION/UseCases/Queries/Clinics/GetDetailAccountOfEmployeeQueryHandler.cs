@@ -57,6 +57,15 @@ public class GetDetailAccountOfEmployeeQueryHandler(
                     Address = g.Select(x => x.User.Address).FirstOrDefault(),
                     ProfilePictureUrl = g.Select(x => x.User.ProfilePicture).FirstOrDefault(),
                     Role = g.Select(x => x.User.Role.Name).FirstOrDefault(),
+                    DoctorCertificates = g.SelectMany(x => x.User.DoctorCertificates)
+                        .Select(x => new Response.DoctorCertificates
+                        {
+                            Id = x.Id,
+                            CertificateName = x.CertificateName,
+                            CertificateUrl = x.CertificateUrl,
+                            ExpiryDate = x.ExpiryDate,
+                            Note = x.Note
+                        }).ToList()
                 });
             
             var list = await groupByQuery.ToListAsync(cancellationToken);
@@ -96,7 +105,7 @@ public class GetDetailAccountOfEmployeeQueryHandler(
                 Address = isExist.User?.Address,
                 ProfilePictureUrl = isExist.User?.ProfilePicture,
                 Role = isExist.User?.Role?.Name,
-                DoctorCertificates = isExist.User?.DoctorCertificates?.Select(x => new Response.DoctorCertificates()
+                DoctorCertificates = isExist.User?.DoctorCertificates?.Select(x => new Response.DoctorCertificates
                 {
                     Id = x.Id,
                     CertificateName = x.CertificateName,

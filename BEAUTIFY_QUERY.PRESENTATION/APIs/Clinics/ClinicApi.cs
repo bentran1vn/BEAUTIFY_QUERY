@@ -14,8 +14,8 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         gr1.MapGet("{id}", GetClinicDetail).RequireAuthorization();
         gr1.MapGet("application", GetAllApplyRequest);
         gr1.MapGet("application/{id}", GetDetailApplyRequest);
-        gr1.MapGet("{clinicId}/employees", GetAllAccountOfEmployee);
-        gr1.MapGet("{clinicId}/employees/{employeeId}", GetDetailAccountOfEmployee);
+        gr1.MapGet("{clinicId:guid}/employees", GetAllAccountOfEmployee);
+        gr1.MapGet("{clinicId:guid}/employees/{employeeId:guid}", GetDetailAccountOfEmployee);
     }
 
     private static async Task<IResult> GetAllClinics(
