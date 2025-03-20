@@ -6,50 +6,90 @@ using Microsoft.EntityFrameworkCore;
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 
 public class GetDetailAccountOfEmployeeQueryHandler(
+        IRepositoryBase<Clinic, Guid> clinicRepository,
         IRepositoryBase<UserClinic, Guid> userClinicRepository):
     IQueryHandler<Query.GetDetailAccountOfEmployeeQuery,
         Response.GetAccountOfEmployee>
 {
     public async Task<Result<Response.GetAccountOfEmployee>> Handle(Query.GetDetailAccountOfEmployeeQuery request, CancellationToken cancellationToken)
     {
+        var isExistClinic = await  clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken, x => x.Children);
+        if (isExistClinic == null)
+            return Result.Failure<Response.GetAccountOfEmployee>(new Error("404", "Clinic Not Found"));
+        
         var query =  userClinicRepository
-            .FindAll(x => x.ClinicId == request.ClinicId &&
-                                  x.UserId == request.StaffId);
+            .FindAll(x => x.IsDeleted == false && x.UserId == request.StaffId);
+        
         query = query.Include(x => x.User)
             .ThenInclude(x => x.DoctorCertificates);
 
-        var isExist = await query.FirstOrDefaultAsync(cancellationToken);
+        Response.GetAccountOfEmployee? result = null;
         
-        if (isExist == null)
-            return Result.Failure<Response.GetAccountOfEmployee>(new Error("404", "Staff Not Found"));
-        
-        var result = new Response.GetAccountOfEmployee
+        if (isExistClinic.IsParent == true)
         {
-            Id = isExist.Id,
-            ClinicId = isExist.ClinicId,
-            EmployeeId = isExist.User!.Id,
-            FirstName = isExist.User!.FirstName,
-            LastName = isExist.User!.LastName,
-            Email = isExist.User!.Email,
-            FullName = isExist.User?.FirstName + " " + isExist.User?.LastName,
-            PhoneNumber = isExist.User?.PhoneNumber,
-            City = isExist.User?.City,
-            District = isExist.User?.District,
-            Ward = isExist.User?.Ward,
-            FullAddress = isExist.User?.FullAddress,
-            Address = isExist.User?.Address,
-            ProfilePictureUrl = isExist.User?.ProfilePicture,
-            Role = isExist.User?.Role?.Name,
-            DoctorCertificates = isExist.User?.DoctorCertificates?.Select(x => new Response.DoctorCertificates()
+            var childrenIds = isExistClinic.Children.Select(x => x.Id).ToList();
+            childrenIds.Add(request.ClinicId);
+            query = query.Where(x => childrenIds.Contains(x.ClinicId));
+            
+            var groupByQuery = query
+                .GroupBy(x => x.UserId)
+                .Select(g => new Response.GetAccountOfEmployee
+                {
+                    BranchIds = g.Select(x => x.ClinicId).ToArray(),
+                    EmployeeId = g.Key,
+                    FirstName = g.Select(x => x.User.FirstName).FirstOrDefault(),
+                    LastName = g.Select(x => x.User.LastName).FirstOrDefault(),
+                    Email = g.Select(x => x.User.Email).FirstOrDefault(),
+                    FullName = g.Select(x => x.User.FirstName + " " + x.User.LastName).FirstOrDefault(),
+                    PhoneNumber = g.Select(x => x.User.PhoneNumber).FirstOrDefault(),
+                    City = g.Select(x => x.User.City).FirstOrDefault(),
+                    District = g.Select(x => x.User.District).FirstOrDefault(),
+                    Ward = g.Select(x => x.User.Ward).FirstOrDefault(),
+                    FullAddress = g.Select(x => x.User.FullAddress).FirstOrDefault(),
+                    Address = g.Select(x => x.User.Address).FirstOrDefault(),
+                    ProfilePictureUrl = g.Select(x => x.User.ProfilePicture).FirstOrDefault(),
+                    Role = g.Select(x => x.User.Role.Name).FirstOrDefault(),
+                });
+            
+            var list = await groupByQuery.ToListAsync(cancellationToken);
+            result = list.FirstOrDefault();
+        }
+        else
+        {
+            query = query.Where(x => x.ClinicId == request.ClinicId);
+            
+            var isExist = await query.FirstOrDefaultAsync(cancellationToken);
+        
+            if (isExist == null)
+                return Result.Failure<Response.GetAccountOfEmployee>(new Error("404", "Staff Not Found"));
+        
+            result = new Response.GetAccountOfEmployee
             {
-                Id = x.Id,
-                CertificateName = x.CertificateName,
-                CertificateUrl = x.CertificateUrl,
-                ExpiryDate = x.ExpiryDate,
-                Note = x.Note
-            }).ToList()
-        };
-
+                BranchIds = [isExist.ClinicId],
+                EmployeeId = isExist.User!.Id,
+                FirstName = isExist.User!.FirstName,
+                LastName = isExist.User!.LastName,
+                Email = isExist.User!.Email,
+                FullName = isExist.User?.FirstName + " " + isExist.User?.LastName,
+                PhoneNumber = isExist.User?.PhoneNumber,
+                City = isExist.User?.City,
+                District = isExist.User?.District,
+                Ward = isExist.User?.Ward,
+                FullAddress = isExist.User?.FullAddress,
+                Address = isExist.User?.Address,
+                ProfilePictureUrl = isExist.User?.ProfilePicture,
+                Role = isExist.User?.Role?.Name,
+                DoctorCertificates = isExist.User?.DoctorCertificates?.Select(x => new Response.DoctorCertificates()
+                {
+                    Id = x.Id,
+                    CertificateName = x.CertificateName,
+                    CertificateUrl = x.CertificateUrl,
+                    ExpiryDate = x.ExpiryDate,
+                    Note = x.Note
+                }).ToList()
+            };
+        }
+        
         return Result.Success(result);
     }
 }

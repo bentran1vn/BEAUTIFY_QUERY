@@ -59,30 +59,28 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
                 x.Clinic.Address.Contains(request.SearchTerm));
         }
         
-        var pagedResult = await PagedResult<UserClinic>.CreateAsync(query, request.PageIndex, request.PageSize);
-
-        var users = pagedResult.Items
-            .Select(u => new Response.GetAccountOfEmployee
+        var groupByQuery = query
+            .GroupBy(x => x.UserId)
+            .Select(g => new Response.GetAccountOfEmployee
             {
-                Id = u.Id,
-                ClinicId = u.ClinicId,
-                EmployeeId = u.User!.Id,
-                FirstName = u.User.FirstName,
-                LastName = u.User.LastName,
-                Email = u.User.Email,
-                FullName = u.User.FirstName + " " + u.User.LastName,
-                PhoneNumber = u.User.PhoneNumber,
-                City = u.User.City,
-                District = u.User.District,
-                Ward = u.User.Ward,
-                FullAddress = u.User.FullAddress,
-                Address = u.User.Address,
-                ProfilePictureUrl = u.User.ProfilePicture,
-                Role = u.User.Role.Name,
-            }).ToList();
+                BranchIds = g.Select(x => x.ClinicId).ToArray(),
+                EmployeeId = g.Key,
+                FirstName = g.Select(x => x.User.FirstName).FirstOrDefault(),
+                LastName = g.Select(x => x.User.LastName).FirstOrDefault(),
+                Email = g.Select(x => x.User.Email).FirstOrDefault(),
+                FullName = g.Select(x => x.User.FirstName + " " + x.User.LastName).FirstOrDefault(),
+                PhoneNumber = g.Select(x => x.User.PhoneNumber).FirstOrDefault(),
+                City = g.Select(x => x.User.City).FirstOrDefault(),
+                District = g.Select(x => x.User.District).FirstOrDefault(),
+                Ward = g.Select(x => x.User.Ward).FirstOrDefault(),
+                FullAddress = g.Select(x => x.User.FullAddress).FirstOrDefault(),
+                Address = g.Select(x => x.User.Address).FirstOrDefault(),
+                ProfilePictureUrl = g.Select(x => x.User.ProfilePicture).FirstOrDefault(),
+                Role = g.Select(x => x.User.Role.Name).FirstOrDefault(),
+            });
         
-        var result = new PagedResult<Response.GetAccountOfEmployee>(users, pagedResult.TotalCount, pagedResult.PageIndex, pagedResult.PageSize);
-
+        var result = await PagedResult<Response.GetAccountOfEmployee>.CreateAsync(groupByQuery, request.PageIndex, request.PageSize);
+        
         return Result.Success(result);
     }
 }
