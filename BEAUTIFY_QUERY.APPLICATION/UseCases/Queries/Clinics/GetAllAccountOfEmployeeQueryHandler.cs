@@ -63,7 +63,15 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
             .GroupBy(x => x.UserId)
             .Select(g => new Response.GetAccountOfEmployee
             {
-                BranchIds = g.Select(x => x.ClinicId).ToArray(),
+                Branchs = g.Select(isExist => new Response.GetClinicBranches(
+                    isExist.Clinic.Id, isExist.Clinic.Name,
+                    isExist.Clinic.Email, isExist.Clinic.City,
+                    isExist.Clinic.Address, isExist.Clinic.District,
+                    isExist.Clinic.Ward, isExist.Clinic.FullAddress,
+                    isExist.Clinic.TaxCode, isExist.Clinic.BusinessLicenseUrl,
+                    isExist.Clinic.OperatingLicenseUrl, isExist.Clinic.OperatingLicenseExpiryDate,
+                    isExist.Clinic.ProfilePictureUrl, isExist.Clinic.IsActivated
+                )).ToArray(),
                 EmployeeId = g.Key,
                 FirstName = g.Select(x => x.User.FirstName).FirstOrDefault(),
                 LastName = g.Select(x => x.User.LastName).FirstOrDefault(),
