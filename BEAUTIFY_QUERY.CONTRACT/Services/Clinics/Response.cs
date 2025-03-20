@@ -68,7 +68,7 @@ public static class Response
 
     public class GetAccountOfEmployee
     {
-        public Guid[] BranchIds { get; set; }
+        public GetClinicBranches[] Branchs { get; set; }
         public Guid EmployeeId { get; set; }
         public string Email { get; set; }
         public string FirstName { get; set; }
