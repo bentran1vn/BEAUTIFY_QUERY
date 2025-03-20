@@ -12,4 +12,9 @@ public class CustomerScheduleConsumer
 
     public class CustomerScheduleDeletedEvent(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.CustomerScheduleDeleted>(sender, repository);
+
+    public class CustomerScheduleUpdateAfterPaymentCompletedEvent(
+        ISender sender,
+        IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.CustomerScheduleUpdateAfterPaymentCompleted>(sender, repository);
 }
