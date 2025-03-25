@@ -113,10 +113,3 @@ finally
     Log.CloseAndFlush();
     await app.DisposeAsync();
 }
-
-namespace BEAUTIFY_QUERY.API
-{
-    public class Program
-    {
-    }
-}

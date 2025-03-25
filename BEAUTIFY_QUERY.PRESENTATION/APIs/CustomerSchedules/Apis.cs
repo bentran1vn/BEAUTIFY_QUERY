@@ -1,4 +1,5 @@
-﻿using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
+using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.CustomerSchedules;
