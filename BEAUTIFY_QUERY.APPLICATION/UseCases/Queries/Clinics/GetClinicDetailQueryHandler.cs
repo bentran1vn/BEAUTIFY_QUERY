@@ -1,10 +1,10 @@
 using System.Globalization;
+using System.Linq.Expressions;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
-using BEAUTIFY_QUERY.DOMAIN.Entities;
-using Microsoft.EntityFrameworkCore;
 using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
@@ -20,14 +20,34 @@ public class GetClinicDetailQueryHandler(
         var clinic = await clinicRepository.FindByIdAsync(request.id, cancellationToken);
         if (clinic == null || clinic.IsDeleted)
             return Result.Failure<Response.GetClinicDetail>(new Error("404", "Clinic not found."));
+        var searchTerm = request.SearchTerm?.Trim() ?? string.Empty;
+        var query = currentUserService.Role == Constant.Role.CLINIC_ADMIN
+            ? clinicRepository.FindAll(x => x.ParentId == request.id)
+            : clinicRepository.FindAll(x => x.ParentId == null);
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            query = query.Where(x => x.Name.Contains(searchTerm) ||
+                                     x.City.Contains(searchTerm) ||
+                                     x.Address.Contains(searchTerm) ||
+                                     x.Ward.Contains(searchTerm) ||
+                                     x.District.Contains(searchTerm) ||
+                                     x.PhoneNumber.Contains(searchTerm));
+        }
 
-        var branches = currentUserService.Role == Constant.Role.CLINIC_ADMIN
-            ? await clinicRepository.FindAll(x => x.ParentId == request.id).ToListAsync(cancellationToken)
-            : [];
+        query = request.SortOrder == SortOrder.Descending
+            ? query.OrderByDescending(GetSortProperty(request))
+            : query.OrderBy(GetSortProperty(request));
+
+        var branches = await PagedResult<Clinic>.CreateAsync(query, request.PageIndex, request.PageSize);
+        var branchDetails = new PagedResult<Response.GetClinicDetail>(
+            branches.Items.Select(x => MapToResponse(x)).ToList(),
+            branches.TotalCount,
+            branches.PageIndex,
+            branches.PageSize
+        );
         var services = _clinicServiceRepository.FilterBy(x =>
             x.Clinic.Any(clinic => clinic.Id.Equals(request.id))
         ).ToList();
-
 
         var mappedServices = services.Select(x => new CONTRACT.Services.Services.Response.GetAllServiceInGetClinicById
         {
@@ -45,14 +65,12 @@ public class GetClinicDetailQueryHandler(
                 .Select(x => new CONTRACT.Services.Services.Response.Image(x.Id, x.Index, x.Url)).ToList()
         }).ToList();
 
-        var branchDetails = branches.Select(x => MapToResponse(x)).ToList();
-
         var result = MapToResponse(clinic, branchDetails, mappedServices);
         return Result.Success(result);
     }
 
     private static Response.GetClinicDetail MapToResponse(Clinic? clinic,
-        List<Response.GetClinicDetail>? branches = null,
+        PagedResult<Response.GetClinicDetail>? branches = null,
         List<CONTRACT.Services.Services.Response.GetAllServiceInGetClinicById>? services = null)
     {
         return new Response.GetClinicDetail(
@@ -76,5 +94,14 @@ public class GetClinicDetailQueryHandler(
             clinic.BankAccountNumber,
             branches,
             services);
+    }
+
+    private static Expression<Func<Clinic, object>> GetSortProperty(Query.GetClinicDetailQuery request)
+    {
+        return request.SortColumn?.ToLower() switch
+        {
+            "name" => x => x.Name,
+            _ => x => x.CreatedOnUtc
+        };
     }
 }

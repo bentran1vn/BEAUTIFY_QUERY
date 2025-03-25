@@ -32,9 +32,15 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
-    private static async Task<IResult> GetClinicDetail(ISender sender, Guid id)
+    private static async Task<IResult> GetClinicDetail(ISender sender, Guid id, string? searchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        int pageIndex = 1,
+        int pageSize = 10)
     {
-        var result = await sender.Send(new Query.GetClinicDetailQuery(id));
+        var result = await sender.Send(new Query.GetClinicDetailQuery(id, searchTerm,
+            sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
@@ -54,10 +60,11 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         Query.Roles? role, string? searchTerm = null,
         int pageIndex = 1, int pageSize = 10)
     {
-        var result = await sender.Send(new Query.GetAllAccountOfEmployeeQuery(clinicId, role, searchTerm, pageIndex, pageSize));
+        var result =
+            await sender.Send(new Query.GetAllAccountOfEmployeeQuery(clinicId, role, searchTerm, pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
-    
+
     private static async Task<IResult> GetDetailAccountOfEmployee(ISender sender, Guid clinicId,
         Guid employeeId)
     {

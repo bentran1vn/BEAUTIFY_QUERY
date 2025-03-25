@@ -10,17 +10,27 @@ public class Query
         int PageIndex,
         int PageSize) : IQuery<PagedResult<Response.GetClinics>>;
 
-    public record GetClinicDetailQuery(Guid id) : IQuery<Response.GetClinicDetail>;
+    public record GetClinicDetailQuery(
+        Guid id,
+        string? SearchTerm,
+        string? SortColumn,
+        SortOrder? SortOrder,
+        int PageIndex,
+        int PageSize) : IQuery<Response.GetClinicDetail>;
 
     public record GetAllApplyRequestQuery(int PageIndex, int PageSize) : IQuery<PagedResult<Response.GetApplyRequest>>;
 
     public record GetDetailApplyRequestQuery(Guid ApplyRequestId) : IQuery<Response.GetApplyRequestById>;
 
 
-    public record GetAllAccountOfEmployeeQuery(Guid ClinicId, Roles? Role, string? SearchTerm,
-        int PageIndex, int PageSize)
+    public record GetAllAccountOfEmployeeQuery(
+        Guid ClinicId,
+        Roles? Role,
+        string? SearchTerm,
+        int PageIndex,
+        int PageSize)
         : IQuery<PagedResult<Response.GetAccountOfEmployee>>;
-    
+
     public record GetDetailAccountOfEmployeeQuery(Guid ClinicId, Guid StaffId)
         : IQuery<Response.GetAccountOfEmployee>;
 

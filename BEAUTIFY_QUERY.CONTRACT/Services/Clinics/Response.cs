@@ -44,7 +44,7 @@ public static class Response
         bool IsActivated,
         string BankName,
         string BankAccountNumber,
-        List<GetClinicDetail>? Branches = null,
+        PagedResult<GetClinicDetail>? Branches = null,
         List<Services.Response.GetAllServiceInGetClinicById>? Services = null);
 
     public record GetApplyRequest(Guid Id, string Name, string Email, string? FullAddress, int TotalApply);
