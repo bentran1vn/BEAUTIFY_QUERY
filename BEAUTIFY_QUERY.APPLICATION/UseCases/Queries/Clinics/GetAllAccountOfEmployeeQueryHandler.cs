@@ -15,12 +15,12 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
         Query.GetAllAccountOfEmployeeQuery request,
         CancellationToken cancellationToken)
     {
-        var isExist = await  clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken, x => x.Children);
+        var isExist = await clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken, x => x.Children);
         if (isExist == null)
             return Result.Failure<PagedResult<Response.GetAccountOfEmployee>>(new Error("404", "Clinic Not Found"));
-        
+
         var query = userClinicRepository.FindAll(x => x.IsDeleted == false);
-        
+
         query = query
             .Include(x => x.Clinic)
             .Include(x => x.User);
@@ -35,30 +35,32 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
         {
             query = query.Where(x => x.ClinicId == request.ClinicId);
         }
-        
+
         var roles = await roleRepository.FindAll(x => x.IsDeleted == false).ToListAsync(cancellationToken);
-        
+
         if (request.Role != null)
         {
             var roleName = request.Role.ToString() == "DOCTOR" ? "DOCTOR" : "CLINIC STAFF";
-            var role = roles.FirstOrDefault(x => x.Name.ToUpper() == roleName);
+            var role = roles.FirstOrDefault(x => x.Name.Equals(roleName, StringComparison.CurrentCultureIgnoreCase));
             query = query.Where(x => x.User.RoleId == role.Id);
         }
         else
         {
-            var rolesRequire = roles.Where(x => x.Name.ToUpper() == "DOCTOR" || x.Name.ToUpper() == "CLINIC STAFF").ToList();
+            var rolesRequire = roles.Where(x =>
+                x.Name.Equals("DOCTOR", StringComparison.CurrentCultureIgnoreCase) ||
+                x.Name.Equals("CLINIC STAFF", StringComparison.CurrentCultureIgnoreCase)).ToList();
             query = query.Where(x => rolesRequire.Select(r => r.Id).ToList().Contains((Guid)x.User.RoleId));
         }
-        
-        if(request.SearchTerm != null)
+
+        if (request.SearchTerm != null)
         {
             query = query.Where(x =>
                 x.User.FirstName.Contains(request.SearchTerm) ||
                 x.User.LastName.Contains(request.SearchTerm) ||
-                x.User.Email.Contains(request.SearchTerm)||
+                x.User.Email.Contains(request.SearchTerm) ||
                 x.Clinic.Address.Contains(request.SearchTerm));
         }
-        
+
         var groupByQuery = query
             .GroupBy(x => x.UserId)
             .Select(g => new Response.GetAccountOfEmployee
@@ -86,9 +88,11 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
                 ProfilePictureUrl = g.Select(x => x.User.ProfilePicture).FirstOrDefault(),
                 Role = g.Select(x => x.User.Role.Name).FirstOrDefault(),
             });
-        
-        var result = await PagedResult<Response.GetAccountOfEmployee>.CreateAsync(groupByQuery, request.PageIndex, request.PageSize);
-        
+
+        var result =
+            await PagedResult<Response.GetAccountOfEmployee>.CreateAsync(groupByQuery, request.PageIndex,
+                request.PageSize);
+
         return Result.Success(result);
     }
 }
