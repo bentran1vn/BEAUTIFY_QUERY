@@ -15,6 +15,7 @@ public class Apis : ApiEndpoint, ICarterModule
             .WithName("Staff Check In Customer Schedule")
             .WithSummary("Staff Check In Customer Schedule")
             .WithDescription("Check in customer schedule by staff");
+        gr1.MapGet("clinic", GetAllCustomerSchedule).RequireAuthorization();
     }
 
     private static async Task<IResult> StaffCheckInCustomerSchedule(ISender sender,
@@ -23,6 +24,19 @@ public class Apis : ApiEndpoint, ICarterModule
     {
         var result = await sender.Send(
             new Query.StaffCheckInCustomerScheduleQuery(customerName, customerPhone));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetAllCustomerSchedule(ISender sender,
+        string SearchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        int pageIndex = 1,
+        int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.GetAllCustomerSchedule(SearchTerm,
+            sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }

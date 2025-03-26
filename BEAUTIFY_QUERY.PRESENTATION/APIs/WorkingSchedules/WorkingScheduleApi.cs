@@ -13,7 +13,10 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
             .WithSummary("Search theo Date : Date1 to Date2 or Time : Time1 to Time2|| search by DoctorName");
         gr1.MapGet("doctors/busy-times", GetDoctorBusyTimeInADay)
             .WithSummary("Get doctor's busy time slots for a specific day");
+        gr1.MapGet("doctors/", GetDoctorScheduleById).RequireAuthorization();
     }
+
+    #region GetWorkingSchedules
 
     private static async Task<IResult> GetWorkingSchedules(ISender sender, string? searchTerm = null,
         string? sortColumn = null,
@@ -27,14 +30,32 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
-  private static async Task<IResult> GetDoctorBusyTimeInADay(
+    #endregion
+
+    #region GetDoctorBusyTimeInADay
+
+    private static async Task<IResult> GetDoctorBusyTimeInADay(
         ISender sender,
         [FromQuery] Guid doctorId,
-        [FromQuery] Guid clinicId, 
+        [FromQuery] Guid clinicId,
         [FromQuery] DateOnly date)
     {
         var query = new Query.GetAllDoctorFreeTime(doctorId, clinicId, date);
         var result = await sender.Send(query);
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+
+    #endregion
+
+    private static async Task<IResult> GetDoctorScheduleById(ISender sender, string searchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        int pageNumber = 1,
+        int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.GetWorkingScheduleOfDoctorId(searchTerm,
+            sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageNumber, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }

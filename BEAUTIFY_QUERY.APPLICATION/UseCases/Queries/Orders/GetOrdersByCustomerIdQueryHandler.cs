@@ -11,50 +11,68 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
     ICurrentUserService currentUserService)
     : IQueryHandler<Query.GetOrdersByCustomerId, PagedResult<Response.Order>>
 {
-    public async Task<Result<PagedResult<Response.Order>>> Handle(Query.GetOrdersByCustomerId request,
-        CancellationToken cancellationToken)
+    public async Task<Result<PagedResult<Response.Order>>> Handle(Query.GetOrdersByCustomerId request, CancellationToken cancellationToken)
     {
-        var searchTerm = request.SearchTerm?.Trim() ?? string.Empty;
-        var query = orderRepositoryBase.FindAll(x => x.CustomerId == currentUserService.UserId);
-        if (string.IsNullOrEmpty(searchTerm))
-        {
-            var parts = searchTerm.Split(["to"], StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length == 2)
-            {
-                var part1 = parts[0].Trim();
-                var part2 = parts[1].Trim();
+        var query = BuildQuery(request);
+        var orders = await PagedResult<Order>.CreateAsync(query, request.PageIndex, request.PageSize);
+        var result = MapToResponse(orders);
+        return Result.Success(result);
+    }
 
-                if (DateTimeOffset.TryParse(part1, out var dateFrom) &&
-                    DateTimeOffset.TryParse(part2, out var dateTo))
-                    query = query.Where(x => x.OrderDate >= dateFrom && x.OrderDate <= dateTo);
-                else if (decimal.TryParse(part1, out var priceFrom) &&
-                         decimal.TryParse(part2, out var priceTo))
-                    query = query.Where(x =>
-                        (x.FinalAmount >= priceFrom && x.FinalAmount <= priceTo) ||
-                        (x.Discount >= priceFrom && x.Discount <= priceTo) ||
-                        (x.TotalAmount >= priceFrom && x.TotalAmount <= priceTo));
-            }
+    private IQueryable<Order> BuildQuery(Query.GetOrdersByCustomerId request)
+    {
+        var query = orderRepositoryBase.FindAll(x => x.CustomerId == currentUserService.UserId);
+
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+        {
+            ApplySearchFilter(ref query, request.SearchTerm.Trim());
         }
 
         query = query.Include(x => x.Service);
+        query = ApplySorting(query, request);
 
-        query = request.SortOrder == SortOrder.Descending
+        return query;
+    }
+
+    private static void ApplySearchFilter(ref IQueryable<Order> query, string searchTerm)
+    {
+        var parts = searchTerm.Split(["to"], StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length != 2) return;
+
+        var part1 = parts[0].Trim();
+        var part2 = parts[1].Trim();
+
+        if (DateTimeOffset.TryParse(part1, out var dateFrom) && DateTimeOffset.TryParse(part2, out var dateTo))
+        {
+            query = query.Where(x => x.OrderDate >= dateFrom && x.OrderDate <= dateTo);
+        }
+        else if (decimal.TryParse(part1, out var priceFrom) && decimal.TryParse(part2, out var priceTo))
+        {
+            query = query.Where(x => x.FinalAmount >= priceFrom && x.FinalAmount <= priceTo ||
+                                   x.Discount >= priceFrom && x.Discount <= priceTo ||
+                                   x.TotalAmount >= priceFrom && x.TotalAmount <= priceTo);
+        }
+    }
+
+    private static IQueryable<Order> ApplySorting(IQueryable<Order> query, Query.GetOrdersByCustomerId request)
+    {
+        return request.SortOrder == SortOrder.Descending
             ? query.OrderByDescending(GetSortProperty(request))
             : query.OrderBy(GetSortProperty(request));
-        var orders = await PagedResult<Order>.CreateAsync(query, request.PageIndex, request.PageSize);
+    }
+
+    private static PagedResult<Response.Order> MapToResponse(PagedResult<Order> orders)
+    {
         var mapped = orders.Items.Select(x => new Response.Order(
             x.Id,
-            x.Customer.FirstName + " " + x.Customer.LastName,
+            x.Customer.FullName,
             x.Service.Name,
-            x.TotalAmount,
-            x.Discount,
             x.FinalAmount,
-            x.OrderDate,
+            DateOnly.Parse(x.OrderDate.ToString("yyyy-MM-dd")),
             x.Status
         )).ToList();
 
-        var result = new PagedResult<Response.Order>(mapped, orders.PageIndex, orders.PageSize, orders.TotalCount);
-        return Result.Success(result);
+        return new PagedResult<Response.Order>(mapped, orders.PageIndex, orders.PageSize, orders.TotalCount);
     }
 
     private static Expression<Func<Order, object>> GetSortProperty(Query.GetOrdersByCustomerId request)

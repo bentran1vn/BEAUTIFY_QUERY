@@ -5,9 +5,9 @@ public static class Response
         Guid Id,
         string CustomerName,
         string ServiceName,
-        decimal? TotalAmount,
-        decimal? Discount,
+        //decimal? TotalAmount,
+       // decimal? Discount,
         decimal? FinalAmount,
-        DateTimeOffset OrderDate,
+        DateOnly OrderDate,
         string Status);
 }

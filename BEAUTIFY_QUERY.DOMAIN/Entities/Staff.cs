@@ -10,6 +10,7 @@ public class Staff : AggregateRoot<Guid>,IAuditableEntity
 
     [MaxLength(50)] public required string FirstName { get; set; }
     [MaxLength(50)] public required string LastName { get; set; }
+    public string FullName => $"{FirstName} {LastName}".Trim();
     [MaxLength(255)] public required string Password { get; set; }
 
     [MaxLength(50)] public required int Status { get; set; }

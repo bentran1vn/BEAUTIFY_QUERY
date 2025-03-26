@@ -12,4 +12,16 @@ public class WorkingScheduleProjection : Document
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
     public bool IsDeleted { get; set; } = false;
+
+    public string? Status { get; set; }
+    public string? Note { get; set; }
+
+    public string StepIndex { get; set; }
+    public string CustomerName { get; set; }
+    public Guid? CustomerId { get; set; }
+
+    public Guid? ServiceId { get; set; }
+    public string ServiceName { get; set; }
+
+    public string CurrentProcedureName { get; set; }
 }

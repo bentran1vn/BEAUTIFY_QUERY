@@ -14,14 +14,9 @@ internal sealed class GetWorkingScheduleQueryHandler(
         CancellationToken cancellationToken)
     {
         var searchTerm = request.searchTerm?.Trim();
-        var query = repository.AsQueryable(x => !x.IsDeleted );
+        var query = repository.AsQueryable(x => !x.IsDeleted);
         if (!string.IsNullOrEmpty(searchTerm))
         {
-            if (Guid.TryParse(searchTerm, out var doctorGuid))
-            {
-                query = query.Where(x => x.DoctorId == doctorGuid);
-            }
-            // If the search term appears to be a range (e.g. "2025-02-01 to 2025-02-15" or "08:00 to 17:00")
             if (searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
             {
                 var parts = searchTerm.Split(["to"], StringSplitOptions.RemoveEmptyEntries);
@@ -41,8 +36,6 @@ internal sealed class GetWorkingScheduleQueryHandler(
                     else
                         // If the range parts can't be parsed, fall back to a standard contains search.
                         query = query.Where(x =>
-                            x.DocumentId.ToString().Contains(searchTerm) ||
-                            x.DoctorId.ToString().Contains(searchTerm) ||
                             x.DoctorName!.Contains(searchTerm) ||
                             x.Date.ToString().Contains(searchTerm) ||
                             x.StartTime.ToString().Contains(searchTerm) ||
@@ -53,21 +46,11 @@ internal sealed class GetWorkingScheduleQueryHandler(
                     // If "to" is present but splitting doesn't yield exactly two parts,
                     // use the standard search.
                     query = query.Where(x =>
-                        x.DocumentId.ToString().Contains(searchTerm) ||
-                        x.DoctorId.ToString().Contains(searchTerm) ||
                         x.DoctorName!.Contains(searchTerm) ||
                         x.Date.ToString().Contains(searchTerm) ||
                         x.StartTime.ToString().Contains(searchTerm) ||
                         x.EndTime.ToString().Contains(searchTerm));
                 }
-            }
-            else
-            {
-                query = query.Where(x =>
-                    //x.DocumentId.ToString().Contains(searchTerm) ||
-                    x.DoctorId!.Value.ToString().Contains(searchTerm) ||
-                    x.DoctorName!.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
-                );
             }
         }
 
@@ -86,8 +69,8 @@ internal sealed class GetWorkingScheduleQueryHandler(
             DoctorId = ws.DoctorId,
             DoctorName = ws.DoctorName,
             Date = ws.Date,
-            Start = ws.StartTime,
-            End = ws.EndTime
+            StartTime = ws.StartTime,
+            EndTime = ws.EndTime
         }).ToList();
         var result = new PagedResult<Response.GetWorkingScheduleResponse>(
             r1,

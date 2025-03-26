@@ -16,7 +16,16 @@ internal sealed class WorkingScheduleCreatedEventHandler(IMongoRepository<Workin
                 DoctorId = x.DoctorId,
                 StartTime = x.StartTime,
                 EndTime = x.EndTime,
-                Date = x.Date
+                Date = x.Date,
+                Note = x.Note,
+                Status = x.Status,
+                StepIndex = x.CustomerScheduleEntity.StepIndex,
+                CustomerName = x.CustomerScheduleEntity.CustomerName,
+                CustomerId = x.CustomerScheduleEntity.CustomerId,
+                ServiceId = x.CustomerScheduleEntity.ServiceId,
+                ServiceName = x.CustomerScheduleEntity.ServiceName,
+                CurrentProcedureName = x.CustomerScheduleEntity.CurrentProcedureName,
+                IsDeleted = x.IsDeleted,
             })
             .ToList();
         await repository.InsertManyAsync(workingSchedule);

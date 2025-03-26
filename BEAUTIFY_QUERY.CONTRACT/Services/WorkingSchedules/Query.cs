@@ -10,5 +10,13 @@ public static class Query
         int PageNumber,
         int PageSize) : IQuery<PagedResult<Response.GetWorkingScheduleResponse>>;
 
-    public record GetAllDoctorFreeTime(Guid DoctorId,Guid ClinicId,DateOnly Date) : IQuery<IReadOnlyList<Response.DoctorBusyTimeInADay>>;
+    public record GetAllDoctorFreeTime(Guid DoctorId, Guid ClinicId, DateOnly Date)
+        : IQuery<IReadOnlyList<Response.DoctorBusyTimeInADay>>;
+
+    public record GetWorkingScheduleOfDoctorId(
+        string? searchTerm,
+        string? SortColumn,
+        SortOrder SortOrder,
+        int PageNumber,
+        int PageSize) : IQuery<PagedResult<Response.GetWorkingScheduleResponse>>;
 }
