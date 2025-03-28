@@ -16,7 +16,6 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
             currentUserService.Role != Constant.Role.CLINIC_ADMIN)
             return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(new Error("403",
                 "You do not have permission to access this resource."));
-        var userId = currentUserService.UserId;
         var clinicId = currentUserService.ClinicId;
         var searchTerm = request.SearchTerm?.Trim() ?? string.Empty;
         var query = customerScheduleRepositoryBase.FindAll(x =>
@@ -58,6 +57,7 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
         var mapped = customerSchedules.Items.Select(x =>
             new Response.StaffCheckInCustomerScheduleResponse(
                 x.Id,
+                x.OrderId.Value,
                 x.Customer.FullName,
                 x.Customer.PhoneNumber,
                 x.Service.Name,

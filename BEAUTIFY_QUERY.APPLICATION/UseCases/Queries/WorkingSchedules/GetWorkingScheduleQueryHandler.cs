@@ -15,55 +15,80 @@ internal sealed class GetWorkingScheduleQueryHandler(
     {
         var searchTerm = request.searchTerm?.Trim();
         var query = repository.AsQueryable(x => !x.IsDeleted);
+
         if (!string.IsNullOrEmpty(searchTerm))
         {
-            if (searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
-            {
-                var parts = searchTerm.Split(["to"], StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length == 2)
-                {
-                    var part1 = parts[0].Trim();
-                    var part2 = parts[1].Trim();
-
-                    // Try to parse as a date range
-                    if (DateOnly.TryParse(part1, out var dateFrom) &&
-                        DateOnly.TryParse(part2, out var dateTo))
-                        query = query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
-                    // Otherwise, try to parse as a time range
-                    else if (TimeSpan.TryParse(part1, out var timeFrom) &&
-                             TimeSpan.TryParse(part2, out var timeTo))
-                        query = query.Where(x => x.StartTime >= timeFrom && x.EndTime <= timeTo);
-                    else
-                        // If the range parts can't be parsed, fall back to a standard contains search.
-                        query = query.Where(x =>
-                            x.DoctorName!.Contains(searchTerm) ||
-                            x.Date.ToString().Contains(searchTerm) ||
-                            x.StartTime.ToString().Contains(searchTerm) ||
-                            x.EndTime.ToString().Contains(searchTerm));
-                }
-                else
-                {
-                    // If "to" is present but splitting doesn't yield exactly two parts,
-                    // use the standard search.
-                    query = query.Where(x =>
-                        x.DoctorName!.Contains(searchTerm) ||
-                        x.Date.ToString().Contains(searchTerm) ||
-                        x.StartTime.ToString().Contains(searchTerm) ||
-                        x.EndTime.ToString().Contains(searchTerm));
-                }
-            }
+            query = ApplySearchFilter(query, searchTerm);
         }
 
+        query = ApplySorting(query, request);
 
-        query = request.SortOrder == SortOrder.Descending
-            ? query.OrderByDescending(GetSortProperty(request))
-            : query.OrderBy(GetSortProperty(request));
         var workingSchedules = await PagedResult<WorkingScheduleProjection>.CreateAsyncMongoLinq(
             query,
             request.PageNumber,
             request.PageSize
         );
-        var r1 = workingSchedules.Items.Select(ws => new Response.GetWorkingScheduleResponse
+
+        var result = MapToResponse(workingSchedules);
+        return Result.Success(result);
+    }
+
+    private static IMongoQueryable<WorkingScheduleProjection> ApplySearchFilter(
+        IMongoQueryable<WorkingScheduleProjection> query, string searchTerm)
+    {
+        if (searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
+        {
+            var parts = searchTerm.Split(["to"], StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 2)
+            {
+                var part1 = parts[0].Trim();
+                var part2 = parts[1].Trim();
+
+                if (TryParseDateRange(part1, part2, out var dateFrom, out var dateTo))
+                {
+                    return query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
+                }
+
+                if (TryParseTimeRange(part1, part2, out var timeFrom, out var timeTo))
+                {
+                    return query.Where(x => x.StartTime >= timeFrom && x.EndTime <= timeTo);
+                }
+            }
+        }
+
+        return query.Where(x =>
+            x.DoctorName!.Contains(searchTerm) ||
+            x.Date.ToString().Contains(searchTerm) ||
+            x.StartTime.ToString().Contains(searchTerm) ||
+            x.EndTime.ToString().Contains(searchTerm));
+    }
+
+    private static bool TryParseDateRange(string part1, string part2, out DateOnly dateFrom, out DateOnly dateTo)
+    {
+        dateFrom = default;
+        dateTo = default;
+        return DateOnly.TryParse(part1, out dateFrom) && DateOnly.TryParse(part2, out dateTo);
+    }
+
+    private static bool TryParseTimeRange(string part1, string part2, out TimeSpan timeFrom, out TimeSpan timeTo)
+    {
+        timeFrom = default;
+        timeTo = default;
+        return TimeSpan.TryParse(part1, out timeFrom) && TimeSpan.TryParse(part2, out timeTo);
+    }
+
+    private static IMongoQueryable<WorkingScheduleProjection> ApplySorting(
+        IMongoQueryable<WorkingScheduleProjection> query, Query.GetWorkingSchedule request)
+    {
+        return request.SortOrder == SortOrder.Descending
+            ? query.OrderByDescending(GetSortProperty(request))
+            : query.OrderBy(GetSortProperty(request));
+    }
+
+    private static PagedResult<Response.GetWorkingScheduleResponse> MapToResponse(
+        PagedResult<WorkingScheduleProjection> workingSchedules)
+    {
+        var responseItems = workingSchedules.Items.Select(ws => new Response.GetWorkingScheduleResponse
         {
             WorkingScheduleId = ws.DocumentId,
             DoctorId = ws.DoctorId,
@@ -72,13 +97,13 @@ internal sealed class GetWorkingScheduleQueryHandler(
             StartTime = ws.StartTime,
             EndTime = ws.EndTime
         }).ToList();
-        var result = new PagedResult<Response.GetWorkingScheduleResponse>(
-            r1,
+
+        return new PagedResult<Response.GetWorkingScheduleResponse>(
+            responseItems,
             workingSchedules.PageIndex,
             workingSchedules.PageSize,
             workingSchedules.TotalCount
         );
-        return Result.Success(result);
     }
 
     private static Expression<Func<WorkingScheduleProjection, object>> GetSortProperty(Query.GetWorkingSchedule request)

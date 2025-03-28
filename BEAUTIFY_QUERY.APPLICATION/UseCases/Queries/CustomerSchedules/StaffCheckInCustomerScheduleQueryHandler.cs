@@ -38,6 +38,7 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             .Include(x => x.Doctor)
             .ThenInclude(d => d.User)
             .Include(x => x.ProcedurePriceType)
+            .Include(x => x.Order)
             .ToListAsync(cancellationToken);
 
         if (customerSchedules.Count == 0)
@@ -84,6 +85,7 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
 
         return new Response.StaffCheckInCustomerScheduleResponse(
             Id: schedule.Id,
+            orderId: schedule.OrderId.Value,
             CustomerName: $"{user.FirstName} {user.LastName}".Trim(),
             CustomerPhoneNumber: user.PhoneNumber,
             ServiceName: schedule.Service?.Name ?? string.Empty,

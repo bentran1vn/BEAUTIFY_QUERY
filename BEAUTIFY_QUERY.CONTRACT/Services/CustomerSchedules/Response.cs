@@ -3,6 +3,7 @@ public static class Response
 {
     public record StaffCheckInCustomerScheduleResponse(
         Guid Id,
+        Guid orderId,
         string CustomerName,
         string CustomerPhoneNumber,
         string ServiceName,
