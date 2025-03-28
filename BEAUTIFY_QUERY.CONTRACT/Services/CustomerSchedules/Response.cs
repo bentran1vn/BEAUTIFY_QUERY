@@ -4,6 +4,7 @@ public static class Response
     public record StaffCheckInCustomerScheduleResponse(
         Guid Id,
         Guid orderId,
+        decimal Amount,
         string CustomerName,
         string CustomerPhoneNumber,
         string ServiceName,

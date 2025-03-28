@@ -58,6 +58,7 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
             new Response.StaffCheckInCustomerScheduleResponse(
                 x.Id,
                 x.OrderId.Value,
+                x.Order.FinalAmount.Value,
                 x.Customer.FullName,
                 x.Customer.PhoneNumber,
                 x.Service.Name,
