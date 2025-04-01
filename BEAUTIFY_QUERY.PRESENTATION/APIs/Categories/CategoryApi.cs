@@ -15,12 +15,15 @@ public class CategoryApi : ApiEndpoint, ICarterModule
     }
 
     private static async Task<IResult> GetAllCategories(
-        ISender sender, int? pageIndex,
-        int? pageSize)
+        ISender sender,
+        int? pageIndex,
+        int? pageSize, string? searchTerm = null)
     {
         Result result;
         if (pageIndex != null && pageSize == null) result = await sender.Send(new Query.GetAllCategoriesQuery());
-        else result = await sender.Send(new Query.GetAllCategoriesPagingQuery((int)pageIndex!, (int)pageSize!));
+        else
+            result = await sender.Send(
+                new Query.GetAllCategoriesPagingQuery(searchTerm, (int)pageIndex!, (int)pageSize!));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
