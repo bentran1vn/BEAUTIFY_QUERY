@@ -8,32 +8,22 @@ public class ProcedureDeletedEventHandler(IMongoRepository<ClinicServiceProjecti
 {
     public async Task<Result> Handle(DomainEvents.ProcedureDelete request, CancellationToken cancellationToken)
     {
-        var createRequest = request.entity;
+        var deleteRequest = request.entity;
 
         var isServiceExisted = await clinicServiceRepository
-            .FindOneAsync(p => p.DocumentId.Equals(createRequest.ServiceId));
+            .FindOneAsync(p => p.DocumentId.Equals(deleteRequest.ServiceId));
 
-        if (isServiceExisted == null) throw new Exception($"Service {createRequest.ServiceId} not found");
-
-        var procedure = new Procedure(
-            createRequest.Id,
-            createRequest.Description,
-            createRequest.Name,
-            createRequest.StepIndex,
-            createRequest.coverImage,
-            createRequest.procedurePriceTypes.Select(x => new ProcedurePriceType(x.Id, x.Name, x.Price,x.Duration,x.IsDefault)).ToList());
+        if (isServiceExisted == null) throw new Exception($"Service {deleteRequest.ServiceId} not found");
 
         var procedures = isServiceExisted.Procedures?.ToList() ?? [];
 
-        procedures.Add(procedure);
+        isServiceExisted.Procedures = procedures.Where(x => x.Id != deleteRequest.Id).ToList();
 
-        isServiceExisted.Procedures = procedures;
+        isServiceExisted.MinPrice = deleteRequest.MinPrice;
+        isServiceExisted.MaxPrice = deleteRequest.MaxPrice;
 
-        isServiceExisted.MinPrice = createRequest.MinPrice;
-        isServiceExisted.MaxPrice = createRequest.MaxPrice;
-
-        isServiceExisted.DiscountMinPrice = createRequest.DiscountMinPrice ?? createRequest.MinPrice;
-        isServiceExisted.DiscountMaxPrice = createRequest.DiscountMaxPrice ?? createRequest.MaxPrice;
+        isServiceExisted.DiscountMinPrice = deleteRequest.DiscountMinPrice;
+        isServiceExisted.DiscountMaxPrice = deleteRequest.DiscountMaxPrice;
 
         await clinicServiceRepository.ReplaceOneAsync(isServiceExisted);
 
