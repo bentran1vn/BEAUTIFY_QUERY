@@ -10,8 +10,7 @@ public static class Query
         int PageNumber,
         int PageSize) : IQuery<PagedResult<Response.GetBookingResponse>>;
 
-    public record GetTotalAppointment(
-        string date) : IQuery<Response.GetTotalAppointmentResponse>;
-    
-   // public record GetBookingWithDate(string Date): IQuery<Response.GetBookingWithDateResponse>;
+    public record GetTotalAppointment(string date) : IQuery<Response.GetTotalAppointmentResponse>;
+
+    public record GetBookingWithDate(string Date) : IQuery<Response.GetBookingWithDateResponse>;
 }
