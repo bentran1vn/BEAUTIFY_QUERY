@@ -14,4 +14,9 @@ public static class Query
 
     public record GetClinicServicesByIdQuery(Guid ServiceId, Guid? MainClinicId)
         : IQuery<Response.GetAllServiceByIdResponse>;
+
+    public record GetAllServiceInGetClinicByIdQuery(
+        int PageNumber,
+        int PageSize)
+        : IQuery<PagedResult<Response.GetAllServiceInGetClinicById>>;
 }

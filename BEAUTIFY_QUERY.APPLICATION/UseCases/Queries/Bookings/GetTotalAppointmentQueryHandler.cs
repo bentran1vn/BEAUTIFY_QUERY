@@ -14,7 +14,8 @@ internal sealed class GetTotalAppointmentQueryHandler(
     {
         if (!TryParseDate(request.date, out var firstDayOfMonth, out var lastDayOfMonth))
         {
-            return Result.Failure<Response.GetTotalAppointmentResponse>(new Error("400", "Invalid date format. Use MM-yyyy."));
+            return Result.Failure<Response.GetTotalAppointmentResponse>(new Error("400",
+                "Invalid date format. Use MM-yyyy."));
         }
 
         var filteredAppointments = await GetFilteredAppointmentsAsync(firstDayOfMonth, lastDayOfMonth);
@@ -40,7 +41,8 @@ internal sealed class GetTotalAppointmentQueryHandler(
         return true;
     }
 
-    private async Task<IEnumerable<CustomerScheduleProjection>> GetFilteredAppointmentsAsync(DateOnly firstDay, DateOnly lastDay)
+    private async Task<IEnumerable<CustomerScheduleProjection>> GetFilteredAppointmentsAsync(DateOnly firstDay,
+        DateOnly lastDay)
     {
         return customerScheduleMongoRepository.FilterBy(x =>
             x.Date >= firstDay &&
@@ -48,7 +50,8 @@ internal sealed class GetTotalAppointmentQueryHandler(
             x.ClinicId == currentUserService.ClinicId);
     }
 
-    private static List<Response.GetTotalAppointmentResponse.DayCount> CalculateDayCounts(IEnumerable<CustomerScheduleProjection> appointments)
+    private static List<Response.GetTotalAppointmentResponse.DayCount> CalculateDayCounts(
+        IEnumerable<CustomerScheduleProjection> appointments)
     {
         return appointments
             .GroupBy(x => x.Date)
