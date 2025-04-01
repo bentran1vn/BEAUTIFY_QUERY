@@ -8,8 +8,7 @@ using MongoDB.Driver.Linq;
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
 internal sealed class GetWorkingScheduleOfDoctorIdQueryHandler(
     IRepositoryBase<WorkingSchedule, Guid> workingScheduleRepository,
-    ICurrentUserService currentUserService) : IQueryHandler<Query.GetWorkingScheduleOfDoctorId,
-    PagedResult<Response.GetWorkingScheduleResponse>>
+    ICurrentUserService currentUserService) 
 {
     public async Task<Result<PagedResult<Response.GetWorkingScheduleResponse>>> Handle(
         Query.GetWorkingScheduleOfDoctorId request, CancellationToken cancellationToken)

@@ -9,9 +9,9 @@ public static class Response
         string CustomerPhoneNumber,
         string ServiceName,
         string DoctorName,
-        DateOnly BookingDate,
-        TimeSpan StartTime,
-        TimeSpan EndTime,
+        DateOnly? BookingDate,
+        TimeSpan? StartTime,
+        TimeSpan? EndTime,
         string Status,
         string ProcedurePriceTypeName);
 }

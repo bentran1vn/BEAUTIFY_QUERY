@@ -36,23 +36,31 @@ internal sealed class GetWorkingScheduleQueryHandler(
     private static IMongoQueryable<WorkingScheduleProjection> ApplySearchFilter(
         IMongoQueryable<WorkingScheduleProjection> query, string searchTerm)
     {
-        if (searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
+        if (!searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
+            return query.Where(x =>
+                x.DoctorName!.Contains(searchTerm) ||
+                x.Date.ToString().Contains(searchTerm) ||
+                x.StartTime.ToString().Contains(searchTerm) ||
+                x.EndTime.ToString().Contains(searchTerm));
         {
             var parts = searchTerm.Split(["to"], StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length == 2)
+            if (parts.Length != 2)
+                return query.Where(x =>
+                    x.DoctorName!.Contains(searchTerm) ||
+                    x.Date.ToString().Contains(searchTerm) ||
+                    x.StartTime.ToString().Contains(searchTerm) ||
+                    x.EndTime.ToString().Contains(searchTerm));
+            var part1 = parts[0].Trim();
+            var part2 = parts[1].Trim();
+
+            if (TryParseDateRange(part1, part2, out var dateFrom, out var dateTo))
             {
-                var part1 = parts[0].Trim();
-                var part2 = parts[1].Trim();
+                return query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
+            }
 
-                if (TryParseDateRange(part1, part2, out var dateFrom, out var dateTo))
-                {
-                    return query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
-                }
-
-                if (TryParseTimeRange(part1, part2, out var timeFrom, out var timeTo))
-                {
-                    return query.Where(x => x.StartTime >= timeFrom && x.EndTime <= timeTo);
-                }
+            if (TryParseTimeRange(part1, part2, out var timeFrom, out var timeTo))
+            {
+                return query.Where(x => x.StartTime >= timeFrom && x.EndTime <= timeTo);
             }
         }
 
@@ -72,8 +80,8 @@ internal sealed class GetWorkingScheduleQueryHandler(
 
     private static bool TryParseTimeRange(string part1, string part2, out TimeSpan timeFrom, out TimeSpan timeTo)
     {
-        timeFrom = default;
-        timeTo = default;
+        timeFrom = TimeSpan.Zero;
+        timeTo = TimeSpan.Zero;
         return TimeSpan.TryParse(part1, out timeFrom) && TimeSpan.TryParse(part2, out timeTo);
     }
 

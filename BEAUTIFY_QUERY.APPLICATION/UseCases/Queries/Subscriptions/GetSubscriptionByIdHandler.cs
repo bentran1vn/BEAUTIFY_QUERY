@@ -19,7 +19,7 @@ public class GetSubscriptionByIdHandler(IRepositoryBase<SubscriptionPackage, Gui
             Description = subscription.Description,
             Price = subscription.Price,
             Duration = subscription.Duration,
-            LimitBranch = subscription.LimitBranch,
+            LimitBranches = subscription.LimitBranch,
             LimitLiveStream = subscription.LimitLiveStream,
             EnhancedViewer = subscription.EnhancedViewer,
             IsActivated = subscription.IsActivated
