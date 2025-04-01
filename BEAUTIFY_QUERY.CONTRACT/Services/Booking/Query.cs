@@ -9,4 +9,9 @@ public static class Query
         SortOrder SortOrder,
         int PageNumber,
         int PageSize) : IQuery<PagedResult<Response.GetBookingResponse>>;
+
+    public record GetTotalAppointment(
+        string date) : IQuery<Response.GetTotalAppointmentResponse>;
+    
+   // public record GetBookingWithDate(string Date): IQuery<Response.GetBookingWithDateResponse>;
 }

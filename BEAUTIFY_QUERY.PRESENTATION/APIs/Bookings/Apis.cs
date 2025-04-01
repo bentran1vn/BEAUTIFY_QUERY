@@ -10,6 +10,7 @@ public class Apis : ApiEndpoint, ICarterModule
         var gr1 = app.NewVersionedApi("Bookings")
             .MapGroup(BaseUrl).HasApiVersion(1);
         gr1.MapGet("", GetBookingPagedResult).RequireAuthorization();
+        gr1.MapGet("appointments/total", GetTotalAppointment).RequireAuthorization();
     }
 
     private static async Task<IResult> GetBookingPagedResult(ISender sender, string? searchTerm = null,
@@ -20,6 +21,12 @@ public class Apis : ApiEndpoint, ICarterModule
     {
         var result = await sender.Send(new Query.GetBookingPagedResult(searchTerm, sortColumn,
             SortOrderExtension.ConvertStringToSortOrder(sortOrder), pageNumber, pageSize));
+        return result.IsSuccess ? Results.Ok(result) : HandlerFailure(result);
+    }
+
+    private static async Task<IResult> GetTotalAppointment(ISender sender, string Date)
+    {
+        var result = await sender.Send(new Query.GetTotalAppointment(Date));
         return result.IsSuccess ? Results.Ok(result) : HandlerFailure(result);
     }
 }
