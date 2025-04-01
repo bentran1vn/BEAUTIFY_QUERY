@@ -9,9 +9,9 @@ public class CustomerScheduleProjection : Document
     public string StepIndex;
     public string CustomerName;
     public Guid? CustomerId;
-    public TimeSpan StartTime;
-    public TimeSpan EndTime;
-    public DateOnly Date;
+    public TimeSpan? StartTime;
+    public TimeSpan? EndTime;
+    public DateOnly? Date;
     public Guid? ServiceId;
     public string ServiceName;
     public Guid? DoctorId;
