@@ -27,7 +27,6 @@ internal sealed class GetAllServiceInGetClinicByIdQueryHandler(
             DiscountMaxPrice = x.DiscountMaxPrice,
             DiscountMinPrice = x.DiscountMinPrice,
             CoverImage = x.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
-            DescriptionImage = x.DescriptionImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
         }).ToList();
         return Result.Success(new PagedResult<Response.GetAllServiceInGetClinicById>(mapList,
             result.PageIndex, result.PageSize, result.TotalCount));
