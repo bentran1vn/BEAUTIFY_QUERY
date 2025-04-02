@@ -1,7 +1,7 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Services;
-public class Query
+public static class Query
 {
     public record GetClinicServicesQuery(
         string? SearchTerm,
@@ -14,4 +14,9 @@ public class Query
 
     public record GetClinicServicesByIdQuery(Guid ServiceId, Guid? MainClinicId)
         : IQuery<Response.GetAllServiceByIdResponse>;
+
+    public record GetAllServiceInGetClinicByIdQuery(
+        int PageNumber,
+        int PageSize)
+        : IQuery<PagedResult<Response.GetAllServiceInGetClinicById>>;
 }

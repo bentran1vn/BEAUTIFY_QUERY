@@ -31,4 +31,48 @@ public static class Response
             public int Cancelled { get; init; }
         }
     }
+
+    public class GetBookingWithDateResponse
+    {
+        public string Date { get; set; }
+        public List<AppointmentResponse> Appointments { get; set; }
+    }
+
+    public class AppointmentResponse
+    {
+        public Guid Id { get; set; }
+        public CustomerResponse Customer { get; set; }
+        public ServiceResponse Service { get; set; }
+        public TimeSpan? StartTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
+        public string Duration { get; set; }
+        public string Status { get; set; }
+        public DoctorResponse Doctor { get; set; }
+        public ClinicResponse Clinic { get; set; }
+    }
+
+    public class CustomerResponse
+    {
+        public Guid? Id { get; set; }
+        public string Name { get; set; }
+        public string Avatar { get; set; }
+    }
+
+    public class ServiceResponse
+    {
+        public Guid? Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class DoctorResponse
+    {
+        public Guid? Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class ClinicResponse
+    {
+        public Guid? Id { get; set; }
+        public string Name { get; set; }
+    }
 }

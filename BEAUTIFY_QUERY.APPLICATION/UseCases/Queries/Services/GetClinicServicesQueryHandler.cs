@@ -7,23 +7,17 @@ using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Services;
 public class
-    GetClinicServicesQueryHandler : IQueryHandler<Query.GetClinicServicesQuery,
-    PagedResult<Response.GetAllServiceResponse>>
+    GetClinicServicesQueryHandler(IMongoRepository<ClinicServiceProjection> clinicServiceRepository)
+    : IQueryHandler<Query.GetClinicServicesQuery,
+        PagedResult<Response.GetAllServiceResponse>>
 {
-    private readonly IMongoRepository<ClinicServiceProjection> _clinicServiceRepository;
-
-    public GetClinicServicesQueryHandler(IMongoRepository<ClinicServiceProjection> clinicServiceRepository)
-    {
-        _clinicServiceRepository = clinicServiceRepository;
-    }
-
     public async Task<Result<PagedResult<Response.GetAllServiceResponse>>> Handle(Query.GetClinicServicesQuery request,
         CancellationToken cancellationToken)
     {
         // 1. Trim and store the search term
         var searchTerm = request.SearchTerm?.Trim() ?? string.Empty;
 
-        var query = _clinicServiceRepository.AsQueryable();
+        var query = clinicServiceRepository.AsQueryable();
 
         // 3. If a search term was provided, filter further
         if (request.MainClinicId.HasValue)

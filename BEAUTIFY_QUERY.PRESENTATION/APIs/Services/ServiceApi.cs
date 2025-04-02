@@ -12,6 +12,7 @@ public class ServiceApi : ApiEndpoint, ICarterModule
 
         gr1.MapGet(string.Empty, GetAllServices);
         gr1.MapGet("{id}", GetServicesById);
+        gr1.MapGet("clinic", GetServicesByClinicId).RequireAuthorization();
     }
 
     private static async Task<IResult> GetAllServices(
@@ -36,6 +37,13 @@ public class ServiceApi : ApiEndpoint, ICarterModule
 
         var result = await sender.Send(new Query.GetClinicServicesByIdQuery(id,
             !string.IsNullOrEmpty(mainClinicId) ? new Guid(mainClinicId) : null));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetServicesByClinicId(
+        ISender sender, int pageIndex = 1, int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.GetAllServiceInGetClinicByIdQuery(pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }

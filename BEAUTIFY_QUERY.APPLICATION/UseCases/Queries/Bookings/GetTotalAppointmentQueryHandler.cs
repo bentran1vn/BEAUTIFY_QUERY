@@ -12,25 +12,50 @@ internal sealed class GetTotalAppointmentQueryHandler(
     public async Task<Result<Response.GetTotalAppointmentResponse>> Handle(Query.GetTotalAppointment request,
         CancellationToken cancellationToken)
     {
-        // Parse the input month/year (assuming request.date is in "MM/yyyy" format)
-        var parts = request.date.Split('-');
-        if (parts.Length != 2 || !int.TryParse(parts[0], out var month) || !int.TryParse(parts[1], out var year))
+        if (!TryParseDate(request.date, out var firstDayOfMonth, out var lastDayOfMonth))
         {
             return Result.Failure<Response.GetTotalAppointmentResponse>(new Error("400",
-                "Invalid date format. Use MM/yyyy."));
+                "Invalid date format. Use MM-yyyy."));
         }
 
-        // Create date range for the entire month
-        var firstDayOfMonth = new DateOnly(year, month, 1);
-        var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+        var filteredAppointments = await GetFilteredAppointmentsAsync(firstDayOfMonth, lastDayOfMonth);
+        var dayCounts = CalculateDayCounts(filteredAppointments);
+        return Result.Success(new Response.GetTotalAppointmentResponse
+        {
+            Month = request.date,
+            Days = dayCounts
+        });
+    }
 
-        var filteredAppointments = customerScheduleMongoRepository.FilterBy(x =>
-            x.Date >= firstDayOfMonth &&
-            x.Date <= lastDayOfMonth &&
+    private static bool TryParseDate(string dateString, out DateOnly firstDayOfMonth, out DateOnly lastDayOfMonth)
+    {
+        firstDayOfMonth = default;
+        lastDayOfMonth = default;
+
+        var parts = dateString.Split('-');
+        if (parts.Length != 2 || !int.TryParse(parts[0], out var month) || !int.TryParse(parts[1], out var year))
+            return false;
+
+        firstDayOfMonth = new DateOnly(year, month, 1);
+        lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+        return true;
+    }
+
+    private async Task<IEnumerable<CustomerScheduleProjection>> GetFilteredAppointmentsAsync(DateOnly firstDay,
+        DateOnly lastDay)
+    {
+        return customerScheduleMongoRepository.FilterBy(x =>
+            x.Date >= firstDay &&
+            x.Date <= lastDay &&
             x.ClinicId == currentUserService.ClinicId);
+    }
 
-        var dayCounts = filteredAppointments
+    private static List<Response.GetTotalAppointmentResponse.DayCount> CalculateDayCounts(
+        IEnumerable<CustomerScheduleProjection> appointments)
+    {
+        return appointments
             .GroupBy(x => x.Date)
+            .Where(g => g.Any())
             .Select(g => new Response.GetTotalAppointmentResponse.DayCount
             {
                 Date = g.Key.Value.ToString("yyyy-MM-dd"),
@@ -44,11 +69,5 @@ internal sealed class GetTotalAppointmentQueryHandler(
                 }
             })
             .ToList();
-
-        return Result.Success(new Response.GetTotalAppointmentResponse
-        {
-            Month = request.date,
-            Days = dayCounts
-        });
     }
 }
