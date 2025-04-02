@@ -60,9 +60,7 @@ public class GetClinicDetailQueryHandler(
             DiscountMaxPrice = x.DiscountMaxPrice,
             DiscountMinPrice = x.DiscountMinPrice,
             CoverImage = x.CoverImage.Select(x => new CONTRACT.Services.Services.Response.Image(x.Id, x.Index, x.Url))
-                .ToList(),
-            DescriptionImage = x.DescriptionImage
-                .Select(x => new CONTRACT.Services.Services.Response.Image(x.Id, x.Index, x.Url)).ToList()
+                .ToList()
         }).ToList();
 
         var result = MapToResponse(clinic, branchDetails, mappedServices);

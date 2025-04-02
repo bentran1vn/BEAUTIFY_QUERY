@@ -36,11 +36,6 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
             isServiceExisted.CoverImage = UpdateImageCollection(isServiceExisted.CoverImage.ToList(),
                 serviceRequest.CoverImages.ToList());
 
-        // Update Description Images
-        if (serviceRequest.DescriptionImages?.Any() == true)
-            isServiceExisted.DescriptionImage = UpdateImageCollection(isServiceExisted.DescriptionImage.ToList(),
-                serviceRequest.DescriptionImages.ToList());
-
         // Save updated service back to the database
         await _clinicServiceRepository.ReplaceOneAsync(isServiceExisted);
 
