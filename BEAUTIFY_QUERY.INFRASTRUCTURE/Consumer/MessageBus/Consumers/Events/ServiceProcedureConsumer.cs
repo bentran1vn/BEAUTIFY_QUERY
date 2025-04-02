@@ -10,6 +10,9 @@ public class ServiceProcedureConsumer
     public class ProcedureCreatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.ProcedureCreated>(sender, repository);
     
+    public class ProcedureUpdatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.ProcedureUpdate>(sender, repository);
+    
     public class ProcedureDeletedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.ProcedureDelete>(sender, repository);
 }

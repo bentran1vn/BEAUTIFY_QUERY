@@ -63,7 +63,6 @@ public class Response
         public decimal DiscountMaxPrice { get; set; }
         public decimal DiscountMinPrice { get; set; }
         public ICollection<Image> CoverImage { get; set; }
-        public ICollection<Image> DescriptionImage { get; set; }
     }
 
     public record GetAllServiceByIdResponse(
@@ -76,7 +75,6 @@ public class Response
         decimal DiscountMaxPrice,
         decimal DiscountMinPrice,
         ICollection<Image> CoverImage,
-        ICollection<Image> DescriptionImage,
         ICollection<Clinic>? Clinics,
         Category Category,
         ICollection<Procedure> Procedures,
@@ -88,7 +86,6 @@ public class Response
         string Name,
         string Description,
         int StepIndex,
-        string[] coverImage,
         ICollection<ProcedurePriceType> procedurePriceTypes
     );
 

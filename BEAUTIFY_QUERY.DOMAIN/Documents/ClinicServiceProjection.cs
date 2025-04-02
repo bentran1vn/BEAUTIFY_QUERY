@@ -9,8 +9,6 @@ public class ClinicServiceProjection : Document
     public string Name { get; set; }
     public string Description { get; set; }
     public ICollection<Image> CoverImage { get; set; }
-    public ICollection<Image> DescriptionImage { get; set; }
-
     public ICollection<EntityEvent.DoctorServiceEntity> DoctorServices { get; set; } = [];
     public decimal DiscountPercent { get; set; } = 0;
     public decimal MaxPrice { get; set; } = 0;
@@ -45,7 +43,6 @@ public record Procedure(
     string Name,
     string Description,
     int StepIndex,
-    string[] coverImage,
     ICollection<ProcedurePriceType> procedurePriceTypes
 );
 

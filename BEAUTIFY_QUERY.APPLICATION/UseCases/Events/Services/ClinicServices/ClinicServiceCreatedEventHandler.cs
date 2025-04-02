@@ -27,12 +27,6 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
                 Index = x.Index,
                 Url = x.Url
             }).ToList(),
-            DescriptionImage = serviceRequest.DescriptionImages.Select(x => new Image
-            {
-                Id = x.Id,
-                Index = x.Index,
-                Url = x.Url
-            }).ToList(),
             Category = new Category(
                 serviceRequest.Category.Id, serviceRequest.Category.Name,
                 serviceRequest.Category.Description

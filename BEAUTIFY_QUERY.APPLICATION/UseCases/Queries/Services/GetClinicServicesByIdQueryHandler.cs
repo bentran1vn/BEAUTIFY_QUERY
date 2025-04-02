@@ -28,7 +28,6 @@ public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServicePro
                 isServiceExisted.DiscountMaxPrice,
                 isServiceExisted.DiscountMinPrice,
                 isServiceExisted.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
-                isServiceExisted.DescriptionImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
                 isServiceExisted.Clinic.Select(y => new Response.Clinic(
                     y.Id,
                     y.Name,
@@ -47,7 +46,6 @@ public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServicePro
                     x.Name,
                     x.Description,
                     x.StepIndex,
-                    x.coverImage,
                     x.procedurePriceTypes.Select(y => new Response.ProcedurePriceType(
                         y.Id,
                         y.Name,
@@ -81,7 +79,6 @@ public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServicePro
                 isServiceExisted.DiscountMaxPrice,
                 isServiceExisted.DiscountMinPrice,
                 isServiceExisted.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
-                isServiceExisted.DescriptionImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
                 isServiceExisted.Clinic.Select(y => new Response.Clinic(
                     y.Id,
                     y.Name,
@@ -100,7 +97,6 @@ public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServicePro
                     x.Name,
                     x.Description,
                     x.StepIndex,
-                    x.coverImage,
                     x.procedurePriceTypes.Select(y => new Response.ProcedurePriceType(
                         y.Id,
                         y.Name,
