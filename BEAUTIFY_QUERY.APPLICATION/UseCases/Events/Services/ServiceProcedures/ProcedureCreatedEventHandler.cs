@@ -17,8 +17,8 @@ public class ProcedureCreatedEventHandler(IMongoRepository<ClinicServiceProjecti
 
         var procedure = new Procedure(
             createRequest.Id,
-            createRequest.Description,
             createRequest.Name,
+            createRequest.Description,
             createRequest.StepIndex,
             createRequest.procedurePriceTypes.Select(x => new ProcedurePriceType(x.Id, x.Name, x.Price,x.Duration,x.IsDefault)).ToList());
 
