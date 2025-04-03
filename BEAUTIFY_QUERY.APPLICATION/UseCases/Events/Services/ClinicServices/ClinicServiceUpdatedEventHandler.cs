@@ -31,10 +31,15 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
         isServiceExisted.Clinic = serviceRequest.Clinic.Select(x => new Clinic(
             x.Id, x.Name, x.Email, x.City, x.Address, x.District, x.Ward, x.FullAddress, x.PhoneNumber,
             x.ProfilePictureUrl, x.IsParent, x.ParentId)).ToList();
-        // Update Cover Images
-        if (serviceRequest.CoverImages?.Any() == true)
-            isServiceExisted.CoverImage = UpdateImageCollection(isServiceExisted.CoverImage.ToList(),
-                serviceRequest.CoverImages.ToList());
+
+        isServiceExisted.CoverImage = serviceRequest.CoverImages
+            .Select(x => new Image()
+            {
+                Id = x.Id,
+                Index = x.Index,
+                Url = x.Url
+            }).ToList();
+            
 
         // Save updated service back to the database
         await _clinicServiceRepository.ReplaceOneAsync(isServiceExisted);
