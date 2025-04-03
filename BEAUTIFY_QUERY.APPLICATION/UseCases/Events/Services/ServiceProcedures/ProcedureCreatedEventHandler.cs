@@ -42,7 +42,7 @@ public class ProcedureCreatedEventHandler(IMongoRepository<ClinicServiceProjecti
         }
         else
         {
-            var nextStepIndex = isServiceExisted.Procedures?.Any() == true ? isServiceExisted.Procedures?.Max(x => x.StepIndex) + 1 : 0;
+            var nextStepIndex = isServiceExisted.Procedures?.Any() == true ? isServiceExisted.Procedures?.Max(x => x.StepIndex) + 1 : 1;
             indexToAdd = nextStepIndex;
             var proceduresUpdate = isServiceExisted.Procedures?.Where(x => x.StepIndex != nextStepIndex).ToList() ?? [];
             proceduresToUpdate.AddRange(proceduresUpdate);
