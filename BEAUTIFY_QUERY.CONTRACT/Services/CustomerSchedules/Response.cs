@@ -24,6 +24,7 @@ public static class Response
         TimeSpan? StartTime,
         TimeSpan? EndTime,
         string Status,
+        string DoctorNote,
 
         // Current procedure details
         ProcedureDetailResponse CurrentProcedure);

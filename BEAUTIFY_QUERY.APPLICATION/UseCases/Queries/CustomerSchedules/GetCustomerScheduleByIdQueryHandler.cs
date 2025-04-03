@@ -38,6 +38,7 @@ internal sealed class GetCustomerScheduleByIdQueryHandler(
             customerSchedule.StartTime,
             customerSchedule.EndTime,
             customerSchedule.Status ?? string.Empty,
+            customerSchedule.DoctorNote ?? string.Empty,
             currentProcedure);
 
         return Result.Success(response);
