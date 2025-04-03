@@ -29,21 +29,28 @@ public class ProcedureCreatedEventHandler(IMongoRepository<ClinicServiceProjecti
             {
                 item.StepIndex += 1;
             }
+            
+            var proceduresDown = isServiceExisted.Procedures?.Where(x => x.StepIndex < createRequest.StepIndex).ToList() ?? [];
 
             if (proceduresUpdate.Any())
                 proceduresToUpdate.AddRange(proceduresUpdate);
+            
+            if (proceduresDown.Any())
+                proceduresToUpdate.AddRange(proceduresDown);
             
             indexToAdd = createRequest.StepIndex;
         }
         else
         {
-            var nextStepIndex = isServiceExisted.Procedures?.Max(x => x.StepIndex) + 1 ?? 0;
+            var nextStepIndex = isServiceExisted.Procedures?.Any() == true ? isServiceExisted.Procedures?.Max(x => x.StepIndex) + 1 : 1;
             indexToAdd = nextStepIndex;
+            var proceduresUpdate = isServiceExisted.Procedures?.Where(x => x.StepIndex != nextStepIndex).ToList() ?? [];
+            proceduresToUpdate.AddRange(proceduresUpdate);
         }
 
         var procedure = new Procedure()
         {
-            Id = Guid.NewGuid(),
+            Id = createRequest.Id,
             Name = createRequest.Name,
             Description = createRequest.Description,
             StepIndex = (int)indexToAdd,
