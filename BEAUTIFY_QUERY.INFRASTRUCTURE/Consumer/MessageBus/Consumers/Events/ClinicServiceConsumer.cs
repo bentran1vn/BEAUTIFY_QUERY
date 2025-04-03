@@ -12,4 +12,7 @@ public static class ClinicServiceConsumer
 
     public class ClinicServiceUpdatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.ClinicServiceUpdated>(sender, repository);
+    
+    public class ClinicServiceDeletedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.ClinicServiceDeleted>(sender, repository);
 }
