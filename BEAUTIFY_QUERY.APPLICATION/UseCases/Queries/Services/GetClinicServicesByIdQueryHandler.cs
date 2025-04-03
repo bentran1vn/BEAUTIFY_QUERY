@@ -46,7 +46,7 @@ public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServicePro
                     x.Name,
                     x.Description,
                     x.StepIndex,
-                    x.procedurePriceTypes.Select(y => new Response.ProcedurePriceType(
+                    x.ProcedurePriceTypes.Select(y => new Response.ProcedurePriceType(
                         y.Id,
                         y.Name,
                         y.Price,
@@ -98,7 +98,7 @@ public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServicePro
                     x.Name,
                     x.Description,
                     x.StepIndex,
-                    x.procedurePriceTypes.Select(y => new Response.ProcedurePriceType(
+                    x.ProcedurePriceTypes.Select(y => new Response.ProcedurePriceType(
                         y.Id,
                         y.Name,
                         y.Price,
