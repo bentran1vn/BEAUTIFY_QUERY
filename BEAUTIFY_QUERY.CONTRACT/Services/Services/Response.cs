@@ -89,7 +89,7 @@ public class Response
         ICollection<ProcedurePriceType> procedurePriceTypes
     );
 
-    public record ProcedurePriceType(Guid Id, string Name, decimal Price, bool IsDefault);
+    public record ProcedurePriceType(Guid Id, string Name, int Duration, decimal Price, bool IsDefault);
 
     public record Image(Guid Id, int Index, string Url);
 
