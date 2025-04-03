@@ -17,7 +17,6 @@ public class ClinicServiceProjection : Document
     public decimal DiscountMinPrice { get; set; } = 0;
     public Category Category { get; set; }
     public ICollection<Clinic> Clinic { get; set; }
-
     public ICollection<Procedure> Procedures { get; set; } = Array.Empty<Procedure>();
     public ICollection<Promotion> Promotions { get; set; } = Array.Empty<Promotion>();
 }
