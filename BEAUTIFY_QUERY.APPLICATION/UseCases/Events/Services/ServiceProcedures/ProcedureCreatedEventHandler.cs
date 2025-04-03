@@ -30,7 +30,7 @@ public class ProcedureCreatedEventHandler(IMongoRepository<ClinicServiceProjecti
                 item.StepIndex += 1;
             }
             
-            var proceduresDown = isServiceExisted.Procedures?.Where(x => x.StepIndex > createRequest.StepIndex).ToList() ?? [];
+            var proceduresDown = isServiceExisted.Procedures?.Where(x => x.StepIndex < createRequest.StepIndex).ToList() ?? [];
 
             if (proceduresUpdate.Any())
                 proceduresToUpdate.AddRange(proceduresUpdate);
