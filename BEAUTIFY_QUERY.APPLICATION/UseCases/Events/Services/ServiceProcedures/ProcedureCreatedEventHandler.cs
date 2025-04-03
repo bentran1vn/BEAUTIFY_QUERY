@@ -50,7 +50,7 @@ public class ProcedureCreatedEventHandler(IMongoRepository<ClinicServiceProjecti
 
         var procedure = new Procedure()
         {
-            Id = Guid.NewGuid(),
+            Id = createRequest.Id,
             Name = createRequest.Name,
             Description = createRequest.Description,
             StepIndex = (int)indexToAdd,
