@@ -17,6 +17,7 @@ public class GetClinicDetailQueryHandler(
     public async Task<Result<Response.GetClinicDetail>> Handle(Query.GetClinicDetailQuery request,
         CancellationToken cancellationToken)
     {
+        
         var clinic = await clinicRepository.FindByIdAsync(request.id, cancellationToken);
         if (clinic == null || clinic.IsDeleted)
             return Result.Failure<Response.GetClinicDetail>(new Error("404", "Clinic not found."));
