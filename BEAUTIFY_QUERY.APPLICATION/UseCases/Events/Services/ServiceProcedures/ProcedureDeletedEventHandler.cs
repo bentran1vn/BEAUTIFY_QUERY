@@ -17,7 +17,20 @@ public class ProcedureDeletedEventHandler(IMongoRepository<ClinicServiceProjecti
 
         var procedures = isServiceExisted.Procedures?.ToList() ?? [];
 
-        isServiceExisted.Procedures = procedures.Where(x => x.Id != deleteRequest.Id).ToList();
+        var existPro = procedures.FirstOrDefault(x => x.Id == deleteRequest.Id)!;
+        
+        isServiceExisted.Procedures = procedures.Select(x => x.StepIndex > existPro.StepIndex
+            ? new Procedure()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Description = x.Description,
+                StepIndex = x.StepIndex - 1,
+                ProcedurePriceTypes = x.ProcedurePriceTypes.Select(y => new ProcedurePriceType(y.Id, y.Name, y.Price, y.Duration, y.IsDefault)).ToList()
+            }
+            : x).ToList();
+        
+        isServiceExisted.Procedures.Remove(existPro);
 
         isServiceExisted.MinPrice = deleteRequest.MinPrice;
         isServiceExisted.MaxPrice = deleteRequest.MaxPrice;

@@ -16,15 +16,48 @@ public class ProcedureUpdatedEventHandler(IMongoRepository<ClinicServiceProjecti
 
         if (isServiceExisted == null) throw new Exception($"Service {createRequest.ServiceId} not found");
         
-        isServiceExisted.Procedures = isServiceExisted.Procedures
-            .Select(x => x.Id.Equals(createRequest.Id) ? new Procedure(
-                createRequest.Id,
-                createRequest.Description,
-                createRequest.Name,
-                createRequest.StepIndex,
-                createRequest.procedurePriceTypes.Select(y => new ProcedurePriceType(y.Id, y.Name, y.Price, y.Duration, y.IsDefault)).ToList())
-                : x)
-            .ToList();
+        List<Procedure> proceduresToUpdate = new List<Procedure>();
+        int? indexToAdd;
+        
+        var isExisted = isServiceExisted.Procedures?.FirstOrDefault(x => x.Id == createRequest.Id);
+        
+        if (isExisted != null)
+        {
+            if (isExisted.StepIndex != createRequest.StepIndex)
+            {
+                var proceduresUpdate = isServiceExisted.Procedures
+                    ?.Where(x => x.StepIndex != createRequest.StepIndex).ToList() ?? new List<Procedure>();
+                
+                foreach (var item in proceduresUpdate)
+                {
+                    if (item.StepIndex < createRequest.StepIndex)
+                        item.StepIndex += 1;
+                    else
+                        item.StepIndex -= 1;
+                }
+                
+                proceduresToUpdate.AddRange(proceduresUpdate);
+            }
+            indexToAdd = createRequest.StepIndex;
+        }
+        else
+        {
+            indexToAdd = isServiceExisted.Procedures?.Max(x => x.StepIndex) + 1 ?? 0;
+        }
+        
+        var procedure = new Procedure()
+        {
+            Id = createRequest.Id,
+            Name = createRequest.Name,
+            Description = createRequest.Description,
+            StepIndex = (int)indexToAdd,
+            ProcedurePriceTypes = createRequest.procedurePriceTypes
+                .Select(x => new ProcedurePriceType(x.Id, x.Name, x.Price,x.Duration,x.IsDefault)).ToList()
+        };
+        
+        proceduresToUpdate.Add(procedure);
+
+        isServiceExisted.Procedures = proceduresToUpdate;
         
         isServiceExisted.MinPrice = createRequest.MinPrice;
         isServiceExisted.MaxPrice = createRequest.MaxPrice;
