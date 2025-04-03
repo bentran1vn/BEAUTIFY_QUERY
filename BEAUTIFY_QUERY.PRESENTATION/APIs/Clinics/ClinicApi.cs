@@ -1,3 +1,4 @@
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Clinics;
@@ -11,7 +12,7 @@ public class ClinicApi : ApiEndpoint, ICarterModule
             .MapGroup(BaseUrl).HasApiVersion(1);
 
         gr1.MapGet(string.Empty, GetAllClinics);
-        gr1.MapGet("{id}", GetClinicDetail).RequireAuthorization();
+        gr1.MapGet("{id}", GetClinicDetail).RequireAuthorization(Constant.Role.CLINIC_ADMIN);
         gr1.MapGet("application", GetAllApplyRequest);
         gr1.MapGet("application/{id}", GetDetailApplyRequest);
         gr1.MapGet("{clinicId:guid}/employees", GetAllAccountOfEmployee);

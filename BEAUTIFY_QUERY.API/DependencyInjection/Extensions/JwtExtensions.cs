@@ -1,4 +1,5 @@
 using System.Text;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.INFRASTRUCTURE.DependencyInjection.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -55,12 +56,13 @@ public static class JwtExtensions
             //o.EventsType = typeof(CustomJwtBearerEvents);
         });
 
-        services.AddAuthorization(opts =>
-        {
-            // opts.AddPolicy(RoleNames.Student, policy => policy.RequireRole("0"));
-            // opts.AddPolicy(RoleNames.Mentor, policy => policy.RequireRole("1"));
-            // opts.AddPolicy(RoleNames.Admin, policy => policy.RequireRole("2"));
-        });
+        services.AddAuthorizationBuilder()
+            .AddPolicy(Constant.Role.CLINIC_STAFF, policy => policy.RequireRole(Constant.Role.CLINIC_STAFF))
+            .AddPolicy(Constant.Role.CLINIC_ADMIN, policy => policy.RequireRole(Constant.Role.CLINIC_ADMIN))
+            .AddPolicy(Constant.Role.DOCTOR, policy => policy.RequireRole(Constant.Role.DOCTOR))
+            .AddPolicy(Constant.Role.CUSTOMER, policy => policy.RequireRole(Constant.Role.CUSTOMER))
+            .AddPolicy(Constant.Role.SYSTEM_ADMIN, policy => policy.RequireRole(Constant.Role.SYSTEM_ADMIN))
+            .AddPolicy(Constant.Role.SYSTEM_STAFF, policy => policy.RequireRole(Constant.Role.SYSTEM_STAFF));
         // services.AddScoped<CustomJwtBearerEvents>();
     }
 }
