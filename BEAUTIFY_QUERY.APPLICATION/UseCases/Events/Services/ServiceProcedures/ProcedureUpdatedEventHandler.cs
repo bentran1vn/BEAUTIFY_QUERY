@@ -5,9 +5,9 @@ using BEAUTIFY_QUERY.DOMAIN.Documents;
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.ServiceProcedures;
 
 public class ProcedureUpdatedEventHandler(IMongoRepository<ClinicServiceProjection> clinicServiceRepository)
-    : ICommandHandler<DomainEvents.ProcedureCreated>
+    : ICommandHandler<DomainEvents.ProcedureUpdate>
 {
-    public async Task<Result> Handle(DomainEvents.ProcedureCreated request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(DomainEvents.ProcedureUpdate request, CancellationToken cancellationToken)
     {
         var createRequest = request.entity;
 
@@ -22,7 +22,8 @@ public class ProcedureUpdatedEventHandler(IMongoRepository<ClinicServiceProjecti
                 createRequest.Description,
                 createRequest.Name,
                 createRequest.StepIndex,
-                createRequest.procedurePriceTypes.Select(y => new ProcedurePriceType(y.Id, y.Name, y.Price, y.Duration, y.IsDefault)).ToList()) : x)
+                createRequest.procedurePriceTypes.Select(y => new ProcedurePriceType(y.Id, y.Name, y.Price, y.Duration, y.IsDefault)).ToList())
+                : x)
             .ToList();
         
         isServiceExisted.MinPrice = createRequest.MinPrice;
