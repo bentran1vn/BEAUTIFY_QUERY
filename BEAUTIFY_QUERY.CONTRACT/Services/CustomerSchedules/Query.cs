@@ -15,6 +15,6 @@ public static class Query
         SortOrder? SortOrder,
         int PageIndex,
         int PageSize) : IQuery<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>;
-    
-  
+
+    public record GetCustomerScheduleById(Guid Id) : IQuery<Response.CustomerScheduleWithProceduresResponse>;
 }

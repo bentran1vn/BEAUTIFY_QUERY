@@ -75,7 +75,7 @@ internal sealed class GetBookingPagedResultQueryHandler(
                 x.StartTime,
                 x.EndTime,
                 x.ServiceName,
-                x.CurrentProcedureName,
+                x.CurrentProcedure,
                 x.Status,
                 x.Date
             )).ToList();

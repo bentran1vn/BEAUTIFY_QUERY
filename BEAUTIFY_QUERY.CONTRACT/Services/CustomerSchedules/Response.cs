@@ -14,4 +14,23 @@ public static class Response
         TimeSpan? EndTime,
         string Status,
         string ProcedurePriceTypeName);
+
+    public record CustomerScheduleWithProceduresResponse(
+        // Basic customer information
+        Guid Id,
+        string CustomerName,
+        string ServiceName,
+        DateOnly? BookingDate,
+        TimeSpan? StartTime,
+        TimeSpan? EndTime,
+        string Status,
+
+        // Current procedure details
+        ProcedureDetailResponse CurrentProcedure);
+
+    public record ProcedureDetailResponse(
+        Guid Id,
+        string Name,
+        string StepIndex,
+        DateOnly? Date);
 }

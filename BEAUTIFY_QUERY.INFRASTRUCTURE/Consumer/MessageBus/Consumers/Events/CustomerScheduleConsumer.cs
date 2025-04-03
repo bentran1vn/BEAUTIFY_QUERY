@@ -17,4 +17,14 @@ public class CustomerScheduleConsumer
         ISender sender,
         IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.CustomerScheduleUpdateAfterPaymentCompleted>(sender, repository);
+
+    public class CustomerScheduleUpdatedDoctorNoteEvent(
+        ISender sender,
+        IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.CustomerScheduleUpdatedDoctorNote>(sender, repository);
+
+    public class CustomerScheduleUpdateDateAndTimeEvent(
+        ISender sender,
+        IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.CustomerScheduleUpdateDateAndTime>(sender, repository);
 }

@@ -1,4 +1,6 @@
-﻿namespace BEAUTIFY_QUERY.CONTRACT.Services.Booking;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.EntityEvents;
+
+namespace BEAUTIFY_QUERY.CONTRACT.Services.Booking;
 public static class Response
 {
     public record GetBookingResponse(
@@ -7,7 +9,7 @@ public static class Response
         TimeSpan? Start,
         TimeSpan? End,
         string ServiceName,
-        string CurrentProcedurePriceType,
+        EntityEvent.ProcedurePriceTypeEntity CurrentProcedurePriceType,
         string Status,
         DateOnly? date);
 

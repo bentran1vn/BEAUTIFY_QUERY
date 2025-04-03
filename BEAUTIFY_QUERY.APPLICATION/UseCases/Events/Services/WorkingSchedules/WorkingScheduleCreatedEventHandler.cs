@@ -19,12 +19,12 @@ internal sealed class WorkingScheduleCreatedEventHandler(IMongoRepository<Workin
                 Date = x.Date,
                 Note = x.Note,
                 Status = x.Status,
-                StepIndex = x.CustomerScheduleEntity.StepIndex,
+                StepIndex = x.CustomerScheduleEntity.CurrentProcedure.StepIndex,
                 CustomerName = x.CustomerScheduleEntity.CustomerName,
                 CustomerId = x.CustomerScheduleEntity.CustomerId,
                 ServiceId = x.CustomerScheduleEntity.ServiceId,
                 ServiceName = x.CustomerScheduleEntity.ServiceName,
-                CurrentProcedureName = x.CustomerScheduleEntity.CurrentProcedureName,
+                CurrentProcedureName = x.CustomerScheduleEntity.CurrentProcedure.Name,
                 IsDeleted = x.IsDeleted,
             })
             .ToList();
