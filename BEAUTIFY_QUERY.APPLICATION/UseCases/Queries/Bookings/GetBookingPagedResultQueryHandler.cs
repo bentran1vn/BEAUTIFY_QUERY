@@ -4,6 +4,7 @@ using BEAUTIFY_QUERY.CONTRACT.Services.Booking;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using System.Linq.Expressions;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.EntityEvents;
 using MongoDB.Driver.Linq;
 
 
@@ -75,10 +76,15 @@ internal sealed class GetBookingPagedResultQueryHandler(
                 x.StartTime,
                 x.EndTime,
                 x.ServiceName,
-                x.CurrentProcedure,
+                x.CurrentProcedure.Id,
+                x.CurrentProcedure.StepIndex,
+                x.CurrentProcedure.Name,
+                x.CurrentProcedure.Duration,
+                x.CurrentProcedure.DateCompleted,
                 x.Status,
                 x.Date
             )).ToList();
+        
         return Result.Success(
             new PagedResult<Response.GetBookingResponse>(mapped, total.PageIndex, total.PageSize, total.TotalCount));
     }
