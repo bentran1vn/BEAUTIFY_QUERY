@@ -9,9 +9,23 @@ public static class Response
         TimeSpan? Start,
         TimeSpan? End,
         string ServiceName,
-        EntityEvent.ProcedurePriceTypeEntity CurrentProcedurePriceType,
+        Guid ProcedureId,
+        string StepIndex,
+        string Name,
+        int Duration,
+        DateOnly? DateCompleted,
         string Status,
         DateOnly? date);
+
+
+    public class ProcedurePriceTypeEntity
+    {
+        public Guid Id;
+        public string StepIndex;
+        public string Name;
+        public int Duration;
+        public DateOnly? DateCompleted;
+    }
 
     public record GetTotalAppointmentResponse
     {

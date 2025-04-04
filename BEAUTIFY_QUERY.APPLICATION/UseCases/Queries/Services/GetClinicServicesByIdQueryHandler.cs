@@ -1,9 +1,14 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Services;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
+using BEAUTIFY_QUERY.DOMAIN.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Services;
-public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServiceProjection> clinicServiceRepository)
+public class GetClinicServicesByIdQueryHandler(
+    IMongoRepository<ClinicServiceProjection> clinicServiceRepository,
+    IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository
+)
     : IQueryHandler<Query.GetClinicServicesByIdQuery, Response.GetAllServiceByIdResponse>
 {
     public async Task<Result<Response.GetAllServiceByIdResponse>> Handle(
@@ -14,6 +19,10 @@ public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServicePro
 
         if (isServiceExisted == null)
             throw new Exception($"Service {request.ServiceId} not found");
+        var listDoctorID = isServiceExisted.DoctorServices.Select(x => x.Doctor.Id).ToList();
+        var doctorCertificates = await doctorCertificateRepository
+            .FindAll(x => listDoctorID.Contains(x.DoctorId))
+            .ToListAsync(cancellationToken);
 
         Response.GetAllServiceByIdResponse result;
 
@@ -69,7 +78,17 @@ public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServicePro
                         y.Doctor.Email,
                         y.Doctor.PhoneNumber,
                         y.Doctor.ProfilePictureUrl,
-                        []))).ToList());
+                        doctorCertificates
+                            .Where(c => c.DoctorId == y.Doctor.Id)
+                            .Select(c => new Response.CertificateEntity
+                            {
+                                Id = c.Id,
+                                CertificateUrl = c.CertificateUrl,
+                                CertificateName = c.CertificateName,
+                                ExpiryDate = c.ExpiryDate,
+                                Note = c.Note
+                            }).ToList()
+                    ))).ToList());
         else
             result = new Response.GetAllServiceByIdResponse(
                 isServiceExisted.DocumentId,
@@ -115,7 +134,16 @@ public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServicePro
                         y.Doctor.Email,
                         y.Doctor.PhoneNumber,
                         y.Doctor.ProfilePictureUrl,
-                        []))).ToList());
+                        doctorCertificates
+                            .Where(c => c.DoctorId == y.Doctor.Id)
+                            .Select(c => new Response.CertificateEntity
+                            {
+                                Id = c.Id,
+                                CertificateUrl = c.CertificateUrl,
+                                CertificateName = c.CertificateName,
+                                ExpiryDate = c.ExpiryDate,
+                                Note = c.Note
+                            }).ToList()))).ToList());
 
         return Result.Success(result);
     }
