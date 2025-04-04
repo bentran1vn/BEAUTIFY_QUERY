@@ -33,7 +33,8 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
         // Fetch customer schedules efficiently with includes
         var customerSchedules = await customerScheduleRepositoryBase.FindAll(
                 x => users.Select(u => u.Id).Contains(x.CustomerId) &&
-                     x.Doctor.ClinicId == currentUserService.ClinicId)
+                     x.Doctor.ClinicId == currentUserService.ClinicId &&
+                     x.Date == DateOnly.FromDateTime(DateTime.Now) && x.StartTime != null)
             .Include(x => x.Service)
             .Include(x => x.Doctor)
             .ThenInclude(d => d.User)
@@ -51,6 +52,7 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
         // Map to response with null-safe navigation and optimized projection
         var responses = customerSchedules
             .Select(schedule => MapToResponse(schedule, userDict))
+            .OrderBy(x => x.StartTime)
             .ToList();
 
         return Result.Success(responses);

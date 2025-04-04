@@ -26,5 +26,5 @@ public class CustomerScheduleConsumer
     public class CustomerScheduleUpdateDateAndTimeEvent(
         ISender sender,
         IMongoRepository<EventProjection> repository)
-        : Consumer<DomainEvents.CustomerScheduleUpdateDateAndTime>(sender, repository);
+        : Consumer<DomainEvents.CustomerScheduleUpdateDateAndTimeAndStatus>(sender, repository);
 }

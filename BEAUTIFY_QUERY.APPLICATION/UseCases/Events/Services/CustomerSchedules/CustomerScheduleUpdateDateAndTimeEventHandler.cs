@@ -1,13 +1,14 @@
 ﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Services.CustomerSchedules;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.CustomerSchedules;
 internal sealed class CustomerScheduleUpdateDateAndTimeEventHandler(
     IMongoRepository<CustomerScheduleProjection> customerScheduleRepository)
-    : ICommandHandler<DomainEvents.CustomerScheduleUpdateDateAndTime>
+    : ICommandHandler<DomainEvents.CustomerScheduleUpdateDateAndTimeAndStatus>
 {
-    public async Task<Result> Handle(DomainEvents.CustomerScheduleUpdateDateAndTime request,
+    public async Task<Result> Handle(DomainEvents.CustomerScheduleUpdateDateAndTimeAndStatus request,
         CancellationToken cancellationToken)
     {
         var customerSchedule =
@@ -18,6 +19,7 @@ internal sealed class CustomerScheduleUpdateDateAndTimeEventHandler(
         customerSchedule.StartTime = request.StartTime;
         customerSchedule.EndTime = request.EndTime;
         customerSchedule.Date = request.Date;
+        customerSchedule.Status = request.Status;
 
         await customerScheduleRepository.ReplaceOneAsync(customerSchedule);
         return Result.Success();
