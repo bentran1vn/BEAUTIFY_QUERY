@@ -51,7 +51,7 @@ public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServicePro
                         y.Name,
                         y.Duration,
                         y.Price,
-                        y.IsDefault)).ToList())).ToList(),
+                        y.IsDefault)).ToList())).OrderBy(x => x.StepIndex).ToList(),
                 isServiceExisted.Promotions.Select(x => new Response.Promotion(
                     x.Id,
                     x.Name,
@@ -104,7 +104,7 @@ public class GetClinicServicesByIdQueryHandler(IMongoRepository<ClinicServicePro
                         y.Name,
                         y.Duration,
                         y.Price,
-                        y.IsDefault)).ToList())).ToList(),
+                        y.IsDefault)).ToList())).OrderBy(x => x.StepIndex).ToList(),
                 null,
                 isServiceExisted.DoctorServices.Select(y => new Response.DoctorService(
                     y.Id,

@@ -17,32 +17,103 @@ public class ProcedureUpdatedEventHandler(IMongoRepository<ClinicServiceProjecti
         if (isServiceExisted == null) throw new Exception($"Service {createRequest.ServiceId} not found");
         
         List<Procedure> proceduresToUpdate = new List<Procedure>();
-        int? indexToAdd;
         
         var isExisted = isServiceExisted.Procedures?.FirstOrDefault(x => x.Id == createRequest.Id);
+
+        if (isExisted == null)
+            throw new Exception($"Procedure {createRequest.Id} not found");
         
-        if (isExisted != null)
+        if (isServiceExisted.Procedures != null && (isServiceExisted.Procedures.Max(x => x.StepIndex) < createRequest.StepIndex || createRequest.StepIndex < isServiceExisted.Procedures.Min(x => x.StepIndex)))
         {
-            if (isExisted.StepIndex != createRequest.StepIndex)
+            return Result.Failure(new Error("400", "Step index is out of range !"));
+        }
+        
+        int indexToAdd = isExisted.StepIndex;
+        
+        if (isExisted.StepIndex != createRequest.StepIndex)
+        {
+            // Jump back
+            if(isExisted.StepIndex > createRequest.StepIndex)
             {
-                var proceduresUpdate = isServiceExisted.Procedures
-                    ?.Where(x => x.StepIndex != createRequest.StepIndex).ToList() ?? new List<Procedure>();
-                
-                foreach (var item in proceduresUpdate)
+                var proceduresToUpdateTop = isServiceExisted.Procedures?
+                    .Where(x =>
+                        x.StepIndex >= createRequest.StepIndex &&
+                        x.StepIndex < isExisted.StepIndex).ToList();
+
+                if (proceduresToUpdateTop != null && proceduresToUpdateTop.Any())
                 {
-                    if (item.StepIndex < createRequest.StepIndex)
-                        item.StepIndex += 1;
-                    else
-                        item.StepIndex -= 1;
+                    proceduresToUpdateTop = proceduresToUpdateTop
+                        .Select(x => new Procedure()
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            Description = x.Description,
+                            StepIndex = x.StepIndex + 1,
+                            ProcedurePriceTypes = x.ProcedurePriceTypes
+                        }).ToList();
+                }
+
+                var procedureTop = isServiceExisted.Procedures?
+                    .Where(x => x.StepIndex > isExisted.StepIndex).ToList();
+
+                var proceduresDown = isServiceExisted.Procedures?
+                    .Where(x => x.StepIndex < createRequest.StepIndex).ToList();
+                
+                if (proceduresToUpdateTop != null && proceduresToUpdateTop.Any())
+                    proceduresToUpdate.AddRange(proceduresToUpdateTop);
+                    
+                if (procedureTop != null && procedureTop.Any())
+                    proceduresToUpdate.AddRange(procedureTop);
+
+                if (proceduresDown != null && proceduresDown.Any())
+                    proceduresToUpdate.AddRange(proceduresDown);
+            }
+        
+            // Jump next
+            if(isExisted.StepIndex < createRequest.StepIndex)
+            {
+                var proceduresToUpdateDown = isServiceExisted.Procedures?
+                    .Where(x =>
+                        x.StepIndex <= createRequest.StepIndex &&
+                        x.StepIndex > isExisted.StepIndex).ToList();
+
+                if (proceduresToUpdateDown != null && proceduresToUpdateDown.Any())
+                {
+                    proceduresToUpdateDown = proceduresToUpdateDown
+                        .Select(x => new Procedure()
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            Description = x.Description,
+                            StepIndex = x.StepIndex - 1,
+                            ProcedurePriceTypes = x.ProcedurePriceTypes
+                        }).ToList();
                 }
                 
-                proceduresToUpdate.AddRange(proceduresUpdate);
+                var proceduresTop = isServiceExisted.Procedures?
+                    .Where(x => x.StepIndex > createRequest.StepIndex).ToList();
+                
+                var procedureDown = isServiceExisted.Procedures?.Where(x => x.StepIndex < isExisted.StepIndex).ToList();
+                
+                if (proceduresToUpdateDown != null && proceduresToUpdateDown.Any())
+                    proceduresToUpdate.AddRange(proceduresToUpdateDown);
+                
+                if (procedureDown != null && procedureDown.Any())
+                    proceduresToUpdate.AddRange(procedureDown);
+                
+                if (proceduresTop != null && proceduresTop.Any())
+                    proceduresToUpdate.AddRange(proceduresTop);
             }
+
             indexToAdd = createRequest.StepIndex;
         }
         else
         {
-            indexToAdd = isServiceExisted.Procedures?.Any() == true ? isServiceExisted.Procedures?.Max(x => x.StepIndex) + 1 : 1;
+            var proceduresUpdate = isServiceExisted.Procedures?
+                .Where(x => x.StepIndex != createRequest.StepIndex).ToList();
+
+            if (proceduresUpdate != null && proceduresUpdate.Any())
+                proceduresToUpdate.AddRange(proceduresUpdate);
         }
         
         var procedure = new Procedure()
@@ -50,7 +121,7 @@ public class ProcedureUpdatedEventHandler(IMongoRepository<ClinicServiceProjecti
             Id = createRequest.Id,
             Name = createRequest.Name,
             Description = createRequest.Description,
-            StepIndex = (int)indexToAdd,
+            StepIndex = indexToAdd,
             ProcedurePriceTypes = createRequest.procedurePriceTypes
                 .Select(x => new ProcedurePriceType(x.Id, x.Name, x.Price,x.Duration,x.IsDefault)).ToList()
         };
