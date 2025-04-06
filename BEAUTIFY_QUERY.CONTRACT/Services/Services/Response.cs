@@ -93,7 +93,7 @@ public class Response
 
     public record Image(Guid Id, int Index, string Url);
 
-    public class Promotion(
+    public record Promotion(
         Guid Id,
         string Name,
         double DiscountPercent,
