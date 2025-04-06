@@ -9,7 +9,17 @@ public static class Query
         SortOrder? SortOrder,
         int PageIndex,
         int PageSize) : IQuery<PagedResult<Response.Order>>;
+
+
     
-    
+    //Todo Check roles
+    public record GetOrdersByClinicId(
+        string? SearchTerm,
+        string? SortColumn,
+        SortOrder? SortOrder,
+        int PageIndex,
+        int PageSize) : IQuery<PagedResult<Response.Order>>;
+
+
     public record GetOrderById(string Id) : IQuery<Response.Order>;
 }

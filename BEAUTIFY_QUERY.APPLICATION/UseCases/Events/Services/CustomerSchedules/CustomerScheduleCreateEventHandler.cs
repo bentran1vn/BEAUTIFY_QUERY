@@ -26,6 +26,7 @@ internal sealed class CustomerScheduleCreateEventHandler(
             DoctorName = service.DoctorName,
             ClinicId = service.ClinicId,
             ClinicName = service.ClinicName,
+            OrderId = service.OrderId,
             DoctorNote = service.DoctorNote,
             CurrentProcedure = new EntityEvent.ProcedurePriceTypeEntity
             {
@@ -36,8 +37,7 @@ internal sealed class CustomerScheduleCreateEventHandler(
                 Duration = 0,
             },
             Status = service.Status,
-            PendingProcedures = [],
-            CompletedProcedures = []
+
         };
         await customerScheduleRepository.InsertOneAsync(customerSchedule);
         return Result.Success();

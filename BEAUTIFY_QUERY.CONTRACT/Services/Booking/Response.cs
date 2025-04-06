@@ -17,6 +17,29 @@ public static class Response
         string Status,
         DateOnly? date);
 
+    public record GetBookingDetailByIdResponse
+    {
+        public Guid Id { get; init; }
+        public string CustomerName { get; init; }
+        public DateOnly? Date { get; init; }
+        public TimeSpan? StartTime { get; init; }
+        public TimeSpan? EndTime { get; init; }
+        public string Status { get; init; }
+        public ServiceResponse Service { get; init; }
+        public DoctorResponse Doctor { get; init; }
+        public ClinicResponse Clinic { get; init; }
+        public List<ProcedureHistory> ProcedureHistory { get; init; }
+    }
+
+    public record ProcedureHistory
+    {
+        public string StepIndex { get; init; }
+        public string Name { get; init; }
+        public int Duration { get; init; }
+        public DateOnly? DateCompleted { get; init; }
+        public TimeSpan? TimeCompleted { get; init; }
+        public string Status { get; init; }
+    }
 
     public class ProcedurePriceTypeEntity
     {
@@ -29,12 +52,12 @@ public static class Response
 
     public record GetTotalAppointmentResponse
     {
-        public string Month { get; init; } // Format: "yyyy-MM"
+        public string Month { get; init; }
         public List<DayCount> Days { get; init; }
 
         public record DayCount
         {
-            public string? Date { get; init; } // Format: "yyyy-MM-dd"
+            public string? Date { get; init; }
             public CountDetails Counts { get; init; }
         }
 

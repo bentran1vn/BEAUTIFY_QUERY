@@ -12,6 +12,14 @@ public class Apis : ApiEndpoint, ICarterModule
         gr1.MapGet("", GetBookingPagedResult).RequireAuthorization();
         gr1.MapGet("appointments/total", GetTotalAppointment).RequireAuthorization().WithSummary("mm-yyyy");
         gr1.MapGet("appointments/{date}", GetBookingWithDate).RequireAuthorization();
+        gr1.MapGet("{id}", GetBookingDetailById).RequireAuthorization();
+    }
+
+
+    private static async Task<IResult> GetBookingDetailById(ISender sender, Guid id)
+    {
+        var result = await sender.Send(new Query.GetBookingDetailById(id));
+        return result.IsSuccess ? Results.Ok(result) : HandlerFailure(result);
     }
 
     private static async Task<IResult> GetBookingPagedResult(ISender sender, string? searchTerm = null,

@@ -84,7 +84,7 @@ internal sealed class GetBookingPagedResultQueryHandler(
                 x.Status,
                 x.Date
             )).ToList();
-        
+
         return Result.Success(
             new PagedResult<Response.GetBookingResponse>(mapped, total.PageIndex, total.PageSize, total.TotalCount));
     }

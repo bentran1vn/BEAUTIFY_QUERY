@@ -18,9 +18,7 @@ public class CustomerScheduleProjection : Document
     public Guid? ClinicId;
     public string ClinicName;
     public string? DoctorNote;
+    public required Guid OrderId;
     public string Status;
     public EntityEvent.ProcedurePriceTypeEntity CurrentProcedure;
-    public ICollection<EntityEvent.ProcedurePriceTypeEntity> CompletedProcedures;
-    public ICollection<EntityEvent.ProcedurePriceTypeEntity> PendingProcedures;
 }
-
