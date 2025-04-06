@@ -9,6 +9,7 @@ public class ClinicServiceProjection : Document
     public string Name { get; set; }
     public string Description { get; set; }
     public ICollection<Image> CoverImage { get; set; }
+    public Clinic Branding { get; set; }
     public ICollection<EntityEvent.DoctorServiceEntity> DoctorServices { get; set; } = [];
     public decimal DiscountPercent { get; set; } = 0;
     public decimal MaxPrice { get; set; } = 0;

@@ -21,6 +21,11 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
             DocumentId = serviceRequest.Id,
             Name = serviceRequest.Name,
             Description = serviceRequest.Description,
+            Branding = new Clinic(
+                serviceRequest.Branding.Id, serviceRequest.Branding.Name, serviceRequest.Branding.Email,
+                serviceRequest.Branding.City, serviceRequest.Branding.Address, serviceRequest.Branding.District,
+                serviceRequest.Branding.Ward, serviceRequest.Branding.FullAddress, serviceRequest.Branding.PhoneNumber,
+                serviceRequest.Branding.ProfilePictureUrl, serviceRequest.Branding.IsParent, serviceRequest.Branding.ParentId),
             CoverImage = serviceRequest.CoverImages.Select(x => new Image
             {
                 Id = x.Id,
