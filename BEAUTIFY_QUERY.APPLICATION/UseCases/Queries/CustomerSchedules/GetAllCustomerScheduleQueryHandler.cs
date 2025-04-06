@@ -67,6 +67,7 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                 x.StartTime,
                 x.EndTime, x.Status,
                 x.ProcedurePriceType.Name,
+                x.ProcedurePriceType?.Procedure.StepIndex.ToString(),
                 x.ProcedurePriceType.Procedure.StepIndex == 1
             )).ToList();
         var result = new PagedResult<Response.StaffCheckInCustomerScheduleResponse>(mapped,

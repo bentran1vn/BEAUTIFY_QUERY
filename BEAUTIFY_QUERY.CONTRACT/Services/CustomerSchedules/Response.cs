@@ -14,6 +14,7 @@ public static class Response
         TimeSpan? EndTime,
         string Status,
         string ProcedurePriceTypeName,
+        string StepIndex,
         bool IsFirstCheckIn = false);
 
     public record CustomerScheduleWithProceduresResponse(

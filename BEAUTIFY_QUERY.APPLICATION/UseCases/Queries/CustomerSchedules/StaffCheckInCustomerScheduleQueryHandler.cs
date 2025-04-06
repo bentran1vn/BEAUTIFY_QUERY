@@ -100,6 +100,7 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             EndTime: schedule.EndTime,
             Status: schedule.Status,
             ProcedurePriceTypeName: schedule.ProcedurePriceType?.Name ?? string.Empty,
+            StepIndex: schedule.ProcedurePriceType?.Procedure.StepIndex.ToString(),
             schedule.ProcedurePriceType.Procedure.StepIndex == 1
         );
     }
