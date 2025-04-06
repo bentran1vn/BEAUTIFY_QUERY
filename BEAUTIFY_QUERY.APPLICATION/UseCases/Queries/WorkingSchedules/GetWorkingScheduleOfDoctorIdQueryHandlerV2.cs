@@ -88,6 +88,7 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
     {
         return items.Select(x => new Response.GetWorkingScheduleResponse
         {
+            WorkingScheduleId = x.DocumentId,
             DoctorName = x.DoctorName,
             ClinicId = x.ClinicId,
             DoctorId = x.DoctorId,
