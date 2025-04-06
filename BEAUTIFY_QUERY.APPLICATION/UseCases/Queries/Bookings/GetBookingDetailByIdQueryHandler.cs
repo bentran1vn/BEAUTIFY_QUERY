@@ -61,7 +61,9 @@ internal sealed class GetBookingDetailByIdQueryHandler(
                 ImageUrl = clinicImageUrlTask.Result?.ProfilePictureUrl
             },
             ProcedureHistory = procedureHistory
-            
+                .OrderBy(x => x.DateCompleted)
+                .ThenBy(x => x.TimeCompleted)
+                .ToList(),
         };
         return Result.Success(response);
     }
