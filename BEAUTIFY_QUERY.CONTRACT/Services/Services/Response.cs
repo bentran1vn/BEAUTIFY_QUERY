@@ -4,6 +4,7 @@ public class Response
     public record GetAllServiceResponse(
         Guid Id,
         string Name,
+        Clinic Branding,
         decimal MaxPrice,
         decimal MinPrice,
         string DiscountPercent,
@@ -69,6 +70,7 @@ public class Response
         Guid Id,
         string Name,
         string Description,
+        Clinic Branding,
         decimal MaxPrice,
         decimal MinPrice,
         string DiscountPercent,

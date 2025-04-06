@@ -42,7 +42,11 @@ public class
         );
 
         var mapList = services.Items.Select(x => new Response.GetAllServiceResponse(
-            x.DocumentId, x.Name, x.MaxPrice, x.MinPrice, (x.DiscountPercent * 100).ToString(),
+            x.DocumentId, x.Name,
+            new Response.Clinic(x.Branding.Id, x.Branding.Name, x.Branding.Email,
+                x.Branding.Address, x.Branding.PhoneNumber, x.Branding.ProfilePictureUrl,
+                x.Branding.IsParent, x.Branding.ParentId),
+            x.MaxPrice, x.MinPrice, (x.DiscountPercent * 100).ToString(),
             x.DiscountMaxPrice, x.DiscountMinPrice,
             x.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
             x.Clinic.Select(y => new Response.Clinic(y.Id, y.Name, y.Email,
