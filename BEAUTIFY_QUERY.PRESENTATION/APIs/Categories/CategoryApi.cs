@@ -16,8 +16,9 @@ public class CategoryApi : ApiEndpoint, ICarterModule
 
     private static async Task<IResult> GetAllCategories(
         ISender sender,
-        int? pageIndex,
-        int? pageSize, string? searchTerm = null)
+        string? searchTerm = null,
+        int pageIndex = 1,
+        int pageSize = 10)
     {
         Result result;
         if (pageIndex != null && pageSize == null) result = await sender.Send(new Query.GetAllCategoriesQuery());
