@@ -22,9 +22,13 @@ public class GetClinicDetailQueryHandler(
         if (clinic == null || clinic.IsDeleted)
             return Result.Failure<Response.GetClinicDetail>(new Error("404", "Clinic not found."));
         var searchTerm = request.SearchTerm?.Trim() ?? string.Empty;
-        var query = currentUserService.Role == Constant.Role.CLINIC_ADMIN
-            ? clinicRepository.FindAll(x => x.ParentId == request.id)
-            : clinicRepository.FindAll(x => x.ParentId == null);
+        
+        // var query = currentUserService.Role == Constant.Role.CLINIC_ADMIN
+        //     ? clinicRepository.FindAll(x => x.ParentId == request.id)
+        //     : clinicRepository.FindAll(x => x.ParentId == null);
+
+        var query = clinicRepository.FindAll(x => x.ParentId == request.id);
+        
         if (!string.IsNullOrEmpty(searchTerm))
         {
             query = query.Where(x => x.Name.Contains(searchTerm) ||
