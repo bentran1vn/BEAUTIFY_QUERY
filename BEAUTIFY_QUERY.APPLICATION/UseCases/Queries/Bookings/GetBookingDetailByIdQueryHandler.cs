@@ -5,14 +5,14 @@ using MongoDB.Driver;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Bookings;
 internal sealed class GetBookingDetailByIdQueryHandler(IMongoRepository<CustomerScheduleProjection> mongoRepository)
-    : IQueryHandler<Query.GetBookingDetailById, List<Response.GetBookingDetailByIdResponse>>
+    : IQueryHandler<Query.GetBookingDetailById, Response.GetBookingDetailByIdResponse>
 {
-    public async Task<Result<List<Response.GetBookingDetailByIdResponse>>> Handle(Query.GetBookingDetailById request,
+    public async Task<Result<Response.GetBookingDetailByIdResponse>> Handle(Query.GetBookingDetailById request,
         CancellationToken cancellationToken)
     {
         var booking = await mongoRepository.FindOneAsync(x => x.DocumentId == request.Id);
         if (booking is null)
-            return Result.Failure<List<Response.GetBookingDetailByIdResponse>>(new Error("404", "Booking Not Found !"));
+            return Result.Failure<Response.GetBookingDetailByIdResponse>(new Error("404", "Booking Not Found !"));
         var allBookingsBelongingToCustomer = await
             mongoRepository.AsQueryable(x => x.OrderId == booking.OrderId && x.Id != booking.Id)
                 .ToListAsync(cancellationToken);
@@ -26,31 +26,31 @@ internal sealed class GetBookingDetailByIdQueryHandler(IMongoRepository<Customer
                 Duration = 0,
                 Status = x.Status
             }).ToList();
-        var response = allBookingsBelongingToCustomer.Select(x => new Response.GetBookingDetailByIdResponse
+        var response = new Response.GetBookingDetailByIdResponse
         {
-            Id = x.DocumentId,
-            CustomerName = x.CustomerName,
-            StartTime = x.StartTime,
-            EndTime = x.EndTime,
-            Date = x.Date,
-            Status = x.Status,
+            Id = booking.DocumentId,
+            CustomerName = booking.CustomerName,
+            StartTime = booking.StartTime,
+            EndTime = booking.EndTime,
+            Date = booking.Date,
+            Status = booking.Status,
             Service = new Response.ServiceResponse
             {
-                Id = x.ServiceId,
-                Name = x.ServiceName
+                Id = booking.ServiceId,
+                Name = booking.ServiceName
             },
             Doctor = new Response.DoctorResponse
             {
-                Id = x.DoctorId,
-                Name = x.DoctorName
+                Id = booking.DoctorId,
+                Name = booking.DoctorName
             },
             Clinic = new Response.ClinicResponse
             {
-                Id = x.ClinicId,
-                Name = x.ClinicName
+                Id = booking.ClinicId,
+                Name = booking.ClinicName
             },
             ProcedureHistory = procedureHistory
-        }).ToList();
+        };
         return Result.Success(response);
     }
 }
