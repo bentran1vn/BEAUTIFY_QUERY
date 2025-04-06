@@ -13,7 +13,8 @@ public static class Response
         TimeSpan? StartTime,
         TimeSpan? EndTime,
         string Status,
-        string ProcedurePriceTypeName);
+        string ProcedurePriceTypeName,
+        bool IsFirstCheckIn = false);
 
     public record CustomerScheduleWithProceduresResponse(
         // Basic customer information
