@@ -13,6 +13,14 @@ public class ServiceApi : ApiEndpoint, ICarterModule
         gr1.MapGet(string.Empty, GetAllServices);
         gr1.MapGet("{id}", GetServicesById);
         gr1.MapGet("clinic", GetServicesByClinicId).RequireAuthorization();
+        gr1.MapGet("clinic/{clinicId:guid}", GetServicesByClinicIdForCustomer);
+    }
+
+    private static async Task<IResult> GetServicesByClinicIdForCustomer(
+        ISender sender, Guid clinicId)
+    {
+        var result = await sender.Send(new Query.GetServiceByClinicIdQuery(clinicId));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
     private static async Task<IResult> GetAllServices(

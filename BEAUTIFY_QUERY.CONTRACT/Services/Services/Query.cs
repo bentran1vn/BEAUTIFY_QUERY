@@ -3,6 +3,10 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Services;
 public static class Query
 {
+    public record GetServiceByClinicIdQuery(
+        Guid ClinicId)
+        : IQuery<List<Response.GetAllServiceByIdResponse>>;
+
     public record GetClinicServicesQuery(
         string? SearchTerm,
         string? SortColumn,
