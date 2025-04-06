@@ -24,6 +24,8 @@ public static class Response
         public DateOnly? Date { get; init; }
         public TimeSpan? StartTime { get; init; }
         public TimeSpan? EndTime { get; init; }
+        public string Duration { get; init; }
+        public string DoctorNote { get; init; }
         public string Status { get; init; }
         public ServiceResponse Service { get; init; }
         public DoctorResponse Doctor { get; init; }
@@ -101,17 +103,21 @@ public static class Response
     {
         public Guid? Id { get; set; }
         public string Name { get; set; }
+
+        public ICollection<string> ImageUrls { get; set; }
     }
 
     public class DoctorResponse
     {
         public Guid? Id { get; set; }
         public string Name { get; set; }
+        public string ImageUrl { get; set; }
     }
 
     public class ClinicResponse
     {
         public Guid? Id { get; set; }
         public string Name { get; set; }
+        public string ImageUrl { get; set; }
     }
 }

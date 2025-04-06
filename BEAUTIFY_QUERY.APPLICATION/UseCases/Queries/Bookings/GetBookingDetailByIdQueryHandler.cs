@@ -1,10 +1,15 @@
 ﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Booking;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
+using BEAUTIFY_QUERY.DOMAIN.Entities;
 using MongoDB.Driver;
+using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Bookings;
-internal sealed class GetBookingDetailByIdQueryHandler(IMongoRepository<CustomerScheduleProjection> mongoRepository)
+internal sealed class GetBookingDetailByIdQueryHandler(
+    IMongoRepository<CustomerScheduleProjection> mongoRepository,
+    IRepositoryBase<Staff, Guid> staffRepository,
+    IRepositoryBase<Clinic, Guid> clinicRepository)
     : IQueryHandler<Query.GetBookingDetailById, Response.GetBookingDetailByIdResponse>
 {
     public async Task<Result<Response.GetBookingDetailByIdResponse>> Handle(Query.GetBookingDetailById request,
@@ -16,6 +21,10 @@ internal sealed class GetBookingDetailByIdQueryHandler(IMongoRepository<Customer
         var allBookingsBelongingToCustomer = await
             mongoRepository.AsQueryable(x => x.OrderId == booking.OrderId && x.Id != booking.Id)
                 .ToListAsync(cancellationToken);
+
+        var doctorImageUrlTask = staffRepository.FindSingleAsync(x => x.Id == booking.DoctorId, cancellationToken);
+        var clinicImageUrlTask = clinicRepository.FindSingleAsync(x => x.Id == booking.ClinicId, cancellationToken);
+        await Task.WhenAll(doctorImageUrlTask, clinicImageUrlTask);
         var procedureHistory = allBookingsBelongingToCustomer
             .Select(x => new Response.ProcedureHistory
             {
@@ -37,17 +46,19 @@ internal sealed class GetBookingDetailByIdQueryHandler(IMongoRepository<Customer
             Service = new Response.ServiceResponse
             {
                 Id = booking.ServiceId,
-                Name = booking.ServiceName
+                Name = booking.ServiceName,
             },
             Doctor = new Response.DoctorResponse
             {
                 Id = booking.DoctorId,
-                Name = booking.DoctorName
+                Name = booking.DoctorName,
+                ImageUrl = doctorImageUrlTask?.Result?.ProfilePicture
             },
             Clinic = new Response.ClinicResponse
             {
                 Id = booking.ClinicId,
-                Name = booking.ClinicName
+                Name = booking.ClinicName,
+                ImageUrl = clinicImageUrlTask.Result?.ProfilePictureUrl
             },
             ProcedureHistory = procedureHistory
         };
