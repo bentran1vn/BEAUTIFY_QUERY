@@ -9,8 +9,8 @@ namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Services;
 internal sealed class GetServiceByClinicIdQueryHandler(
     IMongoRepository<ClinicServiceProjection> repository,
     IRepositoryBase<DoctorService, Guid> doctorServiceRepository,
-    IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository,
-    IRepositoryBase<Promotion, Guid> promotionRepository)
+    IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository
+   )
     : IQueryHandler<Query.GetServiceByClinicIdQuery, List<Response.GetAllServiceByIdResponse>>
 {
     public async Task<Result<List<Response.GetAllServiceByIdResponse>>> Handle(Query.GetServiceByClinicIdQuery request,
@@ -36,9 +36,7 @@ internal sealed class GetServiceByClinicIdQueryHandler(
             .FindAll(x => doctorIds.Contains(x.DoctorId))
             .ToListAsync(cancellationToken);
 
-        var promotions = await promotionRepository
-            .FindAll(x => serviceIds.Contains(x.ServiceId.Value) && x.IsActivated)
-            .ToListAsync(cancellationToken);
+
         var services = clinicServices.Select(x => new Response.GetAllServiceByIdResponse
             (
                 x.DocumentId,
@@ -76,14 +74,13 @@ internal sealed class GetServiceByClinicIdQueryHandler(
                         y.Duration,
                         y.Price,
                         y.IsDefault)).ToList())).ToList(),
-                promotions
-                    .Where(p => p.ServiceId == x.DocumentId && p.IsActivated)
+                x.Promotions
                     .Select(promo => new Response.Promotion(
                         promo.Id,
                         promo.Name,
                         promo.DiscountPercent,
                         promo.ImageUrl,
-                        promo.StartDate,
+                        promo.StartDay,
                         promo.EndDate,
                         promo.IsActivated))
                     .ToList(),

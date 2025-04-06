@@ -7,6 +7,10 @@ public static class Query
         Guid ClinicId)
         : IQuery<List<Response.GetAllServiceByIdResponse>>;
 
+    public record GetServiceByCategoryIdQuery(
+        Guid CategoryId)
+        : IQuery<List<Response.GetAllServiceByIdResponse>>;
+
     public record GetClinicServicesQuery(
         string? SearchTerm,
         string? SortColumn,
