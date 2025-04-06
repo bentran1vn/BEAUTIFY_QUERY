@@ -1,4 +1,5 @@
-﻿using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
+using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.WorkingSchedules;
@@ -13,11 +14,13 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
             .WithSummary("Search theo Date : Date1 to Date2 or Time : Time1 to Time2|| search by DoctorName");
         gr1.MapGet("doctors/busy-times", GetDoctorBusyTimeInADay)
             .WithSummary("Get doctor's busy time slots for a specific day");
-       // gr1.MapGet("doctors/", GetDoctorScheduleById).RequireAuthorization();
-        
-       
+        // gr1.MapGet("doctors/", GetDoctorScheduleById).RequireAuthorization();
+
+
         gr1.MapGet("doctors/", GetDoctorScheduleByIdV2).RequireAuthorization();
-        
+        gr1.MapGet("doctors/monthly-count", GetWorkingSchedulesEachDayInMonth)
+            .WithSummary("Get doctor's busy time slots for a specific month")
+            .RequireAuthorization(Constant.Role.DOCTOR);
     }
 
     #region GetWorkingSchedules
@@ -51,6 +54,14 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
 
     #endregion
 
+    private static async Task<IResult> GetWorkingSchedulesEachDayInMonth(
+        ISender sender,
+        [FromQuery] DateOnly date)
+    {
+        var result = await sender.Send(new Query.GetWorkingScheduleEachDayInMonth(date));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+
     private static async Task<IResult> GetDoctorScheduleById(ISender sender, string searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,
@@ -62,6 +73,7 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
             pageNumber, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
+
     private static async Task<IResult> GetDoctorScheduleByIdV2(ISender sender, string searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,

@@ -32,4 +32,11 @@ public static class Response
         public TimeSpan? End { get; set; }
         public DateOnly? Date { get; set; }
     }
+
+    public class GetWorkingScheduleEachDayInMonthResponse
+    {
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public Dictionary<DateOnly, int> AppointmentCounts { get; set; } = new();
+    }
 }
