@@ -39,4 +39,28 @@ public static class Response
         public int Month { get; set; }
         public Dictionary<DateOnly, int> AppointmentCounts { get; set; } = new();
     }
+
+    public class GetWorkingScheduleResponseDaily
+    {
+        public DateOnly Date { get; set; }
+        public List<Appointment> Appointments { get; set; } = [];
+
+        public class Appointment
+        {
+            public Guid Id { get; set; }
+            public string CustomerName { get; set; }
+            public string ServiceName { get; set; }
+            public TimeSpan StartTime { get; set; }
+            public TimeSpan EndTime { get; set; }
+            public string StepIndex { get; set; }
+            public string ProcedurePriceTypeName { get; set; }
+            public string Duration { get; set; }
+            public string Status { get; set; }
+        }
+    }
+
+    public class GetWorkingScheduleDetailResponse
+    {
+        public GetWorkingScheduleResponseDaily.Appointment Appointment { get; set; } = new();
+    }
 }

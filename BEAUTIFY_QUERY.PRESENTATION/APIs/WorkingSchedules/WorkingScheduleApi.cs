@@ -21,9 +21,24 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
         gr1.MapGet("doctors/monthly-count", GetWorkingSchedulesEachDayInMonth)
             .WithSummary("Get doctor's busy time slots for a specific month")
             .RequireAuthorization(Constant.Role.DOCTOR);
+        gr1.MapGet("doctors/daily-count", GetWorkingScheduleDaily)
+            .WithSummary("Get doctor's busy time slots for a specific day")
+            .RequireAuthorization(Constant.Role.DOCTOR);
+
+        gr1.MapGet("doctors/{id:guid}", GetWorkingScheduleById)
+            .WithSummary("Get doctor's busy time slots for a specific day")
+            .RequireAuthorization(Constant.Role.DOCTOR);
     }
 
     #region GetWorkingSchedules
+
+    private static async Task<IResult> GetWorkingScheduleById(
+        ISender sender,
+        [FromRoute] Guid id)
+    {
+        var result = await sender.Send(new Query.GetWorkingScheduleDetail(id));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
 
     private static async Task<IResult> GetWorkingSchedules(ISender sender, string? searchTerm = null,
         string? sortColumn = null,
@@ -59,6 +74,14 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
         [FromQuery] DateOnly date)
     {
         var result = await sender.Send(new Query.GetWorkingScheduleEachDayInMonth(date));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetWorkingScheduleDaily(
+        ISender sender,
+        [FromQuery] DateOnly date)
+    {
+        var result = await sender.Send(new Query.GetWorkingScheduleDaily(date));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
