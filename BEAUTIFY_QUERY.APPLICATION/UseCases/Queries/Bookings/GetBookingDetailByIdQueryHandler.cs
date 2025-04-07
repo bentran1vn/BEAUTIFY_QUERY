@@ -8,7 +8,7 @@ using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Bookings;
 internal sealed class GetBookingDetailByIdQueryHandler(
     IMongoRepository<CustomerScheduleProjection> mongoRepository,
-    IRepositoryBase<Staff, Guid> staffRepository,
+    IRepositoryBase<UserClinic, Guid> userClinicRepository,
     IRepositoryBase<Clinic, Guid> clinicRepository)
     : IQueryHandler<Query.GetBookingDetailById, Response.GetBookingDetailByIdResponse>
 {
@@ -22,9 +22,8 @@ internal sealed class GetBookingDetailByIdQueryHandler(
             mongoRepository.AsQueryable(x => x.OrderId == booking.OrderId && x.Id != booking.Id)
                 .ToListAsync(cancellationToken);
 
-        var doctorImageUrlTask = staffRepository.FindSingleAsync(x => x.Id == booking.DoctorId, cancellationToken);
-        var clinicImageUrlTask = clinicRepository.FindSingleAsync(x => x.Id == booking.ClinicId, cancellationToken);
-        await Task.WhenAll(doctorImageUrlTask, clinicImageUrlTask);
+        var doctorImageUrl = await userClinicRepository.FindSingleAsync(x => x.Id == booking.DoctorId, cancellationToken,x=>x.User);
+        var clinicImageUrl = await clinicRepository.FindSingleAsync(x => x.Id == booking.ClinicId, cancellationToken);
         var procedureHistory = allBookingsBelongingToCustomer
             .Select(x => new Response.ProcedureHistory
             {
@@ -52,13 +51,13 @@ internal sealed class GetBookingDetailByIdQueryHandler(
             {
                 Id = booking.DoctorId,
                 Name = booking.DoctorName,
-                ImageUrl = doctorImageUrlTask?.Result?.ProfilePicture
+                ImageUrl = doctorImageUrl.User.ProfilePicture?? string.Empty
             },
             Clinic = new Response.ClinicResponse
             {
                 Id = booking.ClinicId,
                 Name = booking.ClinicName,
-                ImageUrl = clinicImageUrlTask.Result?.ProfilePictureUrl
+                ImageUrl = clinicImageUrl.ProfilePictureUrl
             },
             ProcedureHistory = procedureHistory
                 .OrderBy(x => x.DateCompleted)
