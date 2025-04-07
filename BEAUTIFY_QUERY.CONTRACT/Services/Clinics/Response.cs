@@ -7,6 +7,7 @@ public static class Response
         string Email,
         string FullAddress,
         int TotalBranches,
+        string ProfilePictureUrl,
         bool IsActivated);
 
     public record GetClinicBranches(

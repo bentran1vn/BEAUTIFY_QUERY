@@ -33,7 +33,7 @@ internal sealed class GetClinicsQueryHandler(
         var result = new PagedResult<Response.GetClinics>(clinics.Items
                 .Select(x =>
                     new Response.GetClinics(x.Id, x.Name, x.Email, x.FullAddress,
-                        x.TotalBranches ?? 0, x.IsActivated)).ToList(),
+                        x.TotalBranches ?? 0, x.ProfilePictureUrl, x.IsActivated)).ToList(),
             clinics.PageIndex, clinics.PageSize, clinics.TotalCount);
 
         return Result.Success(result);
