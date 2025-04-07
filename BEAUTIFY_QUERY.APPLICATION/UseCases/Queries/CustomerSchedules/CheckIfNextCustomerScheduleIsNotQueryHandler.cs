@@ -29,6 +29,6 @@ internal sealed class CheckIfNextCustomerScheduleIsNotQueryHandler(
                 x.OrderId == customerSchedule.OrderId &&
                 x.CurrentProcedure.StepIndex == customerSchedule.CurrentProcedure.StepIndex + 1)
             .FirstOrDefaultAsync(cancellationToken);
-        return Result.Success(nextCustomerSchedule is { Date: null } ? "Need to schedule for next step" : "Already scheduled for next step");
+        return Result.Success(nextCustomerSchedule.Date is null ? "Need to schedule for next step" : "Already scheduled for next step");
     }
 }
