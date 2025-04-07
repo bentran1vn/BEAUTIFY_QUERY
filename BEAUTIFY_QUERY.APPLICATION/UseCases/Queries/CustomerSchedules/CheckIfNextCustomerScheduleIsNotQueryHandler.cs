@@ -13,7 +13,7 @@ internal sealed class CheckIfNextCustomerScheduleIsNotQueryHandler(
     public async Task<Result<string>> Handle(Query.CheckIfNextCustomerScheduleIsNotScheduledYet request,
         CancellationToken cancellationToken)
     {
-        var customerSchedule = await mongoRepository.FindOneAsync(x => x.DoctorId == request.CustomerScheduleId);
+        var customerSchedule = await mongoRepository.FindOneAsync(x => x.DocumentId == request.CustomerScheduleId);
         if (customerSchedule is null)
             return Result.Failure<string>(new Error("404", "Customer Schedule Not Found !"));
 
