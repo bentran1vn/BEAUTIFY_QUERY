@@ -17,4 +17,8 @@ public static class Query
         int PageSize) : IQuery<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>;
 
     public record GetCustomerScheduleById(Guid Id) : IQuery<Response.CustomerScheduleWithProceduresResponse>;
+
+    
+    public record CheckIfNextCustomerScheduleIsNotScheduledYet(
+        Guid CustomerScheduleId) : IQuery<string>;
 }

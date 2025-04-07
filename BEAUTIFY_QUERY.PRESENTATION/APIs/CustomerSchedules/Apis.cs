@@ -21,6 +21,21 @@ public class Apis : ApiEndpoint, ICarterModule
             .WithName("Get Customer Schedule By Id")
             .WithSummary("Get Customer Schedule By Id")
             .WithDescription("Get customer schedule by id");
+        gr1.MapGet("{customerScheduleId:guid}/next-schedule/availability",
+                CheckIfNextCustomerScheduleIsNotScheduledYet)
+            .RequireAuthorization(Constant.Role.CLINIC_STAFF)
+            .WithName("Check Next Schedule Availability")
+            .WithSummary("Check if next schedule is available")
+            .WithDescription("Check if the next customer schedule is not scheduled yet");
+    }
+
+    private static async Task<IResult> CheckIfNextCustomerScheduleIsNotScheduledYet(
+        ISender sender,
+        [FromRoute] Guid customerScheduleId)
+    {
+        var result = await sender.Send(
+            new Query.CheckIfNextCustomerScheduleIsNotScheduledYet(customerScheduleId));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
     private static async Task<IResult> StaffCheckInCustomerSchedule(ISender sender,
