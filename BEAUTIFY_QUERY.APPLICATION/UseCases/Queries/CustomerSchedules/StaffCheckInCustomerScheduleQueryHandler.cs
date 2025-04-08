@@ -30,11 +30,15 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             return Result.Failure<List<Response.StaffCheckInCustomerScheduleResponse>>(
                 new Error("404", "No matching users found"));
 
+        var VietNameTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+        var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, VietNameTimeZone);
+        
+        
         // Fetch customer schedules efficiently with includes
         var customerSchedules = await customerScheduleRepositoryBase.FindAll(
                 x => users.Select(u => u.Id).Contains(x.CustomerId) &&
                      x.Doctor.ClinicId == currentUserService.ClinicId &&
-                     x.Date == DateOnly.FromDateTime(DateTime.Now) && x.StartTime != null)
+                     x.Date == DateOnly.FromDateTime(currentTime) && x.StartTime != null)
             .Include(x => x.Service)
             .Include(x => x.Doctor)
             .ThenInclude(d => d.User)
