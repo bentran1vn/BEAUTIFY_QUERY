@@ -15,7 +15,11 @@ public class Apis : ApiEndpoint, ICarterModule
             .WithName("Staff Check In Customer Schedule")
             .WithSummary("Staff Check In Customer Schedule")
             .WithDescription("Check in customer schedule by staff");
-        gr1.MapGet("clinic", GetAllCustomerSchedule).RequireAuthorization();
+        gr1.MapGet("clinic", GetAllCustomerSchedule)
+            .RequireAuthorization(Constant.Role.CLINIC_STAFF, Constant.Role.CLINIC_ADMIN)
+            .WithName("Get All Customer Schedule")
+            .WithSummary("Get All Customer Schedule")
+            .WithDescription("Get all customer schedule");
         gr1.MapGet("{customerScheduleId:guid}", GetCustomerScheduleById)
             .RequireAuthorization()
             .WithName("Get Customer Schedule By Id")

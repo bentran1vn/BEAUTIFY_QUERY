@@ -12,14 +12,11 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
     public async Task<Result<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>> Handle(
         Query.GetAllCustomerSchedule request, CancellationToken cancellationToken)
     {
-        if (currentUserService.Role != Constant.Role.CLINIC_STAFF &&
-            currentUserService.Role != Constant.Role.CLINIC_ADMIN)
-            return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(new Error("403",
-                "You do not have permission to access this resource."));
         var clinicId = currentUserService.ClinicId;
         var searchTerm = request.SearchTerm?.Trim() ?? string.Empty;
         var query = customerScheduleRepositoryBase.FindAll(x =>
             !x.IsDeleted && x.Doctor.ClinicId.Equals(clinicId));
+
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             // check time
@@ -44,13 +41,17 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                 // Fallback to standard contains search with null checks
                 query = query.Where(x =>
                     x.Customer != null &&
-                    (x.Customer.FirstName != null && x.Customer.FirstName.ToLower().Contains(searchTerm.ToLower()) ||
-                     x.Customer.LastName != null && x.Customer.LastName.ToLower().Contains(searchTerm.ToLower())));
+                    (x.Customer.FirstName != null &&
+                     x.Customer.FirstName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+                     x.Customer.LastName != null &&
+                     x.Customer.LastName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)));
             }
         }
 
         var customerSchedules = await PagedResult<CustomerSchedule>.CreateAsync(
-            query,
+            query.OrderBy(x => x.Date)
+                .ThenBy(x => x.StartTime)
+                .ThenBy(x => x.Status),
             request.PageIndex,
             request.PageSize
         );
