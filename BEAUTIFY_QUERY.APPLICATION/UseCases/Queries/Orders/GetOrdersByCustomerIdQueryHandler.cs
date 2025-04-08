@@ -11,7 +11,8 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
     ICurrentUserService currentUserService)
     : IQueryHandler<Query.GetOrdersByCustomerId, PagedResult<Response.Order>>
 {
-    public async Task<Result<PagedResult<Response.Order>>> Handle(Query.GetOrdersByCustomerId request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResult<Response.Order>>> Handle(Query.GetOrdersByCustomerId request,
+        CancellationToken cancellationToken)
     {
         var query = BuildQuery(request);
         var orders = await PagedResult<Order>.CreateAsync(query, request.PageIndex, request.PageSize);
@@ -42,15 +43,15 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
         var part1 = parts[0].Trim();
         var part2 = parts[1].Trim();
 
-        if (DateTimeOffset.TryParse(part1, out var dateFrom) && DateTimeOffset.TryParse(part2, out var dateTo))
+        if (DateOnly.TryParse(part1, out var dateFrom) && DateOnly.TryParse(part2, out var dateTo))
         {
             query = query.Where(x => x.OrderDate >= dateFrom && x.OrderDate <= dateTo);
         }
         else if (decimal.TryParse(part1, out var priceFrom) && decimal.TryParse(part2, out var priceTo))
         {
             query = query.Where(x => x.FinalAmount >= priceFrom && x.FinalAmount <= priceTo ||
-                                   x.Discount >= priceFrom && x.Discount <= priceTo ||
-                                   x.TotalAmount >= priceFrom && x.TotalAmount <= priceTo);
+                                     x.Discount >= priceFrom && x.Discount <= priceTo ||
+                                     x.TotalAmount >= priceFrom && x.TotalAmount <= priceTo);
         }
     }
 

@@ -9,7 +9,7 @@ public class Order : AggregateRoot<Guid>, IAuditableEntity
     [Column(TypeName = "decimal(18,2)")] public decimal? TotalAmount { get; set; }
     [Column(TypeName = "decimal(18,2)")] public decimal? Discount { get; set; }
     [Column(TypeName = "decimal(18,2)")] public decimal? FinalAmount { get; set; }
-    public DateTimeOffset OrderDate { get; set; } = DateTimeOffset.UtcNow;
+    public DateOnly OrderDate { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
     public Guid? ServiceId { get; set; }
     public virtual Service? Service { get; set; }
     public Guid? LivestreamRoomId { get; set; }
