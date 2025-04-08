@@ -12,6 +12,8 @@ public class Order : AggregateRoot<Guid>, IAuditableEntity
     public DateTimeOffset OrderDate { get; set; } = DateTimeOffset.UtcNow;
     public Guid? ServiceId { get; set; }
     public virtual Service? Service { get; set; }
+    public Guid? LivestreamRoomId { get; set; }
+    
     [MaxLength(50)] public string? Status { get; set; }
     public virtual ICollection<OrderDetail>? OrderDetails { get; set; } = [];
     public DateTimeOffset CreatedOnUtc { get; set; }
