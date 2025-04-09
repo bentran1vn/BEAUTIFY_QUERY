@@ -44,7 +44,8 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                     (x.Customer.FirstName != null &&
                      x.Customer.FirstName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
                      x.Customer.LastName != null &&
-                     x.Customer.LastName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)));
+                     x.Customer.LastName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
+                    x.Status.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase));
             }
         }
 
