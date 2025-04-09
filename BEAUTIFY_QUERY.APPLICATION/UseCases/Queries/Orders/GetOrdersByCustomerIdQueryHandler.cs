@@ -65,13 +65,16 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
     private static PagedResult<Response.Order> MapToResponse(PagedResult<Order> orders)
     {
         var mapped = orders.Items.Select(x => new Response.Order(
-            x.Id,
-            x.Customer.FullName,
-            x.Service.Name,
-            x.FinalAmount,
-            DateOnly.Parse(x.OrderDate.ToString("yyyy-MM-dd")),
-            x.Status
-        )).ToList();
+                x.Id,
+                x.Customer.FullName,
+                x.Service.Name,
+                x.FinalAmount,
+                DateOnly.Parse(x.OrderDate.ToString("yyyy-MM-dd")),
+                x.Status
+            ))
+            .OrderBy(x => x.OrderDate)
+            .ThenBy(x => x.Status)
+            .ToList();
 
         return new PagedResult<Response.Order>(mapped, orders.PageIndex, orders.PageSize, orders.TotalCount);
     }
@@ -80,11 +83,10 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
     {
         return request.SortColumn?.ToLower() switch
         {
-            "date" => projection => projection.OrderDate,
             "total amount" => projection => projection.TotalAmount,
             "discount" => projection => projection.Discount,
             "final amount" => projection => projection.FinalAmount,
-            _ => projection => projection.CreatedOnUtc
+            _ => projection => projection.OrderDate
         };
     }
 }

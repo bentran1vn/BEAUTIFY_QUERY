@@ -1,9 +1,10 @@
-﻿using System.Linq.Expressions;
+﻿﻿using System.Linq.Expressions;
 using AutoMapper;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Subscriptions;
 internal sealed class
@@ -26,8 +27,9 @@ internal sealed class
             var isDecimalSearch = decimal.TryParse(searchTerm, out var decimalValue);
 
             // Filter by name (case-insensitive) OR by price if it's a valid decimal
+            // Use EF.Functions.Like for case-insensitive search instead of Contains with StringComparison
             query = query.Where(x =>
-                x.Name.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)
+                EF.Functions.Like(x.Name, $"%{searchTerm}%")
                 || (isDecimalSearch && x.Price == decimalValue));
         }
 
