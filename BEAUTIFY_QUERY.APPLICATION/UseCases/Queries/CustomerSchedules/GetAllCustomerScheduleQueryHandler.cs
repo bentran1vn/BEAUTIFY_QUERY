@@ -1,7 +1,8 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+﻿﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.CustomerSchedules;
 internal sealed class GetAllCustomerScheduleQueryHandler(
@@ -39,13 +40,14 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
             else
             {
                 // Fallback to standard contains search with null checks
+                // Use EF.Functions.Like for case-insensitive search instead of Contains with StringComparison
                 query = query.Where(x =>
                     x.Customer != null &&
                     (x.Customer.FirstName != null &&
-                     x.Customer.FirstName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+                     EF.Functions.Like(x.Customer.FirstName, $"%{searchTerm}%") ||
                      x.Customer.LastName != null &&
-                     x.Customer.LastName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                    x.Status.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase));
+                     EF.Functions.Like(x.Customer.LastName, $"%{searchTerm}%")) ||
+                    EF.Functions.Like(x.Status, $"%{searchTerm}%"));
             }
         }
 
