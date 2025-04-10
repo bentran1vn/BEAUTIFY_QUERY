@@ -22,6 +22,12 @@ internal sealed class GetClinicsQueryHandler(
                      && !x.IsDeleted
             );
 
+        if (request.Role == null || request.Role == "Customer")
+        {
+            clinicsQuery = clinicsQuery
+                .Where(x => x.IsActivated);
+        }
+
         clinicsQuery = request.SortOrder == SortOrder.Descending
             ? clinicsQuery.OrderByDescending(GetSortProperty(request))
             : clinicsQuery.OrderBy(GetSortProperty(request));
