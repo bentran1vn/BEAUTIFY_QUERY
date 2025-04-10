@@ -1,4 +1,5 @@
-﻿using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
+using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Orders;
 public class Apis : ApiEndpoint, ICarterModule
@@ -11,6 +12,19 @@ public class Apis : ApiEndpoint, ICarterModule
             .MapGroup(BaseUrl).HasApiVersion(1);
         gr1.MapGet(string.Empty, GetOrder).RequireAuthorization();
         gr1.MapGet("{id}", GetOrderById);
+        gr1.MapGet("clinic", GetOrderByClinicId).RequireAuthorization(Constant.Role.CLINIC_STAFF);
+    }
+
+    private static async Task<IResult> GetOrderByClinicId(ISender sender, string? searchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        int pageIndex = 1,
+        int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.GetOrdersByClinicId(searchTerm,
+            sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageIndex, pageSize));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
     private static async Task<IResult> GetOrder(ISender sender, string? searchTerm = null, string? sortColumn = null,
