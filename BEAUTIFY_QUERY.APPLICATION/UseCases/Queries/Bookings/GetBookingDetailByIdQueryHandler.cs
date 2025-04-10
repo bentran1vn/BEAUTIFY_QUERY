@@ -59,7 +59,7 @@ internal sealed class GetBookingDetailByIdQueryHandler(
             {
                 Id = booking.ClinicId,
                 Name = booking.ClinicName,
-                ImageUrl = clinicImageUrl.ProfilePictureUrl
+                ImageUrl = clinicImageUrl?.ProfilePictureUrl
             },
             ProcedureHistory = procedureHistory
                 .OrderBy(x => x.DateCompleted)
