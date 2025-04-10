@@ -2,33 +2,28 @@ using System.Globalization;
 using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
+using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 public class GetClinicDetailQueryHandler(
     IRepositoryBase<Clinic, Guid> clinicRepository,
-    ICurrentUserService currentUserService,
-    IMongoRepository<ClinicServiceProjection> _clinicServiceRepository)
+    IMongoRepository<ClinicServiceProjection> _clinicServiceRepository,
+    IRepositoryBase<SystemTransaction, Guid> systemTransactionRepository)
     : IQueryHandler<Query.GetClinicDetailQuery, Response.GetClinicDetail>
 {
     public async Task<Result<Response.GetClinicDetail>> Handle(Query.GetClinicDetailQuery request,
         CancellationToken cancellationToken)
     {
-        
         var clinic = await clinicRepository.FindByIdAsync(request.id, cancellationToken);
         if (clinic == null || clinic.IsDeleted)
             return Result.Failure<Response.GetClinicDetail>(new Error("404", "Clinic not found."));
         var searchTerm = request.SearchTerm?.Trim() ?? string.Empty;
-        
-        // var query = currentUserService.Role == Constant.Role.CLINIC_ADMIN
-        //     ? clinicRepository.FindAll(x => x.ParentId == request.id)
-        //     : clinicRepository.FindAll(x => x.ParentId == null);
 
         var query = clinicRepository.FindAll(x => x.ParentId == request.id);
-        
+
         if (!string.IsNullOrEmpty(searchTerm))
         {
             query = query.Where(x => x.Name.Contains(searchTerm) ||
@@ -68,13 +63,37 @@ public class GetClinicDetailQueryHandler(
                 .ToList()
         }).ToList();
 
-        var result = MapToResponse(clinic, branchDetails, mappedServices);
+        // Get the latest system transaction for this clinic to extract the subscription package
+        var latestTransaction = systemTransactionRepository
+            .FindAll(x => x.ClinicId == request.id && !x.IsDeleted, x => x.SubscriptionPackage)
+            .OrderByDescending(x => x.TransactionDate)
+            .FirstOrDefault();
+
+        // Extract the subscription package from the latest transaction
+        Response.Subscription? currentSubscription = null;
+        if (latestTransaction?.SubscriptionPackage != null)
+        {
+            var package = latestTransaction.SubscriptionPackage;
+            currentSubscription = new Response.Subscription(
+                package.Id,
+                package.Name,
+                package.Description,
+                package.Price,
+                package.Duration,
+                package.IsActivated,
+                package.LimitBranch,
+                package.LimitLiveStream
+            );
+        }
+
+        var result = MapToResponse(clinic, branchDetails, mappedServices, currentSubscription);
         return Result.Success(result);
     }
 
     private static Response.GetClinicDetail MapToResponse(Clinic? clinic,
         PagedResult<Response.GetClinicDetail>? branches = null,
-        List<CONTRACT.Services.Services.Response.GetAllServiceInGetClinicById>? services = null)
+        List<CONTRACT.Services.Services.Response.GetAllServiceInGetClinicById>? services = null,
+        Response.Subscription? currentSubscription = null)
     {
         return new Response.GetClinicDetail(
             clinic.Id,
@@ -95,6 +114,7 @@ public class GetClinicDetailQueryHandler(
             clinic.IsActivated,
             clinic.BankName,
             clinic.BankAccountNumber,
+            currentSubscription,
             branches,
             services);
     }

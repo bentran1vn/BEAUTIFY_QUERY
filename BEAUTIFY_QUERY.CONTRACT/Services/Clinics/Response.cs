@@ -45,8 +45,19 @@ public static class Response
         bool IsActivated,
         string BankName,
         string BankAccountNumber,
+        Subscription? currentSubscription = null,
         PagedResult<GetClinicDetail>? Branches = null,
         List<Services.Response.GetAllServiceInGetClinicById>? Services = null);
+
+    public record Subscription(
+        Guid Id,
+        string Name,
+        string Description,
+        decimal Price,
+        int Duration,
+        bool IsActivated,
+        int LimitBranch,
+        int LimitLiveStream);
 
     public record GetApplyRequest(Guid Id, string Name, string Email, string? FullAddress, int TotalApply);
 
@@ -85,7 +96,7 @@ public static class Response
         public string? Role { get; set; }
         public List<DoctorCertificates>? DoctorCertificates { get; set; }
     }
-    
+
     public class DoctorCertificates
     {
         public Guid Id { get; set; }
