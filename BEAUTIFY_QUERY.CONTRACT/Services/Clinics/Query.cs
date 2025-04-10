@@ -5,6 +5,7 @@ public class Query
 {
     public record GetClinicsQuery(
         string? SearchTerm,
+        string? Role,
         string? SortColumn,
         SortOrder? SortOrder,
         int PageIndex,

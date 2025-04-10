@@ -21,13 +21,16 @@ public class ClinicApi : ApiEndpoint, ICarterModule
 
     private static async Task<IResult> GetAllClinics(
         ISender sender,
+        HttpContext httpContext,
         string? searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,
         int pageIndex = 1,
         int pageSize = 10)
     {
-        var result = await sender.Send(new Query.GetClinicsQuery(searchTerm,
+        var role = httpContext.User.FindFirst(c => c.Type == "RoleName")?.Value;
+        
+        var result = await sender.Send(new Query.GetClinicsQuery(searchTerm, role,
             sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
