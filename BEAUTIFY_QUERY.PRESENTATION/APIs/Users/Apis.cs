@@ -14,7 +14,7 @@ public class Apis : ApiEndpoint, ICarterModule
         gr1.MapGet("get-user-by-phone-or-email/{searchTerm}", GetUserByPhoneOrEmail);
 
         gr1.MapGet("information", GetUserInformation)
-            .RequireAuthorization(Constant.Role.DOCTOR);
+            .RequireAuthorization(Constant.Policy.POLICY_DOCTOR_AND_CUSTOMER);
     }
 
     private static async Task<IResult> GetUserByPhoneOrEmail(ISender sender, string searchTerm)
