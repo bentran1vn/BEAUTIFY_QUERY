@@ -2,6 +2,7 @@
 using BEAUTIFY_QUERY.CONTRACT.Services.Booking;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 
@@ -19,10 +20,17 @@ internal sealed class GetBookingDetailByIdQueryHandler(
         if (booking is null)
             return Result.Failure<Response.GetBookingDetailByIdResponse>(new Error("404", "Booking Not Found !"));
         var allBookingsBelongingToCustomer = await
-            mongoRepository.AsQueryable(x => x.OrderId == booking.OrderId && x.Id != booking.Id)
-                .ToListAsync(cancellationToken);
+            IAsyncCursorSourceExtensions.ToListAsync(
+                mongoRepository.AsQueryable(x => x.OrderId == booking.OrderId && x.Id != booking.Id),
+                cancellationToken);
 
-        var doctorImageUrl = await userClinicRepository.FindSingleAsync(x => x.Id == booking.DoctorId, cancellationToken,x=>x.User);
+        /* var doctorImageUrl =
+             await userClinicRepository.FindAll(x => x.UserId == booking.DoctorId, cancellationToken,
+
+
+                 x => x.User);*/
+        var doctorImageUrl = await userClinicRepository.FindAll(x => x.UserId == booking.DoctorId).Include(x => x.User)
+            .FirstOrDefaultAsync(cancellationToken);
         var clinicImageUrl = await clinicRepository.FindSingleAsync(x => x.Id == booking.ClinicId, cancellationToken);
         var procedureHistory = allBookingsBelongingToCustomer
             .Select(x => new Response.ProcedureHistory
@@ -51,7 +59,7 @@ internal sealed class GetBookingDetailByIdQueryHandler(
             {
                 Id = booking.DoctorId,
                 Name = booking.DoctorName,
-                ImageUrl = doctorImageUrl.User.ProfilePicture?? string.Empty
+                ImageUrl = doctorImageUrl?.User.ProfilePicture ?? string.Empty
             },
             Clinic = new Response.ClinicResponse
             {
