@@ -18,10 +18,18 @@ internal sealed class GetUserInformationQueryHandler(
         var response = new Response.GetUserInformationResponse
         (
             user.Id,
+            user.FirstName,
+            user.LastName,
             user.FullName,
+            user.DateOfBirth,
             user.Email,
             user.PhoneNumber,
-            user.ProfilePicture
+            user.ProfilePicture,
+            user.City,
+            user.District,
+            user.Ward,
+            user.Address,
+            user.FullAddress
         );
         return Result.Success(response);
     }

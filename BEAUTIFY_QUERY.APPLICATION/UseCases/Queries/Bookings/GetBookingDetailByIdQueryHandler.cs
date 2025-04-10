@@ -23,12 +23,6 @@ internal sealed class GetBookingDetailByIdQueryHandler(
             IAsyncCursorSourceExtensions.ToListAsync(
                 mongoRepository.AsQueryable(x => x.OrderId == booking.OrderId && x.Id != booking.Id),
                 cancellationToken);
-
-        /* var doctorImageUrl =
-             await userClinicRepository.FindAll(x => x.UserId == booking.DoctorId, cancellationToken,
-
-
-                 x => x.User);*/
         var doctorImageUrl = await userClinicRepository.FindAll(x => x.UserId == booking.DoctorId).Include(x => x.User)
             .FirstOrDefaultAsync(cancellationToken);
         var clinicImageUrl = await clinicRepository.FindSingleAsync(x => x.Id == booking.ClinicId, cancellationToken);
