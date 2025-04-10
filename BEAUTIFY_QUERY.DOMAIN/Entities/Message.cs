@@ -6,7 +6,9 @@ public class Message : AggregateRoot<Guid>, IAuditableEntity
     public Guid? ConversationId { get; set; }
     public virtual Conversation? Conversation { get; set; }
     public Guid SenderId { get; set; }
-    public virtual User? Sender { get; set; }
+    //public virtual User? Sender { get; set; }
+
+    public bool IsClinic { get; set; } = false;
     [MaxLength(200)] public required string Content { get; set; }
     public bool IsRead { get; set; } = false;
     public Guid? LivestreamRoomId { get; set; }
