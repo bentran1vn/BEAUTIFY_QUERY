@@ -12,7 +12,7 @@ internal sealed class GetOrdersByClinicIdHandler(
     public async Task<Result<PagedResult<Response.Order>>> Handle(Query.GetOrdersByClinicId request,
         CancellationToken cancellationToken)
     {
-        var searchTerm = request.SearchTerm.Trim();
+        var searchTerm = request.SearchTerm?.Trim();
 
         var query = orderRepository.FindAll(x =>
             x.Service.ClinicServices.FirstOrDefault().ClinicId == currentUserService.ClinicId);
