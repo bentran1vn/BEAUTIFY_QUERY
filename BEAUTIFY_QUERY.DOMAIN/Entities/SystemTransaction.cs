@@ -10,6 +10,7 @@ public class SystemTransaction : AggregateRoot<Guid>, IAuditableEntity
     public virtual SubscriptionPackage? SubscriptionPackage { get; set; }
     public DateTimeOffset TransactionDate { get; set; } = DateTimeOffset.UtcNow;
     [Column(TypeName = "decimal(18,2)")] public decimal Amount { get; set; }
+    public int Status {get;set;}
     [MaxLength(50)] public string? PaymentMethod { get; set; }
 
 
