@@ -65,7 +65,7 @@ public class GetClinicDetailQueryHandler(
 
         // Get the latest system transaction for this clinic to extract the subscription package
         var latestTransaction = systemTransactionRepository
-            .FindAll(x => x.ClinicId == request.id && !x.IsDeleted, x => x.SubscriptionPackage)
+            .FindAll(x => x.ClinicId == request.id && !x.IsDeleted&&x.Status==1, x => x.SubscriptionPackage)
             .OrderByDescending(x => x.TransactionDate)
             .FirstOrDefault();
 
