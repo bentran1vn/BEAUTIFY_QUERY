@@ -65,7 +65,7 @@ public class GetClinicDetailQueryHandler(
 
         // Get the latest system transaction for this clinic to extract the subscription package
         var latestTransaction = systemTransactionRepository
-            .FindAll(x => x.ClinicId == request.id && !x.IsDeleted&&x.Status==1, x => x.SubscriptionPackage)
+            .FindAll(x => x.ClinicId == request.id && !x.IsDeleted && x.Status == 2, x => x.SubscriptionPackage)
             .OrderByDescending(x => x.TransactionDate)
             .FirstOrDefault();
 
@@ -74,6 +74,9 @@ public class GetClinicDetailQueryHandler(
         if (latestTransaction?.SubscriptionPackage != null)
         {
             var package = latestTransaction.SubscriptionPackage;
+            var dateBought = latestTransaction.TransactionDate;
+            var dateExpired = dateBought.AddDays(package.Duration);
+
             currentSubscription = new Response.Subscription(
                 package.Id,
                 package.Name,
@@ -82,7 +85,10 @@ public class GetClinicDetailQueryHandler(
                 package.Duration,
                 package.IsActivated,
                 package.LimitBranch,
-                package.LimitLiveStream
+                package.LimitLiveStream,
+                DateOnly.Parse(dateBought.ToString("yyyy-MM-dd")),
+                DateOnly.Parse(dateExpired.ToString("yyyy-MM-dd")),
+                (int)(dateExpired - dateBought).TotalDays
             );
         }
 
