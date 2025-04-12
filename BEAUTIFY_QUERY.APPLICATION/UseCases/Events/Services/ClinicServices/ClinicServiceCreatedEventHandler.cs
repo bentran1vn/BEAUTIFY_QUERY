@@ -21,11 +21,22 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
             DocumentId = serviceRequest.Id,
             Name = serviceRequest.Name,
             Description = serviceRequest.Description,
-            Branding = new Clinic(
-                serviceRequest.Branding.Id, serviceRequest.Branding.Name, serviceRequest.Branding.Email,
-                serviceRequest.Branding.City, serviceRequest.Branding.Address, serviceRequest.Branding.District,
-                serviceRequest.Branding.Ward, serviceRequest.Branding.FullAddress, serviceRequest.Branding.PhoneNumber,
-                serviceRequest.Branding.ProfilePictureUrl, serviceRequest.Branding.IsParent, true, serviceRequest.Branding.ParentId),
+            Branding = new Clinic
+            {
+                Id = serviceRequest.Branding.Id,
+                Name = serviceRequest.Branding.Name,
+                Email = serviceRequest.Branding.Email,
+                City =serviceRequest.Branding.City,
+                Address = serviceRequest.Branding.Address,
+                District = serviceRequest.Branding.District,
+                Ward = serviceRequest.Branding.Ward,
+                FullAddress = serviceRequest.Branding.FullAddress,
+                PhoneNumber =  serviceRequest.Branding.PhoneNumber,
+                ProfilePictureUrl = serviceRequest.Branding.ProfilePictureUrl,
+                IsParent = serviceRequest.Branding.IsParent,
+                IsActivated = true,
+                ParentId = serviceRequest.Branding.ParentId
+            },
             CoverImage = serviceRequest.CoverImages.Select(x => new Image
             {
                 Id = x.Id,
@@ -36,9 +47,22 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
                 serviceRequest.Category.Id, serviceRequest.Category.Name,
                 serviceRequest.Category.Description
             ),
-            Clinic = serviceRequest.Clinic.Select(x => new Clinic(
-                x.Id, x.Name, x.Email, x.City, x.Address, x.District, x.Ward, x.FullAddress, x.PhoneNumber,
-                x.ProfilePictureUrl, x.IsParent, true, x.ParentId)).ToList(),
+            Clinic = serviceRequest.Clinic.Select(x => new Clinic
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email,
+                    City = x.City,
+                    Address = x.Address,
+                    District = x.District,
+                    Ward = x.Ward,
+                    FullAddress = x.FullAddress,
+                    PhoneNumber = x.PhoneNumber,
+                    ProfilePictureUrl = x.ProfilePictureUrl,
+                    IsParent = x.IsParent,
+                    IsActivated = true,
+                    ParentId = x.ParentId
+                }).ToList(),
             Procedures = []
         };
 
