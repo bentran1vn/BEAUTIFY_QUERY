@@ -24,20 +24,22 @@ public class ClinicServiceProjection : Document
 
 public record Category(Guid Id, string Name, string Description);
 
-public record Clinic(
-    Guid Id,
-    string Name,
-    string Email,
-    string City,
-    string Address,
-    string District,
-    string Ward,
-    string FullAddress,
-    string PhoneNumber,
-    string? ProfilePictureUrl,
-    bool? IsParent,
-    bool IsActivated,
-    Guid? ParentId);
+public class Clinic
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+    public string City { get; set; }
+    public string Address { get; set; }
+    public string District { get; set; }
+    public string Ward { get; set; }
+    public string FullAddress { get; set; }
+    public string PhoneNumber { get; set; }
+    public string? ProfilePictureUrl { get; set; }
+    public bool? IsParent { get; set; }
+    public bool IsActivated { get; set; }
+    public Guid? ParentId { get; set; }
+};
 
 public class Procedure
 {

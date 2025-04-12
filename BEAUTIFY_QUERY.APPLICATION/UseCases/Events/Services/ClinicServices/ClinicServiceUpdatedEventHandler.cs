@@ -28,9 +28,22 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
             serviceRequest.Category.Id, serviceRequest.Category.Name,
             serviceRequest.Category.Description
         );
-        isServiceExisted.Clinic = serviceRequest.Clinic.Select(x => new Clinic(
-            x.Id, x.Name, x.Email, x.City, x.Address, x.District, x.Ward, x.FullAddress, x.PhoneNumber,
-            x.ProfilePictureUrl, x.IsParent, true, x.ParentId)).ToList();
+        isServiceExisted.Clinic = serviceRequest.Clinic.Select(x => new Clinic
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Email = x.Email,
+            City = x.City,
+            Address = x.Address,
+            District = x.District,
+            Ward = x.Ward,
+            FullAddress = x.FullAddress,
+            PhoneNumber = x.PhoneNumber,
+            ProfilePictureUrl = x.ProfilePictureUrl,
+            IsParent = x.IsParent,
+            IsActivated = true,
+            ParentId = x.ParentId
+        }).ToList();
 
         isServiceExisted.CoverImage = serviceRequest.CoverImages
             .Select(x => new Image()
