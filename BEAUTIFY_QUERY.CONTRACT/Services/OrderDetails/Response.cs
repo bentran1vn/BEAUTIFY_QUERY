@@ -1,4 +1,4 @@
-﻿namespace BEAUTIFY_QUERY.CONTRACT.Services.OrderDetails;
+﻿﻿namespace BEAUTIFY_QUERY.CONTRACT.Services.OrderDetails;
 public static class Response
 {
     public class OrderDetailResponse
@@ -8,5 +8,7 @@ public static class Response
         public string? ProcedurePriceType { get; set; }
         public decimal Price { get; set; }
         public int Duration { get; set; }
+        public string? CustomerEmail { get; set; }
+        public string? CustomerPhone { get; set; }
     }
 }

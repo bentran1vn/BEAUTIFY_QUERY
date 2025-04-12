@@ -1,4 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+﻿﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.OrderDetails;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 
@@ -10,7 +10,7 @@ internal sealed class GetOrderDetailsByOrderIdQueryHandler(IRepositoryBase<Order
         Query.GetOrderDetailsByOrderIdQuery request,
         CancellationToken cancellationToken)
     {
-        var order = await orderRepositoryBase.FindByIdAsync(request.OrderId, cancellationToken, x => x.OrderDetails);
+        var order = await orderRepositoryBase.FindByIdAsync(request.OrderId, cancellationToken, x => x.OrderDetails, x => x.Customer);
         if (order == null)
             return Result.Failure<List<Response.OrderDetailResponse>>(new Error("404", "Order not found"));
         var orderDetails = order.OrderDetails.Select(od => new Response.OrderDetailResponse
@@ -19,7 +19,9 @@ internal sealed class GetOrderDetailsByOrderIdQueryHandler(IRepositoryBase<Order
             ServiceName = od.Order.Service.Name,
             ProcedurePriceType = od.ProcedurePriceType.Name,
             Price = od.Price,
-            Duration = od.ProcedurePriceType.Duration
+            Duration = od.ProcedurePriceType.Duration,
+            CustomerEmail = order.Customer?.Email,
+            CustomerPhone = order.Customer?.PhoneNumber
         }).ToList();
         return Result.Success(orderDetails);
     }
