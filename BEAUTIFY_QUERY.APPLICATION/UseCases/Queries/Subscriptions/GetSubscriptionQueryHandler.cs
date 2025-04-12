@@ -1,4 +1,4 @@
-﻿﻿using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using AutoMapper;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
@@ -56,8 +56,7 @@ internal sealed class
         return request.SortColumn?.ToLower() switch
         {
             "name" => projection => projection.Name,
-            "price" => projection => projection.Price,
-            _ => projection => projection.CreatedOnUtc
+            _ => projection => projection.Price,
         };
     }
 }
