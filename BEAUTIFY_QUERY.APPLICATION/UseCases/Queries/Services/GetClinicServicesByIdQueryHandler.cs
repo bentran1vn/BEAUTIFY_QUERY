@@ -39,6 +39,7 @@ public class GetClinicServicesByIdQueryHandler(
                     isServiceExisted.Branding.PhoneNumber,
                     isServiceExisted.Branding.ProfilePictureUrl,
                     isServiceExisted.Branding.IsParent,
+                    isServiceExisted.Branding.IsActivated,
                     isServiceExisted.Branding.ParentId),
                 isServiceExisted.MaxPrice,
                 isServiceExisted.MinPrice,
@@ -54,6 +55,7 @@ public class GetClinicServicesByIdQueryHandler(
                     y.PhoneNumber,
                     y.ProfilePictureUrl,
                     y.IsParent,
+                    y.IsActivated,
                     y.ParentId)).ToList(),
                 new Response.Category(
                     isServiceExisted.Category.Id,
@@ -111,6 +113,7 @@ public class GetClinicServicesByIdQueryHandler(
                     isServiceExisted.Branding.PhoneNumber,
                     isServiceExisted.Branding.ProfilePictureUrl,
                     isServiceExisted.Branding.IsParent,
+                    isServiceExisted.Branding.IsActivated,
                     isServiceExisted.Branding.ParentId),
                 isServiceExisted.MaxPrice,
                 isServiceExisted.MinPrice,
@@ -126,6 +129,7 @@ public class GetClinicServicesByIdQueryHandler(
                     y.PhoneNumber,
                     y.ProfilePictureUrl,
                     y.IsParent,
+                    y.IsActivated,
                     y.ParentId)).ToList(),
                 new Response.Category(
                     isServiceExisted.Category.Id,

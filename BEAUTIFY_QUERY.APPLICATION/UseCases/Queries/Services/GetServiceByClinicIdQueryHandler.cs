@@ -50,6 +50,7 @@ internal sealed class GetServiceByClinicIdQueryHandler(
                     x.Branding.PhoneNumber,
                     x.Branding.ProfilePictureUrl,
                     x.Branding.IsParent,
+                    x.Branding.IsActivated,
                     x.Branding.ParentId),
                 x.MaxPrice,
                 x.MinPrice,
@@ -65,6 +66,7 @@ internal sealed class GetServiceByClinicIdQueryHandler(
                     y.PhoneNumber,
                     y.ProfilePictureUrl,
                     y.IsParent,
+                    y.IsActivated,
                     y.ParentId)).ToList(),
                 new Response.Category
                 (

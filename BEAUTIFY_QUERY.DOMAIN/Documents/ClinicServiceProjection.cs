@@ -36,6 +36,7 @@ public record Clinic(
     string PhoneNumber,
     string? ProfilePictureUrl,
     bool? IsParent,
+    bool IsActivated,
     Guid? ParentId);
 
 public class Procedure
