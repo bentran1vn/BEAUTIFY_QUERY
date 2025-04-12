@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 
@@ -22,7 +23,7 @@ internal sealed class GetClinicsQueryHandler(
                      && !x.IsDeleted
             );
 
-        if (request.Role == null || request.Role == "Customer")
+        if (request.Role is null or Constant.Role.CUSTOMER)
         {
             clinicsQuery = clinicsQuery
                 .Where(x => x.IsActivated);
