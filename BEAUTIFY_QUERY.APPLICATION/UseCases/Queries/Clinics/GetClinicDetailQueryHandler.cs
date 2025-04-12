@@ -74,6 +74,9 @@ public class GetClinicDetailQueryHandler(
         if (latestTransaction?.SubscriptionPackage != null)
         {
             var package = latestTransaction.SubscriptionPackage;
+            var dateBought = latestTransaction.TransactionDate;
+            var dateExpired = dateBought.AddDays(package.Duration);
+
             currentSubscription = new Response.Subscription(
                 package.Id,
                 package.Name,
@@ -82,7 +85,9 @@ public class GetClinicDetailQueryHandler(
                 package.Duration,
                 package.IsActivated,
                 package.LimitBranch,
-                package.LimitLiveStream
+                package.LimitLiveStream,
+                dateBought,
+                dateExpired
             );
         }
 
