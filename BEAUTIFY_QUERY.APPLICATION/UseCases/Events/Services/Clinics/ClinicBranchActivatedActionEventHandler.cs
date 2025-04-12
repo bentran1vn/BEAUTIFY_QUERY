@@ -1,6 +1,7 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Services.Clinic;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
+using MongoDB.Driver;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.Clinics;
 
@@ -18,29 +19,37 @@ public class ClinicBranchActivatedActionEventHandler: ICommandHandler<DomainEven
         var serviceRequest = request.entity;
         
         var isServiceExisted = await _clinicServiceRepository
-                                   .FindOneAsync(p => p.DocumentId == serviceRequest.Id)
-                               ?? throw new Exception($"Service {serviceRequest.Id} not found");
+                    .AsQueryable(x => x.Branding.Id.Equals(serviceRequest.Id))
+                    .ToListAsync(cancellationToken);
 
-        
-        
-        if (serviceRequest.IsParent)
+        if (isServiceExisted != null)
         {
-            isServiceExisted.Branding.IsActivated = serviceRequest.IsActive;
-        }
-        else
-        {
-            isServiceExisted.Clinic = isServiceExisted.Clinic.Select(x =>
+            foreach (var item in isServiceExisted)
             {
-                if (x.Id.Equals(serviceRequest.Id))
+                if (serviceRequest.IsParent)
                 {
-                    x.IsActivated = serviceRequest.IsActive;
+                    item.Branding.IsActivated = serviceRequest.IsActive;
                 }
+                else
+                {
+                    item.Clinic = item.Clinic.Select(x =>
+                    {
+                        if (x.Id.Equals(serviceRequest.Id))
+                        {
+                            x.IsActivated = serviceRequest.IsActive;
+                        }
 
-                return x;
-            }).ToList();
+                        return x;
+                    }).ToList();
+                }
+            }
         }
         
-        await _clinicServiceRepository.ReplaceOneAsync(isServiceExisted);
+        await _clinicServiceRepository.DeleteManyAsync(x => x.Branding.Id.Equals(serviceRequest.Id));
+        if (isServiceExisted != null)
+        {
+            await _clinicServiceRepository.InsertManyAsync(isServiceExisted);
+        }
         
         return Result.Success();
     }
