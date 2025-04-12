@@ -19,7 +19,7 @@ public class ClinicBranchActivatedActionEventHandler: ICommandHandler<DomainEven
         var serviceRequest = request.entity;
         
         var isServiceExisted = await _clinicServiceRepository
-                    .AsQueryable(x => x.Branding.Id.Equals(serviceRequest.Id))
+                    .AsQueryable(x => x.Branding.Id.Equals(serviceRequest.ParentId))
                     .ToListAsync(cancellationToken);
 
         if (isServiceExisted != null)
