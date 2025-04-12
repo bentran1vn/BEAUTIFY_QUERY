@@ -45,7 +45,7 @@ public class ClinicBranchActivatedActionEventHandler: ICommandHandler<DomainEven
             }
         }
         
-        await _clinicServiceRepository.DeleteManyAsync(x => x.Branding.Id.Equals(serviceRequest.Id));
+        await _clinicServiceRepository.DeleteManyAsync(x => x.Branding.Id.Equals(serviceRequest.ParentId));
         if (isServiceExisted != null)
         {
             await _clinicServiceRepository.InsertManyAsync(isServiceExisted);
