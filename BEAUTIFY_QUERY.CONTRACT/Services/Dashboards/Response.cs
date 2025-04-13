@@ -14,11 +14,11 @@ public class Response
     
     public class GetDaytimeInformationResponse
     {
-        DatetimeInformation? DatetimeInformation { get; set; }
-        List<DatetimeInformation>? DatetimeInformationList { get; set; }
+        public Information? DatetimeInformation { get; set; }
+        public List<DatetimeInformation>? DatetimeInformationList { get; set; }
     }
 
-    public class DatetimeInformation
+    public class Information
     {
         public int TotalCountOrderCustomer { get; set; }
         public int TotalCountScheduleCustomer { get; set; }
@@ -30,5 +30,12 @@ public class Response
         public int TotalCountOrderPending { get; set; }
         public decimal TotalSumRevenueNormal { get; set; }
         public decimal TotalSumRevenueLiveStream { get; set; }
+    }
+
+    public class DatetimeInformation
+    {
+        public Information Information { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
     }
 }
