@@ -70,7 +70,9 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
                 x.Service.Name,
                 x.FinalAmount,
                 DateOnly.Parse(x.OrderDate.ToString("yyyy-MM-dd")),
-                x.Status
+                x.Status,
+                x.Customer.PhoneNumber,
+                x.Customer.Email
             ))
             .OrderBy(x => x.OrderDate)
             .ThenBy(x => x.Status)

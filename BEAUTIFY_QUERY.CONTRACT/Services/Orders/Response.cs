@@ -6,8 +6,11 @@ public static class Response
         string CustomerName,
         string ServiceName,
         //decimal? TotalAmount,
-       // decimal? Discount,
+        // decimal? Discount,
         decimal? FinalAmount,
         DateOnly OrderDate,
-        string Status);
+        string Status,
+        string CustomerPhone,
+        string CustomerEmail
+    );
 }

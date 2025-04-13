@@ -20,6 +20,8 @@ internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orde
             order.Service.Name,
             order.FinalAmount,
             DateOnly.Parse(order.OrderDate.ToString("yyyy-MM-dd")),
-            order.Status));
+            order.Status,
+            order.Customer.PhoneNumber,
+            order.Customer.Email));
     }
 }

@@ -1,4 +1,4 @@
-﻿﻿namespace BEAUTIFY_QUERY.CONTRACT.Services.OrderDetails;
+﻿namespace BEAUTIFY_QUERY.CONTRACT.Services.OrderDetails;
 public static class Response
 {
     public class OrderDetailResponse

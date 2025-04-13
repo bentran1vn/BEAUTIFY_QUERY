@@ -29,7 +29,8 @@ internal sealed class GetOrdersByClinicIdHandler(
 
 
         var mapped = orders.Items.Select(x =>
-                new Response.Order(x.Id, x.Customer.FullName, x.Service.Name, x.FinalAmount, x.OrderDate, x.Status))
+                new Response.Order(x.Id, x.Customer.FullName, x.Service.Name, x.FinalAmount, x.OrderDate, x.Status,
+                    x.Customer.PhoneNumber, x.Customer.Email))
             .ToList();
 
         return Result.Success(
