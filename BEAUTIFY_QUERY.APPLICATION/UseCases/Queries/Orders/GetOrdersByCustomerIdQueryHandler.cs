@@ -69,6 +69,8 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
                 x.Customer.FullName,
                 x.Service.Name,
                 x.FinalAmount,
+                x.Discount,
+                x.TotalAmount,
                 DateOnly.Parse(x.OrderDate.ToString("yyyy-MM-dd")),
                 x.Status,
                 x.Customer.PhoneNumber,
