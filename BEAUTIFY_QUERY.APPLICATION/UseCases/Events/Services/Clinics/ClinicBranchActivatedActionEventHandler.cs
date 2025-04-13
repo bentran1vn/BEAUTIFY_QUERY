@@ -42,10 +42,11 @@ public class ClinicBranchActivatedActionEventHandler: ICommandHandler<DomainEven
                         return x;
                     }).ToList();
                 }
+                await _clinicServiceRepository.ReplaceOneAsync(item);
             }
         }
         
-        await _clinicServiceRepository.DeleteManyAsync(x => x.Branding.Id.Equals(serviceRequest.Id));
+        await _clinicServiceRepository.DeleteManyAsync(x => x.Branding.Id.Equals(serviceRequest.ParentId));
         if (isServiceExisted != null)
         {
             await _clinicServiceRepository.InsertManyAsync(isServiceExisted);
