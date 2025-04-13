@@ -57,6 +57,7 @@ public static class Response
             public string ProcedurePriceTypeName { get; set; }
             public string Duration { get; set; }
             public string Status { get; set; }
+            public Guid? CustomerScheduleId { get; set; }
         }
     }
 

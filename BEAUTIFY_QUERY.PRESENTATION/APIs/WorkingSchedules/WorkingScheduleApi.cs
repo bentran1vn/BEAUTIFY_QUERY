@@ -14,9 +14,6 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
             .WithSummary("Search theo Date : Date1 to Date2 or Time : Time1 to Time2|| search by DoctorName");
         gr1.MapGet("doctors/busy-times", GetDoctorBusyTimeInADay)
             .WithSummary("Get doctor's busy time slots for a specific day");
-        // gr1.MapGet("doctors/", GetDoctorScheduleById).RequireAuthorization();
-
-
         gr1.MapGet("doctors/", GetDoctorScheduleByIdV2).RequireAuthorization();
         gr1.MapGet("doctors/monthly-count", GetWorkingSchedulesEachDayInMonth)
             .WithSummary("Get doctor's busy time slots for a specific month")
@@ -82,18 +79,6 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
         [FromQuery] DateOnly date)
     {
         var result = await sender.Send(new Query.GetWorkingScheduleDaily(date));
-        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
-    }
-
-    private static async Task<IResult> GetDoctorScheduleById(ISender sender, string searchTerm = null,
-        string? sortColumn = null,
-        string? sortOrder = null,
-        int pageNumber = 1,
-        int pageSize = 10)
-    {
-        var result = await sender.Send(new Query.GetWorkingScheduleOfDoctorId(searchTerm,
-            sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
-            pageNumber, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 

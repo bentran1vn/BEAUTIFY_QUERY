@@ -26,7 +26,8 @@ internal sealed class GetWorkingScheduleDetailQueryHandler(IMongoRepository<Work
             StepIndex = workingSchedule.StepIndex,
             ProcedurePriceTypeName = workingSchedule.CurrentProcedureName,
             Duration = (workingSchedule.EndTime - workingSchedule.StartTime).ToString(),
-            Status = workingSchedule.Status
+            Status = workingSchedule.Status,
+            CustomerScheduleId = workingSchedule.CustomerScheduleId,
         };
 
         var response = new Response.GetWorkingScheduleDetailResponse

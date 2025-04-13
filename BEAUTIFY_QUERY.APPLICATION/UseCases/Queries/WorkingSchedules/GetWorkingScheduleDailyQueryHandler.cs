@@ -34,7 +34,8 @@ internal sealed class GetWorkingScheduleDailyQueryHandler(
                     StepIndex = ws.StepIndex,
                     ProcedurePriceTypeName = ws.CurrentProcedureName,
                     Duration = (ws.EndTime - ws.StartTime).ToString(),
-                    Status = ws.Status
+                    Status = ws.Status,
+                    CustomerScheduleId = ws.CustomerScheduleId,
                 }).ToList()
             })
             .ToList();
