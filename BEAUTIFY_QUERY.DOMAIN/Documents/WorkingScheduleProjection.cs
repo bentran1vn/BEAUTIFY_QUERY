@@ -6,6 +6,7 @@ namespace BEAUTIFY_QUERY.DOMAIN.Documents;
 public class WorkingScheduleProjection : Document
 {
     public Guid? DoctorId { get; set; }
+    public required Guid CustomerScheduleId { get; set; }
     public string? DoctorName { get; set; }
     public Guid ClinicId { get; set; }
     public DateOnly Date { get; set; }

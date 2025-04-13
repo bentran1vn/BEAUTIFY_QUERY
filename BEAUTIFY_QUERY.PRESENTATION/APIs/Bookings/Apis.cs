@@ -12,7 +12,7 @@ public class Apis : ApiEndpoint, ICarterModule
         gr1.MapGet("", GetBookingPagedResult).RequireAuthorization();
         gr1.MapGet("appointments/total", GetTotalAppointment).RequireAuthorization().WithSummary("mm-yyyy");
         gr1.MapGet("appointments/{date}", GetBookingWithDate).RequireAuthorization();
-        gr1.MapGet("{id}", GetBookingDetailById).RequireAuthorization();
+        gr1.MapGet("{id:guid}", GetBookingDetailById).RequireAuthorization();
     }
 
 

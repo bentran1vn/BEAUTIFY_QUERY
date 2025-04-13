@@ -101,6 +101,7 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
             CustomerId = x.CustomerId,
             ServiceId = x.ServiceId,
             ServiceName = x.ServiceName,
+            CustomerScheduleId = x.CustomerScheduleId,
             CurrentProcedureName = x.CurrentProcedureName
         }).ToList();
     }

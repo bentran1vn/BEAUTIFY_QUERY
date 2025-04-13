@@ -22,8 +22,10 @@ public class
         // 3. If a search term was provided, filter further
         if (request.MainClinicId.HasValue)
             query = query.Where(x => x.Clinic.Any(
-                c => c.Id == request.MainClinicId.Value ||
-                     c.ParentId == request.MainClinicId.Value)
+                                         c => c.Id == request.MainClinicId.Value ||
+                                              c.ParentId == request.MainClinicId.Value) ||
+                                     x.Category.Name
+                                         .Contains(searchTerm)
             );
 
         // 3. If a search term was provided, filter further
@@ -52,7 +54,7 @@ public class
             x.DiscountMaxPrice, x.DiscountMinPrice,
             x.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
             x.Clinic.Select(y => new Response.Clinic(y.Id, y.Name, y.Email,
-                y.Address, y.PhoneNumber, y.ProfilePictureUrl, y.IsParent,y.IsActivated ,y.ParentId)).ToList(),
+                y.Address, y.PhoneNumber, y.ProfilePictureUrl, y.IsParent, y.IsActivated, y.ParentId)).ToList(),
             new Response.Category(x.Category.Id, x.Category.Name, x.Category.Description), x.DoctorServices.Select(y =>
                 new Response.DoctorService(y.Id, y.ServiceId,
                     new Response.UserEntity(y.Doctor.Id, y.Doctor.FullName, y.Doctor.Email, y.Doctor.PhoneNumber,

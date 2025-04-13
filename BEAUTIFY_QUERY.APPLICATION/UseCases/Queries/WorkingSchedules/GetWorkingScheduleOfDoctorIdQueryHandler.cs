@@ -81,6 +81,7 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandler(
             CustomerId = x.CustomerSchedule.CustomerId,
             ServiceId = x.CustomerSchedule.ServiceId,
             ServiceName = x.CustomerSchedule.Service.Name,
+            CustomerScheduleId = x.CustomerScheduleId,
             CurrentProcedureName = x.CustomerSchedule.ProcedurePriceType.Name,
         }).ToList();
         var mapped = new PagedResult<Response.GetWorkingScheduleResponse>(
