@@ -11,6 +11,7 @@ public class Order : AggregateRoot<Guid>, IAuditableEntity
     [Column(TypeName = "decimal(18,2)")] public decimal? FinalAmount { get; set; }
     public DateOnly OrderDate { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
     public Guid? ServiceId { get; set; }
+    public Guid ClinicId { get; set; }
     public virtual Service? Service { get; set; }
     public Guid? LivestreamRoomId { get; set; }
     public virtual LivestreamRoom? LivestreamRoom { get; set; }
