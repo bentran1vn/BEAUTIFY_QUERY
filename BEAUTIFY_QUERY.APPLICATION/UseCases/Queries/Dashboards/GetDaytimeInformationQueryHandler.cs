@@ -13,13 +13,15 @@ public class GetDaytimeInformationQueryHandler : IQueryHandler<Query.GetDaytimeI
     private readonly IRepositoryBase<CustomerSchedule, Guid> _customerScheduleRepository;
     private readonly IRepositoryBase<ClinicService, Guid> _clinicServiceRepository;
     private readonly IRepositoryBase<Clinic, Guid> _clinicRepository;
+    private readonly IRepositoryBase<ClinicTransaction, Guid> _clinicTransactionRepository;
 
-    public GetDaytimeInformationQueryHandler(IRepositoryBase<Order, Guid> orderRepository, IRepositoryBase<CustomerSchedule, Guid> customerScheduleRepository, IRepositoryBase<ClinicService, Guid> clinicServiceRepository, IRepositoryBase<Clinic, Guid> clinicRepository)
+    public GetDaytimeInformationQueryHandler(IRepositoryBase<Order, Guid> orderRepository, IRepositoryBase<CustomerSchedule, Guid> customerScheduleRepository, IRepositoryBase<ClinicService, Guid> clinicServiceRepository, IRepositoryBase<Clinic, Guid> clinicRepository, IRepositoryBase<ClinicTransaction, Guid> clinicTransactionRepository)
     {
         _orderRepository = orderRepository;
         _customerScheduleRepository = customerScheduleRepository;
         _clinicServiceRepository = clinicServiceRepository;
         _clinicRepository = clinicRepository;
+        _clinicTransactionRepository = clinicTransactionRepository;
     }
 
     public async Task<Result<Response.GetDaytimeInformationResponse>> Handle(Query.GetDaytimeInformationQuery request, CancellationToken cancellationToken)
@@ -55,13 +57,23 @@ public class GetDaytimeInformationQueryHandler : IQueryHandler<Query.GetDaytimeI
             
             clinicIds.Add(request.ClinicId);
             
+            var orders = _clinicTransactionRepository
+                .FindAll(x => clinicIds.Contains((Guid)x.ClinicId!))
+                .Select(x => x.OrderId)
+                .ToList();
+            
             orderQuery = orderQuery.Where(
-                x => clinicIds.Contains(x.ClinicId));
+                x => orders.Contains(x.Id));
         }
         else if(request.RoleName == "Clinic Staff")
         {
+            var orders = _clinicTransactionRepository
+                .FindAll(x => x.ClinicId.Equals(request.ClinicId))
+                .Select(x => x.OrderId)
+                .ToList();
+            
             orderQuery = orderQuery.Where(
-                x => x.ClinicId.Equals(request.ClinicId));
+                x => orders.Contains(x.Id));
         }
         
         var result = new Response.GetDaytimeInformationResponse();
