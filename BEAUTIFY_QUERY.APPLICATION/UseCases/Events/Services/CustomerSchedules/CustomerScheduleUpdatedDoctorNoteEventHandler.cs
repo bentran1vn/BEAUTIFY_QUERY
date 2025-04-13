@@ -21,6 +21,7 @@ internal sealed class CustomerScheduleUpdatedDoctorNoteEventHandler(
         if (workingSchedule is null)
             return Result.Failure(new Error("404", "Working Schedule Not Found !"));
         workingSchedule.IsNoted = true;
+        workingSchedule.Note = request.DoctorNote;
         customerSchedule.DoctorNote = request.DoctorNote;
         customerScheduleRepository.ReplaceOneAsync(customerSchedule);
         return Result.Success();
