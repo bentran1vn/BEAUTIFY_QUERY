@@ -15,7 +15,7 @@ public class WorkingScheduleProjection : Document
     public bool IsDeleted { get; set; } = false;
 
     public string? Status { get; set; }
-    public string? Note { get; set; }
+    public bool? IsNoted { get; set; }
 
     public string StepIndex { get; set; }
     public string CustomerName { get; set; }

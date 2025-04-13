@@ -58,6 +58,7 @@ public static class Response
             public string Duration { get; set; }
             public string Status { get; set; }
             public Guid? CustomerScheduleId { get; set; }
+            public  bool? IsNoted { get; set; }
         }
     }
 

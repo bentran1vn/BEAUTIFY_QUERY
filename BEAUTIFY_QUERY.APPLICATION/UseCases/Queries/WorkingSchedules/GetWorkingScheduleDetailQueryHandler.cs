@@ -28,6 +28,7 @@ internal sealed class GetWorkingScheduleDetailQueryHandler(IMongoRepository<Work
             Duration = (workingSchedule.EndTime - workingSchedule.StartTime).ToString(),
             Status = workingSchedule.Status,
             CustomerScheduleId = workingSchedule.CustomerScheduleId,
+            IsNoted = workingSchedule.IsNoted,
         };
 
         var response = new Response.GetWorkingScheduleDetailResponse

@@ -18,7 +18,7 @@ internal sealed class WorkingScheduleCreatedEventHandler(IMongoRepository<Workin
                 CustomerScheduleId = x.CustomerScheduleId,
                 EndTime = x.EndTime,
                 Date = x.Date,
-                Note = x.Note,
+                //IsNoted = x.Note,
                 Status = x.Status,
                 StepIndex = x.CustomerScheduleEntity.CurrentProcedure.StepIndex,
                 CustomerName = x.CustomerScheduleEntity.CustomerName,

@@ -4,7 +4,8 @@ using BEAUTIFY_QUERY.DOMAIN.Documents;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.CustomerSchedules;
 internal sealed class CustomerScheduleUpdatedDoctorNoteEventHandler(
-    IMongoRepository<CustomerScheduleProjection> customerScheduleRepository)
+    IMongoRepository<CustomerScheduleProjection> customerScheduleRepository,
+    IMongoRepository<WorkingScheduleProjection> workingScheduleRepository)
     : ICommandHandler<DomainEvents.CustomerScheduleUpdatedDoctorNote>
 {
     public async Task<Result> Handle(DomainEvents.CustomerScheduleUpdatedDoctorNote request,
@@ -15,6 +16,11 @@ internal sealed class CustomerScheduleUpdatedDoctorNoteEventHandler(
         if (customerSchedule is null)
             return Result.Failure(new Error("404", "Customer Schedule Not Found !"));
 
+        var workingSchedule =
+            await workingScheduleRepository.FindOneAsync(x => x.CustomerScheduleId == request.IdCustomerSchedule);
+        if (workingSchedule is null)
+            return Result.Failure(new Error("404", "Working Schedule Not Found !"));
+        workingSchedule.IsNoted = true;
         customerSchedule.DoctorNote = request.DoctorNote;
         customerScheduleRepository.ReplaceOneAsync(customerSchedule);
         return Result.Success();

@@ -36,6 +36,7 @@ internal sealed class GetWorkingScheduleDailyQueryHandler(
                     Duration = (ws.EndTime - ws.StartTime).ToString(),
                     Status = ws.Status,
                     CustomerScheduleId = ws.CustomerScheduleId,
+                    IsNoted = ws.IsNoted
                 }).ToList()
             })
             .ToList();
