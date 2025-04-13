@@ -7,7 +7,6 @@ public class LiveStreamDetail : AggregateRoot<Guid>, IAuditableEntity
     public int ReactionCount { get; set; }
     public int TotalActivities { get; set; }
     public int TotalBooking { get; set; }
-    public Guid LivestreamRoomId { get; set; }
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? ModifiedOnUtc { get; set; }
 }

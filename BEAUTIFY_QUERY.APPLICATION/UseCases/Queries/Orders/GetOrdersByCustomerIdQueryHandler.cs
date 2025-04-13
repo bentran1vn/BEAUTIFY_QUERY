@@ -22,14 +22,15 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
 
     private IQueryable<Order> BuildQuery(Query.GetOrdersByCustomerId request)
     {
-        var query = orderRepositoryBase.FindAll(x => x.CustomerId == currentUserService.UserId);
+        var query = orderRepositoryBase.FindAll(x => x.CustomerId == currentUserService.UserId)
+            ;
 
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             ApplySearchFilter(ref query, request.SearchTerm.Trim());
         }
 
-        query = query.Include(x => x.Service);
+        query = query.Include(x => x.Service).Include(x => x.LivestreamRoom);
         query = ApplySorting(query, request);
 
         return query;
@@ -74,7 +75,9 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
                 DateOnly.Parse(x.OrderDate.ToString("yyyy-MM-dd")),
                 x.Status,
                 x.Customer.PhoneNumber,
-                x.Customer.Email
+                x.Customer.Email,
+                x.LivestreamRoomId != null,
+                x.LivestreamRoomId != null ? x.LivestreamRoom.Name : null
             ))
             .OrderBy(x => x.OrderDate)
             .ThenBy(x => x.Status)

@@ -13,7 +13,8 @@ public class Order : AggregateRoot<Guid>, IAuditableEntity
     public Guid? ServiceId { get; set; }
     public virtual Service? Service { get; set; }
     public Guid? LivestreamRoomId { get; set; }
-    
+    public virtual LivestreamRoom? LivestreamRoom { get; set; }
+
     [MaxLength(50)] public string? Status { get; set; }
     public virtual ICollection<OrderDetail>? OrderDetails { get; set; } = [];
     public DateTimeOffset CreatedOnUtc { get; set; }

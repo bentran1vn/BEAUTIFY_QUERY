@@ -11,6 +11,9 @@ public static class Response
         DateOnly OrderDate,
         string Status,
         string CustomerPhone,
-        string CustomerEmail
+        string CustomerEmail,
+        bool IsFromLivestream,
+        string? LivestreamName
+        
     );
 }

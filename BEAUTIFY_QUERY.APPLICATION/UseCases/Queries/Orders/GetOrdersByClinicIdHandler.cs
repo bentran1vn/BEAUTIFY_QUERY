@@ -39,7 +39,9 @@ internal sealed class GetOrdersByClinicIdHandler(
                     x.OrderDate,
                     x.Status,
                     x.Customer.PhoneNumber,
-                    x.Customer.Email))
+                    x.Customer.Email,
+                    x.LivestreamRoomId != null,
+                    x.LivestreamRoomId != null ? x.LivestreamRoom.Name : null))
             .ToList();
 
         return Result.Success(

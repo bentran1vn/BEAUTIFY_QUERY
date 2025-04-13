@@ -10,7 +10,7 @@ internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orde
     public async Task<Result<Response.Order>> Handle(Query.GetOrderById request, CancellationToken cancellationToken)
     {
         var order = await orderRepositoryBase.FindSingleAsync(x => x.Id.ToString().Contains(request.Id),
-            cancellationToken);
+            cancellationToken, x => x.LivestreamRoom);
         if (order == null)
             return Result.Failure<Response.Order>(new Error("404", "Order Not Found"));
 
@@ -24,6 +24,9 @@ internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orde
             DateOnly.Parse(order.OrderDate.ToString("yyyy-MM-dd")),
             order.Status,
             order.Customer.PhoneNumber,
-            order.Customer.Email));
+            order.Customer.Email,
+            order.LivestreamRoomId != null,
+            order.LivestreamRoomId != null ? order.LivestreamRoom.Name : null
+        ));
     }
 }
