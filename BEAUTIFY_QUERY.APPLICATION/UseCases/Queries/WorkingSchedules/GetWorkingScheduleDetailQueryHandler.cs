@@ -21,6 +21,7 @@ internal sealed class GetWorkingScheduleDetailQueryHandler(IMongoRepository<Work
             Id = workingSchedule.DocumentId,
             CustomerName = workingSchedule.CustomerName,
             ServiceName = workingSchedule.ServiceName,
+            Date = workingSchedule.Date,
             StartTime = workingSchedule.StartTime,
             EndTime = workingSchedule.EndTime,
             StepIndex = workingSchedule.StepIndex,

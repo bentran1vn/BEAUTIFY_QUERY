@@ -29,6 +29,7 @@ internal sealed class GetWorkingScheduleDailyQueryHandler(
                     Id = ws.DocumentId,
                     CustomerName = ws.CustomerName,
                     ServiceName = ws.ServiceName,
+                    Date = ws.Date,
                     StartTime = ws.StartTime,
                     EndTime = ws.EndTime,
                     StepIndex = ws.StepIndex,
