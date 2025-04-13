@@ -16,6 +16,7 @@ public static class Response
         string? District,
         string? Ward,
         string? Address,
-        string? FullAddress
+        string? FullAddress,
+        decimal? Balance = 0
     );
 }

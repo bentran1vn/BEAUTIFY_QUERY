@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BEAUTIFY_QUERY.DOMAIN.Entities;
 public class User : AggregateRoot<Guid>, IAuditableEntity
@@ -22,7 +23,7 @@ public class User : AggregateRoot<Guid>, IAuditableEntity
 
     [MaxLength(14, ErrorMessage = "Phone Number must be 10 digits")]
     public string? PhoneNumber { get; set; }
-
+    [Column(TypeName = "decimal(18,2)")] public decimal Balance { get; set; }
     [MaxLength(250)] public string? ProfilePicture { get; set; }
 
     // address in detail

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BEAUTIFY_QUERY.DOMAIN.Entities;
 public class Clinic : AggregateRoot<Guid>, IAuditableEntity
@@ -27,6 +28,7 @@ public class Clinic : AggregateRoot<Guid>, IAuditableEntity
     public bool? IsParent { get; set; } = false;
     [MaxLength(255)] public string? BankName { get; set; }
     [MaxLength(100)] public string? BankAccountNumber { get; set; }
+    [Column(TypeName = "decimal(18,2)")] public decimal Balance { get; set; }
     public Guid? ParentId { get; set; }
     public virtual Clinic? Parent { get; set; }
     [MaxLength(250)] public string? Note { get; set; }

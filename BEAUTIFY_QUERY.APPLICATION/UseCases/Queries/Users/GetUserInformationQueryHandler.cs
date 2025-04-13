@@ -14,10 +14,6 @@ internal sealed class GetUserInformationQueryHandler(
         Query.GetUserInformation request,
         CancellationToken cancellationToken)
     {
-        if (!currentUserService.UserId.HasValue)
-            return Result.Failure<Response.GetUserInformationResponse>(
-                new Error("400", "Invalid user identifier."));
-
         var userId = currentUserService.UserId.Value;
         var role = currentUserService.Role;
 
@@ -51,42 +47,15 @@ internal sealed class GetUserInformationQueryHandler(
     private static Response.GetUserInformationResponse MapToResponse<T>(T entity)
         where T : class
     {
-        switch (entity)
+        return entity switch
         {
-            case Staff staff:
-                return new Response.GetUserInformationResponse(
-                    staff.Id,
-                    staff.FirstName,
-                    staff.LastName,
-                    staff.FullName,
-                    staff.DateOfBirth,
-                    staff.Email,
-                    staff.PhoneNumber,
-                    staff.ProfilePicture,
-                    staff.City,
-                    staff.District,
-                    staff.Ward,
-                    staff.Address,
-                    staff.FullAddress);
-
-            case User user:
-                return new Response.GetUserInformationResponse(
-                    user.Id,
-                    user.FirstName,
-                    user.LastName,
-                    user.FullName,
-                    user.DateOfBirth,
-                    user.Email,
-                    user.PhoneNumber,
-                    user.ProfilePicture,
-                    user.City,
-                    user.District,
-                    user.Ward,
-                    user.Address,
-                    user.FullAddress);
-
-            default:
-                throw new ArgumentException("Unsupported entity type.", nameof(entity));
-        }
+            Staff staff => new Response.GetUserInformationResponse(staff.Id, staff.FirstName, staff.LastName,
+                staff.FullName, staff.DateOfBirth, staff.Email, staff.PhoneNumber, staff.ProfilePicture, staff.City,
+                staff.District, staff.Ward, staff.Address, staff.FullAddress),
+            User user => new Response.GetUserInformationResponse(user.Id, user.FirstName, user.LastName, user.FullName,
+                user.DateOfBirth, user.Email, user.PhoneNumber, user.ProfilePicture, user.City, user.District,
+                user.Ward, user.Address, user.FullAddress, user.Balance),
+            _ => throw new ArgumentException("Unsupported entity type.", nameof(entity))
+        };
     }
 }
