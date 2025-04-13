@@ -57,7 +57,10 @@ public static class Response
         int Duration,
         bool IsActivated,
         int LimitBranch,
-        int LimitLiveStream);
+        int LimitLiveStream,
+        DateOnly DateBought,
+        DateOnly DateExpired,
+        int DaysLeft);
 
     public record GetApplyRequest(Guid Id, string Name, string Email, string? FullAddress, int TotalApply);
 
