@@ -14,7 +14,6 @@ public static class Response
         public TimeSpan EndTime { get; set; }
 
         public string? Status { get; set; }
-        public string? Note { get; set; }
 
         public string StepIndex { get; set; }
         public string CustomerName { get; set; }
