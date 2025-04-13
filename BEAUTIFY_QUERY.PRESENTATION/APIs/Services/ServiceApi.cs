@@ -12,7 +12,7 @@ public class ServiceApi : ApiEndpoint, ICarterModule
 
         gr1.MapGet(string.Empty, GetAllServices);
         gr1.MapGet("{id}", GetServicesById);
-        gr1.MapGet("clinic", GetServicesByClinicId).RequireAuthorization();
+        //gr1.MapGet("clinic", GetServicesByClinicId);
         gr1.MapGet("clinics/{clinicId:guid}", GetServicesByClinicIdForCustomer);
         gr1.MapGet("categories/{categoryId:guid}", GetServicesByCategoryId);
     }

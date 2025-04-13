@@ -22,6 +22,7 @@ public static class Response
 
         public Guid? ServiceId { get; set; }
         public string ServiceName { get; set; }
+        public Guid? CustomerScheduleId { get; set; }
 
         public string CurrentProcedureName { get; set; }
     }
