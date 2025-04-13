@@ -30,6 +30,5 @@ internal sealed class GetAllServiceInGetClinicByIdQueryHandler(
         }).ToList();
         return Result.Success(new PagedResult<Response.GetAllServiceInGetClinicById>(mapList,
             result.PageIndex, result.PageSize, result.TotalCount));
-        
     }
 }

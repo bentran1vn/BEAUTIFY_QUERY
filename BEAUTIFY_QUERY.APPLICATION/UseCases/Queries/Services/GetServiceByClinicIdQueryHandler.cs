@@ -10,7 +10,7 @@ internal sealed class GetServiceByClinicIdQueryHandler(
     IMongoRepository<ClinicServiceProjection> repository,
     IRepositoryBase<DoctorService, Guid> doctorServiceRepository,
     IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository
-   )
+)
     : IQueryHandler<Query.GetServiceByClinicIdQuery, List<Response.GetAllServiceByIdResponse>>
 {
     public async Task<Result<List<Response.GetAllServiceByIdResponse>>> Handle(Query.GetServiceByClinicIdQuery request,
@@ -18,14 +18,13 @@ internal sealed class GetServiceByClinicIdQueryHandler(
     {
         var clinicServices =
             repository.FilterBy(
-                    x => x.Clinic.Any(x => x.Id == request.ClinicId) && x.Promotions.Any(x => x.IsActivated))
+                    x => x.Clinic.Any(x => x.Id == request.ClinicId && x.IsActivated))
                 .OrderBy(x => x.Name)
                 .ToList();
         if (clinicServices.Count == 0)
             return Result.Failure<List<Response.GetAllServiceByIdResponse>>(
                 new Error("404", "Clinic Service Not Found !"));
 
-        // Extract the ServiceIds first to avoid complex LINQ in EF translation
         var serviceIds = clinicServices.Select(x => x.DocumentId).ToList();
 
         var doctors = await doctorServiceRepository.FindAll(x => serviceIds.Contains(x.ServiceId))
@@ -86,6 +85,7 @@ internal sealed class GetServiceByClinicIdQueryHandler(
                         y.Price,
                         y.IsDefault)).ToList())).ToList(),
                 x.Promotions
+                    .Where(x => x.IsActivated)
                     .Select(promo => new Response.Promotion(
                         promo.Id,
                         promo.Name,
