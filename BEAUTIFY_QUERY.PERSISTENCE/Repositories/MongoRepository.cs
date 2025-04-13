@@ -25,6 +25,16 @@ public class MongoRepository<TDocument> : IMongoRepository<TDocument>
             ? _collection.AsQueryable().Where(filterExpression)
             : _collection.AsQueryable();
     }
+    
+    public virtual async Task<UpdateResult> UpdateOneAsync(
+        FilterDefinition<TDocument> filter,
+        UpdateDefinition<TDocument> update,
+        UpdateOptions options = null,
+        CancellationToken cancellationToken = default)
+    {
+        // Perform the update operation
+        return await _collection.UpdateOneAsync(filter, update, options, cancellationToken);
+    }
 
     public virtual IEnumerable<TDocument> FilterBy(
         Expression<Func<TDocument, bool>> filterExpression)

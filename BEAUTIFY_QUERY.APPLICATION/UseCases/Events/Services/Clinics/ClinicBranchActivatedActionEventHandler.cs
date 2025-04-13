@@ -42,6 +42,7 @@ public class ClinicBranchActivatedActionEventHandler: ICommandHandler<DomainEven
                         return x;
                     }).ToList();
                 }
+                await _clinicServiceRepository.ReplaceOneAsync(item);
             }
         }
         
