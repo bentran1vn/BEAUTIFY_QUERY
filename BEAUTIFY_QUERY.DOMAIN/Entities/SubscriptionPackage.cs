@@ -10,7 +10,8 @@ public class SubscriptionPackage : AggregateRoot<Guid>, IAuditableEntity
     public bool IsActivated { get; set; }
     public int LimitBranch { get; set; }
     public int LimitLiveStream { get; set; }
-
+    [Column(TypeName = "decimal(18,2)")] public decimal PriceMoreBranch { get; set; }
+    [Column(TypeName = "decimal(18,2)")] public decimal PriceMoreLivestream { get; set; }
     public int EnhancedViewer { get; set; }
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? ModifiedOnUtc { get; set; }
