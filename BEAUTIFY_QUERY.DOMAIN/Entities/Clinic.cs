@@ -13,8 +13,6 @@ public class Clinic : AggregateRoot<Guid>, IAuditableEntity
     [MaxLength(100)] public string? Address { get; set; }
     [MaxLength(250)] public string? FullAddress => $"{Address}, {Ward}, {District}, {City}".Trim(',', ' ', '\n');
     [MaxLength(20)] public required string TaxCode { get; set; }
-    public int AdditionBranches { get; set; } = 0;
-    public int AdditionLivestreams { get; set; } = 0;
     [MaxLength(250)] public required string BusinessLicenseUrl { get; set; }
     [MaxLength(250)] public required string OperatingLicenseUrl { get; set; }
     public DateTimeOffset? OperatingLicenseExpiryDate { get; set; }
