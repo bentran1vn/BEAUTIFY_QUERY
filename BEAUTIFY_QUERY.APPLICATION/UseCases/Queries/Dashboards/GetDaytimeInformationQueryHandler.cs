@@ -26,16 +26,21 @@ public class GetDaytimeInformationQueryHandler : IQueryHandler<Query.GetDaytimeI
 
     public async Task<Result<Response.GetDaytimeInformationResponse>> Handle(Query.GetDaytimeInformationQuery request, CancellationToken cancellationToken)
     {
-        if(request.StartDate == null || request.EndDate == null)
-            return Result.Failure<Response.GetDaytimeInformationResponse>(new Error("400", "Start date and end date cannot be null"));
-
+        if (request.StartDate != null || request.EndDate != null)
+        {
+            if (!(request.StartDate != null && request.EndDate != null))
+            {
+                return Result.Failure<Response.GetDaytimeInformationResponse>(new Error("400", "Start date and end date cannot be null"));
+            }
+        }
+            
         var orderQuery = _orderRepository
             .FindAll(x => !x.IsDeleted);
         
         var customerScheduleQuery = _customerScheduleRepository
             .FindAll(x => !x.IsDeleted);
 
-        if (request.Date == null)
+        if (request.Date != null)
         {
             orderQuery = orderQuery.Where(x => x.OrderDate.Equals(request.Date));
             customerScheduleQuery = customerScheduleQuery.Where(x => x.Date.Equals(request.Date));
@@ -78,7 +83,7 @@ public class GetDaytimeInformationQueryHandler : IQueryHandler<Query.GetDaytimeI
         
         var result = new Response.GetDaytimeInformationResponse();
         
-        if (request.Date == null)
+        if (request.Date != null)
         {
             var infor = new Response.Information();
             infor.TotalSumRevenue = await orderQuery
