@@ -19,20 +19,11 @@ public class WalletTransaction : AggregateRoot<Guid>, IAuditableEntity
     [MaxLength(20)] public required string Status { get; set; }
 
     public bool IsMakeBySystem { get; set; } = true;
-
-    // Reference to the order if this transaction is related to an order
-    /*  public Guid? OrderId { get; set; }
-      public virtual Order? Order { get; set; }
-
-      public Guid? ClinicTransactionId { get; set; }
-      public virtual ClinicTransaction? ClinicTransaction { get; set; }
-
-      public Guid? SystemTransactionId { get; set; }
-      public virtual SystemTransaction? SystemTransaction { get; set; }*/
+    
 
     [MaxLength(255)] public string? Description { get; set; }
 
-    public DateTimeOffset TransactionDate { get; set; } = DateTimeOffset.UtcNow;
+    public DateTime TransactionDate { get; set; } = DateTime.UtcNow;
 
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? ModifiedOnUtc { get; set; }

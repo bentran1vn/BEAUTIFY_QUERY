@@ -11,6 +11,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public virtual DbSet<SurveyAnswer> SurveyAnswers { get; set; }
     public virtual DbSet<SurveyResponse> SurveyResponses { get; set; }
     public virtual DbSet<ClinicTransaction> ClinicTransactions { get; set; }
+    public virtual DbSet<WalletTransaction> WalletTransaction { get; set; }
 
     private static void SetSoftDeleteFilter<T>(ModelBuilder modelBuilder) where T : Entity<T>
     {
@@ -38,6 +39,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Entity<SubscriptionPackage>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<DoctorCertificate>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<WalletTransaction>()
             .HasQueryFilter(x => !x.IsDeleted);
 
         foreach (var entityType in builder.Model.GetEntityTypes())
