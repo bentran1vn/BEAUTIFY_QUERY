@@ -22,7 +22,9 @@ public class GetSubscriptionByIdHandler(IRepositoryBase<SubscriptionPackage, Gui
             LimitBranch = subscription.LimitBranch,
             LimitLiveStream = subscription.LimitLiveStream,
             EnhancedViewer = subscription.EnhancedViewer,
-            IsActivated = subscription.IsActivated
+            IsActivated = subscription.IsActivated,
+            PriceBranchAddition = subscription.PriceMoreBranch,
+            PriceLiveStreamAddition = subscription.PriceMoreLivestream
         };
         return Result.Success(response);
     }
