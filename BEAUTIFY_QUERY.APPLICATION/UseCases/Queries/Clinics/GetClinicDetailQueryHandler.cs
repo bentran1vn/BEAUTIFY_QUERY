@@ -27,11 +27,12 @@ public class GetClinicDetailQueryHandler(
         if (!string.IsNullOrEmpty(searchTerm))
         {
             query = query.Where(x => x.Name.Contains(searchTerm) ||
-                                     x.City.Contains(searchTerm) ||
-                                     x.Address.Contains(searchTerm) ||
-                                     x.Ward.Contains(searchTerm) ||
-                                     x.District.Contains(searchTerm) ||
-                                     x.PhoneNumber.Contains(searchTerm));
+                 x.City.Contains(searchTerm) ||
+                 x.Address.Contains(searchTerm) ||
+                 x.Ward.Contains(searchTerm) ||
+                 x.District.Contains(searchTerm) ||
+                 x.PhoneNumber.Contains(searchTerm)
+            );
         }
 
         query = request.SortOrder == SortOrder.Descending
@@ -111,6 +112,8 @@ public class GetClinicDetailQueryHandler(
             clinic.District,
             clinic.Ward,
             clinic.FullAddress,
+            clinic.AdditionBranches,
+            clinic.AdditionLivestreams,
             clinic.TaxCode,
             clinic.BusinessLicenseUrl,
             clinic.OperatingLicenseUrl,
