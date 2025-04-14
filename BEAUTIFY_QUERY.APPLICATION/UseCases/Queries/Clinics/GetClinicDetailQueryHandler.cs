@@ -10,7 +10,7 @@ using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 public class GetClinicDetailQueryHandler(
     IRepositoryBase<Clinic, Guid> clinicRepository,
-    IMongoRepository<ClinicServiceProjection> _clinicServiceRepository,
+    IMongoRepository<ClinicServiceProjection> clinicServiceRepository,
     IRepositoryBase<SystemTransaction, Guid> systemTransactionRepository)
     : IQueryHandler<Query.GetClinicDetailQuery, Response.GetClinicDetail>
 {
@@ -46,7 +46,7 @@ public class GetClinicDetailQueryHandler(
             branches.PageIndex,
             branches.PageSize
         );
-        var services = _clinicServiceRepository.FilterBy(x =>
+        var services = clinicServiceRepository.FilterBy(x =>
             x.Clinic.Any(clinic => clinic.Id.Equals(request.id))
         ).ToList();
 
