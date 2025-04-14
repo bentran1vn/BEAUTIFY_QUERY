@@ -45,4 +45,16 @@ public static class Query
         string? Status,
         DateTimeOffset? StartDate,
         DateTimeOffset? EndDate) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
+
+
+    public record CustomerGetAllWalletTransactions(
+        string? SearchTerm,
+        string? SortColumn,
+        SortOrder? SortOrder,
+        int PageIndex,
+        int PageSize,
+        string? TransactionType,
+        string? Status,
+        DateTimeOffset? StartDate,
+        DateTimeOffset? EndDate) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
 }

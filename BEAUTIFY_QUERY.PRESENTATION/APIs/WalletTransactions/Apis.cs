@@ -34,6 +34,39 @@ public class Apis : ApiEndpoint, ICarterModule
             .WithSummary("Get wallet transactions for all clinics (admin only)")
             .WithDescription(
                 "Retrieves wallet transactions for all clinics with filtering, sorting, and pagination options. Requires admin privileges.");
+
+        // 4. Endpoint for customer to get all wallet transactions
+        gr1.MapGet("customer", CustomerGetAllWalletTransactions)
+            .RequireAuthorization(Constant.Role.CUSTOMER)
+            .WithName("CustomerGetAllWalletTransactions")
+            .WithSummary("Get all wallet transactions for the customer")
+            .WithDescription(
+                "Retrieves all wallet transactions for the authenticated customer with filtering, sorting, and pagination options");
+    }
+
+    private static async Task<IResult> CustomerGetAllWalletTransactions(
+        ISender sender,
+        string? searchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        string? transactionType = null,
+        string? status = null,
+        DateTimeOffset? startDate = null,
+        DateTimeOffset? endDate = null,
+        int pageIndex = 1,
+        int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.CustomerGetAllWalletTransactions(
+            searchTerm,
+            sortColumn,
+            SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageIndex,
+            pageSize,
+            transactionType,
+            status,
+            startDate,
+            endDate));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
     private static async Task<IResult> GetClinicWalletTransactions(
