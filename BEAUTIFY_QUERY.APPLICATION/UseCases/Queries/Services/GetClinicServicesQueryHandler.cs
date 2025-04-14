@@ -21,16 +21,19 @@ public class
 
         // 3. If a search term was provided, filter further
         if (request.MainClinicId.HasValue)
-            query = query.Where(x => x.Clinic.Any(
-                                         c => c.Id == request.MainClinicId.Value ||
-                                              c.ParentId == request.MainClinicId.Value) ||
-                                     x.Category.Name
-                                         .Contains(searchTerm)
+            query = query.Where(x => x.Clinic
+                .Any(c => c.Id == request.MainClinicId.Value ||
+                          c.ParentId == request.MainClinicId.Value)
             );
 
         // 3. If a search term was provided, filter further
         if (!string.IsNullOrEmpty(searchTerm))
-            query = query.Where(x => x.Name.Contains(searchTerm) || x.Description.Contains(searchTerm));
+            query = query.Where(
+                x => x.Name.Contains(searchTerm) ||
+                     x.Description.Contains(searchTerm) ||
+                     x.Category.Name
+                         .Contains(searchTerm)
+            );
 
         query = request.SortOrder == SortOrder.Descending
             ? query.OrderByDescending(GetSortProperty(request))
