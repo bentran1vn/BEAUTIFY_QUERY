@@ -11,6 +11,8 @@ public static class Response
         public bool IsActivated { get; set; }
         public int LimitBranch { get; set; }
         public int LimitLiveStream { get; set; }
+        public decimal PriceBranchAddition { get; set; }
+        public decimal PriceLiveStreamAddition { get; set; }
         public int EnhancedViewer { get; set; }
     }
 }
