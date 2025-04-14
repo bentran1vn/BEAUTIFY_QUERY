@@ -10,6 +10,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public virtual DbSet<SurveyQuestion> SurveyQuestions { get; set; }
     public virtual DbSet<SurveyAnswer> SurveyAnswers { get; set; }
     public virtual DbSet<SurveyResponse> SurveyResponses { get; set; }
+    public virtual DbSet<ClinicTransaction> ClinicTransactions { get; set; }
 
     private static void SetSoftDeleteFilter<T>(ModelBuilder modelBuilder) where T : Entity<T>
     {

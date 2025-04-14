@@ -14,6 +14,8 @@ public class DashboardApi: ApiEndpoint, ICarterModule
         
         gr1.MapGet("clinics", GetTotalInformation).RequireAuthorization();
         gr1.MapGet("clinics/datetime", GetDaytimeInformation).RequireAuthorization();
+        gr1.MapGet("systems", GetDaytimeInformation).RequireAuthorization();
+        gr1.MapGet("systems/datetime", GetDaytimeInformation).RequireAuthorization();
     }
     
     private static async Task<IResult> GetTotalInformation(
