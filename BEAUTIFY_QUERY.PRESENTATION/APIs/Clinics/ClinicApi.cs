@@ -17,6 +17,16 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         gr1.MapGet("application/{id}", GetDetailApplyRequest);
         gr1.MapGet("{clinicId:guid}/employees", GetAllAccountOfEmployee);
         gr1.MapGet("{clinicId:guid}/employees/{employeeId:guid}", GetDetailAccountOfEmployee);
+        gr1.MapGet("branches", GetClinicBranches)
+            .RequireAuthorization(Constant.Role.CLINIC_ADMIN)
+            .WithName("Get Clinic Branches")
+            .WithSummary("Get all branches for the current clinic admin");
+    }
+
+    private static async Task<IResult> GetClinicBranches(ISender sender)
+    {
+        var result = await sender.Send(new Query.GetClinicBranchesQuery());
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result.Value);
     }
 
     private static async Task<IResult> GetAllClinics(
@@ -29,7 +39,7 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         int pageSize = 10)
     {
         var role = httpContext.User.FindFirst(c => c.Type == "RoleName")?.Value;
-        
+
         var result = await sender.Send(new Query.GetClinicsQuery(searchTerm, role,
             sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex, pageSize));

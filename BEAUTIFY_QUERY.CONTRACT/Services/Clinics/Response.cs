@@ -1,6 +1,30 @@
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 public static class Response
 {
+    public class GetClinicBranchesResponse
+    {
+        public List<ClinicBranchDto> Clinics { get; set; } = new();
+        public TotalSummaryDto Totals { get; set; } = new();
+    }
+
+    public class ClinicBranchDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? Logo { get; set; }
+        public decimal Balance { get; set; }
+        public decimal PendingWithdrawals { get; set; }
+        public decimal TotalEarnings { get; set; }
+        public bool? IsMainClinic { get; set; } = false;
+    }
+
+    public class TotalSummaryDto
+    {
+        public decimal TotalBalance { get; set; }
+        public decimal TotalPendingWithdrawals { get; set; }
+        public decimal TotalEarnings { get; set; }
+    }
+
     public record GetClinics(
         Guid Id,
         string Name,

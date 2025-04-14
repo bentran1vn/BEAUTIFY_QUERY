@@ -1,7 +1,7 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
-public class Query
+public static class Query
 {
     public record GetClinicsQuery(
         string? SearchTerm,
@@ -47,4 +47,8 @@ public class Query
         SortOrder? SortOrder,
         int PageIndex,
         int PageSize) : IQuery<PagedResult<Response.GetClinicBranches>>;
+    
+    public record GetClinicBranchesQuery : IQuery<Response.GetClinicBranchesResponse>;
+
+   
 }
