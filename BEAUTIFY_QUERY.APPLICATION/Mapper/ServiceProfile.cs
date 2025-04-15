@@ -7,7 +7,12 @@ public class ServiceProfile : Profile
 {
     public ServiceProfile()
     {
-        CreateMap<SubscriptionPackage, Response.GetSubscriptionResponse>();
+        CreateMap<SubscriptionPackage, Response.GetSubscriptionResponse>()
+            .ForMember(dest => dest.PriceBranchAddition,
+                opt => opt.MapFrom(src => src.PriceMoreBranch))
+            .ForMember(dest => dest.PriceLiveStreamAddition,
+                opt => opt.MapFrom(src => src.PriceMoreLivestream));
+        
         CreateMap<PagedResult<SubscriptionPackage>, PagedResult<Response.GetSubscriptionResponse>>();
 
 

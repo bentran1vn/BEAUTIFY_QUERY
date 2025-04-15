@@ -60,6 +60,8 @@ public static class Response
         string? District,
         string? Ward,
         string? FullAddress,
+        int BranchLimit,
+        int LivestreamLimit,
         string TaxCode,
         string BusinessLicenseUrl,
         string OperatingLicenseUrl,

@@ -10,7 +10,7 @@ using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
 public class GetClinicDetailQueryHandler(
     IRepositoryBase<Clinic, Guid> clinicRepository,
-    IMongoRepository<ClinicServiceProjection> _clinicServiceRepository,
+    IMongoRepository<ClinicServiceProjection> clinicServiceRepository,
     IRepositoryBase<SystemTransaction, Guid> systemTransactionRepository)
     : IQueryHandler<Query.GetClinicDetailQuery, Response.GetClinicDetail>
 {
@@ -27,11 +27,12 @@ public class GetClinicDetailQueryHandler(
         if (!string.IsNullOrEmpty(searchTerm))
         {
             query = query.Where(x => x.Name.Contains(searchTerm) ||
-                                     x.City.Contains(searchTerm) ||
-                                     x.Address.Contains(searchTerm) ||
-                                     x.Ward.Contains(searchTerm) ||
-                                     x.District.Contains(searchTerm) ||
-                                     x.PhoneNumber.Contains(searchTerm));
+                 x.City.Contains(searchTerm) ||
+                 x.Address.Contains(searchTerm) ||
+                 x.Ward.Contains(searchTerm) ||
+                 x.District.Contains(searchTerm) ||
+                 x.PhoneNumber.Contains(searchTerm)
+            );
         }
 
         query = request.SortOrder == SortOrder.Descending
@@ -45,7 +46,7 @@ public class GetClinicDetailQueryHandler(
             branches.PageIndex,
             branches.PageSize
         );
-        var services = _clinicServiceRepository.FilterBy(x =>
+        var services = clinicServiceRepository.FilterBy(x =>
             x.Clinic.Any(clinic => clinic.Id.Equals(request.id))
         ).ToList();
 
@@ -111,6 +112,8 @@ public class GetClinicDetailQueryHandler(
             clinic.District,
             clinic.Ward,
             clinic.FullAddress,
+            clinic.AdditionBranches,
+            clinic.AdditionLivestreams,
             clinic.TaxCode,
             clinic.BusinessLicenseUrl,
             clinic.OperatingLicenseUrl,
