@@ -10,7 +10,7 @@ public static class Response
         string Status,
         bool IsMakeBySystem,
         string? Description,
-        DateTimeOffset TransactionDate,
+        DateTime TransactionDate,
         DateTimeOffset CreatedOnUtc);
 
     public record ClinicBasicInfo(

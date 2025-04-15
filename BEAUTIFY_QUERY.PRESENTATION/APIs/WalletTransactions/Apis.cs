@@ -20,7 +20,7 @@ public class Apis : ApiEndpoint, ICarterModule
                 "Retrieves wallet transactions for the authenticated clinic with filtering, sorting, and pagination options");
 
         // 2. Endpoint for a parent clinic to get transactions of its sub-clinics
-        gr1.MapGet("sub-clinics/{parentClinicId:guid}", GetSubClinicWalletTransactions)
+        gr1.MapGet("sub-clinics", GetSubClinicWalletTransactions)
             .RequireAuthorization(Constant.Role.CLINIC_ADMIN)
             .WithName("GetSubClinicWalletTransactions")
             .WithSummary("Get wallet transactions for all sub-clinics of a parent clinic")
@@ -82,7 +82,6 @@ public class Apis : ApiEndpoint, ICarterModule
 
     private static async Task<IResult> GetSubClinicWalletTransactions(
         ISender sender,
-        Guid parentClinicId,
         string? searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,
@@ -90,7 +89,6 @@ public class Apis : ApiEndpoint, ICarterModule
         int pageSize = 10)
     {
         var result = await sender.Send(new Query.GetSubClinicWalletTransactions(
-            parentClinicId,
             searchTerm,
             sortColumn,
             SortOrderExtension.ConvertStringToSortOrder(sortOrder),

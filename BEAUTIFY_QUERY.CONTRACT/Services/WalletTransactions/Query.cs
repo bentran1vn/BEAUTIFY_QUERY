@@ -17,7 +17,6 @@ public static class Query
     /// Query to get wallet transactions for all sub-clinics of a parent clinic
     /// </summary>
     public record GetSubClinicWalletTransactions(
-        Guid ParentClinicId,
         string? SearchTerm,
         string? SortColumn,
         SortOrder? SortOrder,
