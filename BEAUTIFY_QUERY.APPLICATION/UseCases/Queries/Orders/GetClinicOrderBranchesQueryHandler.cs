@@ -30,7 +30,7 @@ internal sealed class GetClinicOrderBranchesQueryHandler(
             .ToListAsync(cancellationToken);
 
         if (childClinicIds.Count == 0)
-            return Result.Success(new PagedResult<Response.Order>(new List<Response.Order>(), 0, request.PageIndex, request.PageSize));
+            return Result.Success(new PagedResult<Response.Order>([], 0, request.PageIndex, request.PageSize));
 
         // Get orders from all child clinics
         var searchTerm = request.SearchTerm?.Trim();

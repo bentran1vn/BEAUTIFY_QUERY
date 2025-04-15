@@ -21,7 +21,7 @@ public static class Query
         int PageSize) : IQuery<PagedResult<Response.Order>>;
 
 
-    public record GetOrderById(string Id) : IQuery<Response.Order>;
+    public record GetOrderById(Guid Id) : IQuery<Response.OrderById>;
 
     public record GetClinicOrderBranchesQuery(
         string? SearchTerm,
