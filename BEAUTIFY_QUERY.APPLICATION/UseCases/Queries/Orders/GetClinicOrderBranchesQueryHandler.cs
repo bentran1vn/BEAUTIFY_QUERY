@@ -71,7 +71,7 @@ internal sealed class GetClinicOrderBranchesQueryHandler(
             .ToList();
 
         return Result.Success(
-            new PagedResult<Response.Order>(mapped, orders.TotalCount,orders.PageSize, orders.PageIndex));
+            new PagedResult<Response.Order>(mapped, orders.PageIndex, orders.PageSize, orders.TotalCount));
     }
 
     private static Expression<Func<Order, object>> GetSortProperty(Query.GetClinicOrderBranchesQuery request)
