@@ -49,10 +49,6 @@ public class Apis : ApiEndpoint, ICarterModule
         string? searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,
-        string? transactionType = null,
-        string? status = null,
-        DateTimeOffset? startDate = null,
-        DateTimeOffset? endDate = null,
         int pageIndex = 1,
         int pageSize = 10)
     {
@@ -61,11 +57,8 @@ public class Apis : ApiEndpoint, ICarterModule
             sortColumn,
             SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex,
-            pageSize,
-            transactionType,
-            status,
-            startDate,
-            endDate));
+            pageSize
+        ));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
@@ -74,10 +67,6 @@ public class Apis : ApiEndpoint, ICarterModule
         string? searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,
-        string? transactionType = null,
-        string? status = null,
-        DateTimeOffset? startDate = null,
-        DateTimeOffset? endDate = null,
         int pageIndex = 1,
         int pageSize = 10)
     {
@@ -86,11 +75,7 @@ public class Apis : ApiEndpoint, ICarterModule
             sortColumn,
             SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex,
-            pageSize,
-            transactionType,
-            status,
-            startDate,
-            endDate));
+            pageSize));
 
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
@@ -101,10 +86,6 @@ public class Apis : ApiEndpoint, ICarterModule
         string? searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,
-        string? transactionType = null,
-        string? status = null,
-        DateTimeOffset? startDate = null,
-        DateTimeOffset? endDate = null,
         int pageIndex = 1,
         int pageSize = 10)
     {
@@ -114,11 +95,8 @@ public class Apis : ApiEndpoint, ICarterModule
             sortColumn,
             SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex,
-            pageSize,
-            transactionType,
-            status,
-            startDate,
-            endDate));
+            pageSize
+        ));
 
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
@@ -128,10 +106,6 @@ public class Apis : ApiEndpoint, ICarterModule
         string? searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,
-        string? transactionType = null,
-        string? status = null,
-        DateTimeOffset? startDate = null,
-        DateTimeOffset? endDate = null,
         int pageIndex = 1,
         int pageSize = 10)
     {
@@ -140,11 +114,7 @@ public class Apis : ApiEndpoint, ICarterModule
             sortColumn,
             SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex,
-            pageSize,
-            transactionType,
-            status,
-            startDate,
-            endDate));
+            pageSize));
 
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }

@@ -4,18 +4,14 @@ namespace BEAUTIFY_QUERY.CONTRACT.Services.WalletTransactions;
 public static class Query
 {
     /// <summary>
-    /// Query to get wallet transactions for a specific clinic
+    /// Query to get wallet transactions for the current clinic
     /// </summary>
     public record GetClinicWalletTransactions(
         string? SearchTerm,
         string? SortColumn,
         SortOrder? SortOrder,
         int PageIndex,
-        int PageSize,
-        string? TransactionType,
-        string? Status,
-        DateTimeOffset? StartDate,
-        DateTimeOffset? EndDate) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
+        int PageSize) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
 
     /// <summary>
     /// Query to get wallet transactions for all sub-clinics of a parent clinic
@@ -26,11 +22,7 @@ public static class Query
         string? SortColumn,
         SortOrder? SortOrder,
         int PageIndex,
-        int PageSize,
-        string? TransactionType,
-        string? Status,
-        DateTimeOffset? StartDate,
-        DateTimeOffset? EndDate) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
+        int PageSize) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
 
     /// <summary>
     /// Query to get wallet transactions for all clinics (admin only)
@@ -40,21 +32,12 @@ public static class Query
         string? SortColumn,
         SortOrder? SortOrder,
         int PageIndex,
-        int PageSize,
-        string? TransactionType,
-        string? Status,
-        DateTimeOffset? StartDate,
-        DateTimeOffset? EndDate) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
-
+        int PageSize) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
 
     public record CustomerGetAllWalletTransactions(
         string? SearchTerm,
         string? SortColumn,
         SortOrder? SortOrder,
         int PageIndex,
-        int PageSize,
-        string? TransactionType,
-        string? Status,
-        DateTimeOffset? StartDate,
-        DateTimeOffset? EndDate) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
+        int PageSize) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
 }

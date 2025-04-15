@@ -1,4 +1,5 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.WalletTransactions;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -9,16 +10,28 @@ internal sealed class CustomerGetAllWalletTransactionsQueryHandler(
     IRepositoryBase<WalletTransaction, Guid> walletTransactionRepository)
     : IQueryHandler<Query.CustomerGetAllWalletTransactions, PagedResult<Response.WalletTransactionResponse>>
 {
+    private static readonly Func<WalletTransaction, Response.WalletTransactionResponse> _mapFunction =
+        transaction => new Response.WalletTransactionResponse(
+            transaction.Id,
+            transaction.ClinicId,
+            transaction.Clinic?.Name,
+            transaction.Amount,
+            transaction.TransactionType,
+            transaction.Status,
+            transaction.IsMakeBySystem,
+            transaction.Description ?? string.Empty,
+            transaction.TransactionDate,
+            transaction.CreatedOnUtc);
+
     public async Task<Result<PagedResult<Response.WalletTransactionResponse>>> Handle(
         Query.CustomerGetAllWalletTransactions request, CancellationToken cancellationToken)
     {
-        // Build the query to get all transactions for the customer
-        var query = walletTransactionRepository.FindAll(x => x.UserId == currentUserService.UserId && !x.IsDeleted);
+        // Build the base query to get all transactions for the current user
+        var query = walletTransactionRepository
+            .FindAll(x => x.UserId == currentUserService.UserId && !x.IsDeleted);
 
-        // Apply filters
+        // Apply filters and sorting
         query = ApplyFilters(query, request);
-
-        // Apply sorting
         query = ApplySorting(query, request);
 
         // Execute the query with pagination
@@ -27,8 +40,8 @@ internal sealed class CustomerGetAllWalletTransactionsQueryHandler(
             request.PageIndex,
             request.PageSize);
 
-        // Map to response
-        var mappedTransactions = transactions.Items.Select(MapToResponse).ToList();
+        // Map results to response objects
+        var mappedTransactions = transactions.Items.Select(_mapFunction).ToList();
 
         return Result.Success(
             new PagedResult<Response.WalletTransactionResponse>(
@@ -42,95 +55,132 @@ internal sealed class CustomerGetAllWalletTransactionsQueryHandler(
         IQueryable<WalletTransaction> query,
         Query.CustomerGetAllWalletTransactions request)
     {
-        // Apply search term filter
-        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-        {
-            var searchTerm = request.SearchTerm.Trim().ToLower();
-            query = query.Where(x =>
-                (x.Description != null && x.Description.ToLower().Contains(searchTerm)) ||
-                x.Amount.ToString().Contains(searchTerm) ||
-                (x.TransactionType != null && x.TransactionType.ToLower().Contains(searchTerm)) ||
-                (x.Status != null && x.Status.ToLower().Contains(searchTerm)) ||
-                (x.Clinic != null && x.Clinic.Name.ToLower().Contains(searchTerm)));
-        }
+        var searchTerm = request.SearchTerm?.Trim().ToLower();
 
-        // Apply transaction type filter
-        if (!string.IsNullOrWhiteSpace(request.TransactionType))
+        if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            query = query.Where(x => x.TransactionType == request.TransactionType);
-        }
+            // Check if search term contains "to" for date or amount range
+            if (searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
+            {
+                var parts = searchTerm.Split("to", StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length == 2)
+                {
+                    var part1 = parts[0].Trim();
+                    var part2 = parts[1].Trim();
 
-        // Apply status filter
-        if (!string.IsNullOrWhiteSpace(request.Status))
-        {
-            query = query.Where(x => x.Status == request.Status);
-        }
-
-        // Apply date range filter
-        if (request.StartDate.HasValue)
-        {
-            query = query.Where(x => x.TransactionDate >= request.StartDate.Value);
-        }
-
-        if (request.EndDate.HasValue)
-        {
-            query = query.Where(x => x.TransactionDate <= request.EndDate.Value);
+                    // Try to parse as a date range
+                    if (DateTimeOffset.TryParse(part1, out var dateFrom) &&
+                        DateTimeOffset.TryParse(part2, out var dateTo))
+                    {
+                        // Normalize dateTo to end of day
+                        dateTo = dateTo.Date.AddDays(1).AddTicks(-1);
+                        query = query.Where(x => x.TransactionDate >= dateFrom && x.TransactionDate <= dateTo);
+                    }
+                    // Try to parse as an amount range
+                    else if (decimal.TryParse(part1, out var amountFrom) &&
+                             decimal.TryParse(part2, out var amountTo))
+                    {
+                        query = query.Where(x => x.Amount >= amountFrom && x.Amount <= amountTo);
+                    }
+                    else
+                    {
+                        // If the range parts can't be parsed, fall back to a standard contains search
+                        query = ApplyStandardSearch(query, searchTerm);
+                    }
+                }
+                else
+                {
+                    // If "to" is present but splitting doesn't yield exactly two parts,
+                    // use the standard search
+                    query = ApplyStandardSearch(query, searchTerm);
+                }
+            }
+            // Check for transaction types
+            else if (searchTerm.Equals("deposit", StringComparison.OrdinalIgnoreCase) ||
+                     searchTerm.Equals("withdrawal", StringComparison.OrdinalIgnoreCase) ||
+                     searchTerm.Equals("transfer", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.Where(x => x.TransactionType != null && 
+                                         x.TransactionType.ToLower() == searchTerm);
+            }
+            // Check for status types
+            else if (searchTerm.Equals("pending", StringComparison.OrdinalIgnoreCase) ||
+                     searchTerm.Equals("completed", StringComparison.OrdinalIgnoreCase) ||
+                     searchTerm.Equals("failed", StringComparison.OrdinalIgnoreCase) ||
+                     searchTerm.Equals("cancelled", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.Where(x => x.Status != null && 
+                                         x.Status.ToLower() == searchTerm);
+            }
+            // Check for date
+            else if (DateTimeOffset.TryParse(searchTerm, out var singleDate))
+            {
+                var endOfDay = singleDate.Date.AddDays(1).AddTicks(-1);
+                query = query.Where(x => x.TransactionDate >= singleDate.Date && 
+                                         x.TransactionDate <= endOfDay);
+            }
+            // Standard search for all other cases
+            else
+            {
+                query = ApplyStandardSearch(query, searchTerm);
+            }
         }
 
         return query;
+    }
+
+    private static IQueryable<WalletTransaction> ApplyStandardSearch(
+        IQueryable<WalletTransaction> query, 
+        string searchTerm)
+    {
+        return query.Where(x =>
+            (x.Description != null && EF.Functions.Like(x.Description.ToLower(), $"%{searchTerm}%")) ||
+            EF.Functions.Like(x.Amount.ToString(), $"%{searchTerm}%") ||
+            (x.TransactionType != null && EF.Functions.Like(x.TransactionType.ToLower(), $"%{searchTerm}%")) ||
+            (x.Status != null && EF.Functions.Like(x.Status.ToLower(), $"%{searchTerm}%")) ||
+            (x.Clinic != null && x.Clinic.Name != null &&
+             EF.Functions.Like(x.Clinic.Name.ToLower(), $"%{searchTerm}%")));
     }
 
     private static IQueryable<WalletTransaction> ApplySorting(
         IQueryable<WalletTransaction> query,
         Query.CustomerGetAllWalletTransactions request)
     {
-        if (string.IsNullOrWhiteSpace(request.SortColumn))
-        {
-            // Default sorting by transaction date descending
-            return query.OrderByDescending(x => x.TransactionDate);
-        }
-
+        // Get sort column (or default) and sort order (or default)
+        var sortColumn = request.SortColumn?.ToLower() ?? "transactiondate";
         var sortOrder = request.SortOrder ??
-                        BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations.SortOrder.Descending;
+                        SortOrder.Descending;
+        var isAscending = sortOrder == SortOrder.Ascending;
 
-        return request.SortColumn.ToLower() switch
+        // Apply sorting using a switch expression
+        return sortColumn switch
         {
-            "clinicname" => sortOrder == BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations.SortOrder.Ascending
-                ? query.OrderBy(x => x.Clinic.Name)
-                : query.OrderByDescending(x => x.Clinic.Name),
-            "amount" => sortOrder == BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations.SortOrder.Ascending
+            "clinicname" => isAscending
+                ? query.OrderBy(x => x.Clinic != null ? x.Clinic.Name : string.Empty)
+                : query.OrderByDescending(x => x.Clinic != null ? x.Clinic.Name : string.Empty),
+
+            "amount" => isAscending
                 ? query.OrderBy(x => x.Amount)
                 : query.OrderByDescending(x => x.Amount),
-            "transactiontype" => sortOrder ==
-                                 BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations.SortOrder.Ascending
-                ? query.OrderBy(x => x.TransactionType)
-                : query.OrderByDescending(x => x.TransactionType),
-            "status" => sortOrder == BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations.SortOrder.Ascending
-                ? query.OrderBy(x => x.Status)
-                : query.OrderByDescending(x => x.Status),
-            "transactiondate" => sortOrder ==
-                                 BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations.SortOrder.Ascending
+
+            "transactiontype" => isAscending
+                ? query.OrderBy(x => x.TransactionType ?? string.Empty)
+                : query.OrderByDescending(x => x.TransactionType ?? string.Empty),
+
+            "status" => isAscending
+                ? query.OrderBy(x => x.Status ?? string.Empty)
+                : query.OrderByDescending(x => x.Status ?? string.Empty),
+
+            "transactiondate" => isAscending
                 ? query.OrderBy(x => x.TransactionDate)
                 : query.OrderByDescending(x => x.TransactionDate),
-            "createdonutc" => sortOrder == BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations.SortOrder.Ascending
+
+            "createdonutc" => isAscending
                 ? query.OrderBy(x => x.CreatedOnUtc)
                 : query.OrderByDescending(x => x.CreatedOnUtc),
+
+            // Default to transaction date descending
             _ => query.OrderByDescending(x => x.TransactionDate)
         };
-    }
-
-    private static Response.WalletTransactionResponse MapToResponse(WalletTransaction transaction)
-    {
-        return new Response.WalletTransactionResponse(
-            transaction.Id,
-            transaction.ClinicId,
-            transaction.Clinic?.Name,
-            transaction.Amount,
-            transaction.TransactionType,
-            transaction.Status,
-            transaction.IsMakeBySystem,
-            transaction.Description,
-            transaction.TransactionDate,
-            transaction.CreatedOnUtc);
     }
 }
