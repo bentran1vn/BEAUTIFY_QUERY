@@ -33,6 +33,17 @@ public static class Query
         int PageIndex,
         int PageSize) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
 
+    /// <summary>
+    /// Query to get wallet transactions for a specific clinic by ID
+    /// </summary>
+    public record GetWalletHistoryByClinicId(
+        Guid ClinicId,
+        string? SearchTerm,
+        string? SortColumn,
+        SortOrder? SortOrder,
+        int PageIndex,
+        int PageSize) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
+
     public record CustomerGetAllWalletTransactions(
         string? SearchTerm,
         string? SortColumn,

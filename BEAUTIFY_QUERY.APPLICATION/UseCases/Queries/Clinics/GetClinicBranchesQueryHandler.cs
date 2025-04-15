@@ -71,6 +71,8 @@ internal sealed class GetClinicBranchesQueryHandler(
                 PendingWithdrawals =
                     pendingWithdrawals.TryGetValue(clinic.Id, out var pendingAmount) ? pendingAmount : 0,
                 TotalEarnings = totalEarnings.TryGetValue(clinic.Id, out var earnings) ? earnings : 0,
+                BankName = clinic.BankName,
+                BankAccountNumber = clinic.BankAccountNumber,
                 IsMainClinic = clinic.IsParent,
             }).ToList(),
             Totals = new Response.TotalSummaryDto

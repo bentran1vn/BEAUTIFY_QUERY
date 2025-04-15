@@ -35,30 +35,40 @@ public class Apis : ApiEndpoint, ICarterModule
             .WithDescription(
                 "Retrieves wallet transactions for all clinics with filtering, sorting, and pagination options. Requires admin privileges.");
 
-        // 4. Endpoint for customer to get all wallet transactions
+        // 4. Endpoint for customer to get their own transactions
         gr1.MapGet("customer", CustomerGetAllWalletTransactions)
             .RequireAuthorization(Constant.Role.CUSTOMER)
             .WithName("CustomerGetAllWalletTransactions")
-            .WithSummary("Get all wallet transactions for the customer")
+            .WithSummary("Get wallet transactions for the current customer")
             .WithDescription(
-                "Retrieves all wallet transactions for the authenticated customer with filtering, sorting, and pagination options");
+                "Retrieves wallet transactions for the authenticated customer with filtering, sorting, and pagination options");
+                
+        // 5. Endpoint to get wallet history for a specific clinic by ID
+        gr1.MapGet("clinics/{clinicId:guid}", GetWalletHistoryByClinicId)
+            .RequireAuthorization(Constant.Role.CLINIC_ADMIN, Constant.Role.SYSTEM_ADMIN)
+            .WithName("GetWalletHistoryByClinicId")
+            .WithSummary("Get wallet history for a specific clinic by ID")
+            .WithDescription(
+                "Retrieves wallet transactions for a specific clinic. Clinic admins can only access their own clinic or sub-clinics. System admins can access any clinic.");
     }
 
-    private static async Task<IResult> CustomerGetAllWalletTransactions(
+    private static async Task<IResult> GetWalletHistoryByClinicId(
         ISender sender,
+        Guid clinicId,
         string? searchTerm = null,
         string? sortColumn = null,
         string? sortOrder = null,
         int pageIndex = 1,
         int pageSize = 10)
     {
-        var result = await sender.Send(new Query.CustomerGetAllWalletTransactions(
+        var result = await sender.Send(new Query.GetWalletHistoryByClinicId(
+            clinicId,
             searchTerm,
             sortColumn,
             SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex,
-            pageSize
-        ));
+            pageSize));
+
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
@@ -93,9 +103,26 @@ public class Apis : ApiEndpoint, ICarterModule
             sortColumn,
             SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex,
+            pageSize));
+
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+
+    private static async Task<IResult> CustomerGetAllWalletTransactions(
+        ISender sender,
+        string? searchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        int pageIndex = 1,
+        int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.CustomerGetAllWalletTransactions(
+            searchTerm,
+            sortColumn,
+            SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageIndex,
             pageSize
         ));
-
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
