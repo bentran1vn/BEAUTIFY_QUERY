@@ -19,8 +19,8 @@ public class WalletTransaction : AggregateRoot<Guid>, IAuditableEntity
     [MaxLength(20)] public required string Status { get; set; }
 
     public bool IsMakeBySystem { get; set; } = true;
-    
 
+    public string? NewestQrUrl { get; set; } = null;
     [MaxLength(255)] public string? Description { get; set; }
 
     public DateTime TransactionDate { get; set; } = DateTime.UtcNow;

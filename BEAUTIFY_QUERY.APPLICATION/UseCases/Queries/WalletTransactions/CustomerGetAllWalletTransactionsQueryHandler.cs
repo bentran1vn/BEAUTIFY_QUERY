@@ -19,6 +19,7 @@ internal sealed class CustomerGetAllWalletTransactionsQueryHandler(
             transaction.TransactionType,
             transaction.Status,
             transaction.IsMakeBySystem,
+            "",
             transaction.Description ?? string.Empty,
             transaction.TransactionDate,
             transaction.CreatedOnUtc);
@@ -100,7 +101,7 @@ internal sealed class CustomerGetAllWalletTransactionsQueryHandler(
                      searchTerm.Equals("withdrawal", StringComparison.OrdinalIgnoreCase) ||
                      searchTerm.Equals("transfer", StringComparison.OrdinalIgnoreCase))
             {
-                query = query.Where(x => x.TransactionType != null && 
+                query = query.Where(x => x.TransactionType != null &&
                                          x.TransactionType.ToLower() == searchTerm);
             }
             // Check for status types
@@ -109,14 +110,14 @@ internal sealed class CustomerGetAllWalletTransactionsQueryHandler(
                      searchTerm.Equals("failed", StringComparison.OrdinalIgnoreCase) ||
                      searchTerm.Equals("cancelled", StringComparison.OrdinalIgnoreCase))
             {
-                query = query.Where(x => x.Status != null && 
+                query = query.Where(x => x.Status != null &&
                                          x.Status.ToLower() == searchTerm);
             }
             // Check for date
             else if (DateTimeOffset.TryParse(searchTerm, out var singleDate))
             {
                 var endOfDay = singleDate.Date.AddDays(1).AddTicks(-1);
-                query = query.Where(x => x.TransactionDate >= singleDate.Date && 
+                query = query.Where(x => x.TransactionDate >= singleDate.Date &&
                                          x.TransactionDate <= endOfDay);
             }
             // Standard search for all other cases
@@ -130,7 +131,7 @@ internal sealed class CustomerGetAllWalletTransactionsQueryHandler(
     }
 
     private static IQueryable<WalletTransaction> ApplyStandardSearch(
-        IQueryable<WalletTransaction> query, 
+        IQueryable<WalletTransaction> query,
         string searchTerm)
     {
         return query.Where(x =>

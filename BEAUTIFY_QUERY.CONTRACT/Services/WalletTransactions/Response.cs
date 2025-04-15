@@ -9,6 +9,7 @@ public static class Response
         string TransactionType,
         string Status,
         bool IsMakeBySystem,
+        string? NewestQrUrl,
         string? Description,
         DateTime TransactionDate,
         DateTimeOffset CreatedOnUtc);

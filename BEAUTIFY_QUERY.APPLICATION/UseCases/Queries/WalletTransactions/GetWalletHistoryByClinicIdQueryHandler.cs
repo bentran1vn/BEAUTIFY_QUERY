@@ -198,6 +198,7 @@ internal sealed class GetWalletHistoryByClinicIdQueryHandler(
             transaction.TransactionType,
             transaction.Status,
             transaction.IsMakeBySystem,
+            "",
             transaction.Description,
             transaction.TransactionDate,
             transaction.CreatedOnUtc);

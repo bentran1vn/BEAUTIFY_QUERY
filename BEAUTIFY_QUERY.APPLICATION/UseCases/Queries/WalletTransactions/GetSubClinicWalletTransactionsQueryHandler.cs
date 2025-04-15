@@ -205,6 +205,7 @@ internal sealed class GetSubClinicWalletTransactionsQueryHandler(
             transaction.TransactionType,
             transaction.Status,
             transaction.IsMakeBySystem,
+            "",
             transaction.Description,
             transaction.TransactionDate,
             transaction.CreatedOnUtc);

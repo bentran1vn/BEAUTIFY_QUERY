@@ -184,6 +184,7 @@ internal sealed class GetAllClinicWalletTransactionsQueryHandler(
             transaction.TransactionType,
             transaction.Status,
             transaction.IsMakeBySystem,
+            transaction.NewestQrUrl,
             transaction.Description,
             transaction.TransactionDate,
             transaction.CreatedOnUtc);
