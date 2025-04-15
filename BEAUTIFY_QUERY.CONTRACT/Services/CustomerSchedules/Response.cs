@@ -3,7 +3,24 @@ public static class Response
 {
     public record StaffCheckInCustomerScheduleResponse(
         Guid Id,
-        Guid orderId,
+        Guid OrderId,
+        decimal Amount,
+        string CustomerName,
+        string CustomerPhoneNumber,
+        string ServiceName,
+        string DoctorName,
+        DateOnly? BookingDate,
+        TimeSpan? StartTime,
+        TimeSpan? EndTime,
+        string Status,
+        string ProcedurePriceTypeName,
+        string StepIndex,
+        bool IsFirstCheckIn = false);
+    
+    public record StaffCheckInCustomerScheduleResponse1(
+        Guid Id,
+        Guid OrderId,
+        Guid UserId,
         decimal Amount,
         string CustomerName,
         string CustomerPhoneNumber,
