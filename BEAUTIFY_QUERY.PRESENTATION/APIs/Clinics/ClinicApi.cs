@@ -23,11 +23,11 @@ public class ClinicApi : ApiEndpoint, ICarterModule
             .WithSummary("Get all branches for the current clinic admin");
         gr1.MapGet("branches/{id:guid}", GetClinicBranchById)
             .RequireAuthorization(Constant.Role.CLINIC_ADMIN);
-        gr1.MapGet("sub-clinics/{id:guid}", GetSubClinicById)
+       /* gr1.MapGet("sub-clinics/{id:guid}", GetSubClinicById)
             .RequireAuthorization(Constant.Role.CLINIC_ADMIN)
             .WithName("Get Sub Clinic By Id")
             .WithSummary("Get a specific sub-clinic by ID")
-            .WithDescription("Retrieves details of a specific sub-clinic that belongs to the current clinic admin's main clinic");
+            .WithDescription("Retrieves details of a specific sub-clinic that belongs to the current clinic admin's main clinic");*/
     }
 
     private static async Task<IResult> GetSubClinicById(
