@@ -10,4 +10,10 @@ public class FeedbackConsumer
 {
     public class CreateFeedbackConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.CreateFeedback>(sender, repository);
+    
+    public class UpdateFeedbackConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.UpdateFeedback>(sender, repository);
+    
+    public class ViewActionFeedbackConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.ViewActionFeedback>(sender, repository);
 }

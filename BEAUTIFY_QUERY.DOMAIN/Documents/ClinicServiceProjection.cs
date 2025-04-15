@@ -81,6 +81,7 @@ public class Feedback
     public User User { get; set; }
     public bool IsView { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
 }
 
 public class User
