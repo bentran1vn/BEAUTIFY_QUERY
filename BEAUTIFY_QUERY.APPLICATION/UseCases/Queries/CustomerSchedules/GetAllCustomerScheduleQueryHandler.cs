@@ -6,10 +6,11 @@ using Microsoft.EntityFrameworkCore;
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.CustomerSchedules;
 internal sealed class GetAllCustomerScheduleQueryHandler(
     ICurrentUserService currentUserService,
-    IRepositoryBase<CustomerSchedule, Guid> customerScheduleRepositoryBase)
-    : IQueryHandler<Query.GetAllCustomerSchedule, PagedResult<Response.StaffCheckInCustomerScheduleResponse>>
+    IRepositoryBase<CustomerSchedule, Guid> customerScheduleRepositoryBase,
+    IRepositoryBase<Order, Guid> orderRepositoryBase)
+    : IQueryHandler<Query.GetAllCustomerSchedule, PagedResult<Response.StaffCheckInCustomerScheduleResponse1>>
 {
-    public async Task<Result<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>> Handle(
+    public async Task<Result<PagedResult<Response.StaffCheckInCustomerScheduleResponse1>>> Handle(
         Query.GetAllCustomerSchedule request, CancellationToken cancellationToken)
     {
         var clinicId = currentUserService.ClinicId;
@@ -57,8 +58,14 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
             request.PageIndex,
             request.PageSize
         );
+        
+        var orders = await orderRepositoryBase
+            .FindAll(x => !x.IsDeleted)
+            .ToListAsync(cancellationToken);
+        
         var mapped = customerSchedules.Items.Select(x =>
-            new Response.StaffCheckInCustomerScheduleResponse(
+        {
+            return new Response.StaffCheckInCustomerScheduleResponse(
                 x.Id,
                 x.OrderId.Value,
                 x.Order.FinalAmount.Value,
@@ -72,11 +79,35 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                 x.ProcedurePriceType.Name,
                 x.ProcedurePriceType?.Procedure.StepIndex.ToString(),
                 x.ProcedurePriceType.Procedure.StepIndex == 1
+            );
+        }).ToList();
+
+        var resultList = mapped.Join(orders,
+            schedule => schedule.OrderId,
+            order => order.Id,
+            (schedule, order) => new Response.StaffCheckInCustomerScheduleResponse1(
+                schedule.Id,
+                schedule.OrderId,
+                order.CustomerId,
+                schedule.Amount,
+                schedule.CustomerName,
+                schedule.CustomerPhoneNumber,
+                schedule.ServiceName,
+                schedule.DoctorName,
+                schedule.BookingDate,
+                schedule.StartTime,
+                schedule.EndTime,
+                schedule.Status,
+                schedule.ProcedurePriceTypeName,
+                schedule.StepIndex,
+                schedule.IsFirstCheckIn
             )).ToList();
-        var result = new PagedResult<Response.StaffCheckInCustomerScheduleResponse>(mapped,
+        
+        var result = new PagedResult<Response.StaffCheckInCustomerScheduleResponse1>(resultList,
             customerSchedules.PageIndex,
             customerSchedules.PageSize,
             customerSchedules.TotalCount);
+        
         return Result.Success(result);
     }
 }
