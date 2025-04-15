@@ -12,10 +12,17 @@ public class DashboardApi: ApiEndpoint, ICarterModule
             .MapGroup(BaseUrl)
             .HasApiVersion(1);
         
-        gr1.MapGet("clinics", GetTotalInformation).RequireAuthorization();
-        gr1.MapGet("clinics/datetime", GetDaytimeInformation).RequireAuthorization();
-        gr1.MapGet("systems", GetDaytimeInformation).RequireAuthorization();
-        gr1.MapGet("systems/datetime", GetDaytimeInformation).RequireAuthorization();
+        gr1.MapGet("clinics", GetTotalInformation)
+            .RequireAuthorization();
+        
+        gr1.MapGet("clinics/datetime", GetDaytimeInformation)
+            .RequireAuthorization();
+        
+        gr1.MapGet("systems", GetSystemTotalInformation)
+            .RequireAuthorization();
+        
+        gr1.MapGet("systems/datetime", GetSystemDaytimeInformation)
+            .RequireAuthorization();
     }
     
     private static async Task<IResult> GetTotalInformation(
@@ -41,6 +48,32 @@ public class DashboardApi: ApiEndpoint, ICarterModule
         var result = await sender.Send(new Query.GetDaytimeInformationQuery(
             roleName,
             new Guid(clinicId),
+            startDate,
+            endDate,
+            isDisplayWeek,
+            date));
+        return result.IsSuccess ? Results.Ok(result) : HandlerFailure(result);
+    }
+    
+    private static async Task<IResult> GetSystemTotalInformation(
+        ISender sender,
+        HttpContext httpContext)
+    {
+        var roleName = httpContext.User.FindFirst(c => c.Type == "RoleName")?.Value!;
+        var result = await sender.Send(new Query.GetSystemTotalInformationQuery(roleName));
+        return result.IsSuccess ? Results.Ok(result) : HandlerFailure(result);
+    }
+    
+    private static async Task<IResult> GetSystemDaytimeInformation(
+        ISender sender,
+        HttpContext httpContext,
+        DateOnly? startDate,
+        DateOnly? endDate,
+        bool? isDisplayWeek,
+        DateOnly? date)
+    {
+        var roleName = httpContext.User.FindFirst(c => c.Type == "RoleName")?.Value!;
+        var result = await sender.Send(new Query.GetSystemDaytimeInformationQuery(roleName,
             startDate,
             endDate,
             isDisplayWeek,

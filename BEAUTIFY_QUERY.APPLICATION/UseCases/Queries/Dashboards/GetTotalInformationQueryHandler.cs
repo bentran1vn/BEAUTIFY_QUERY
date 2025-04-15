@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Dashboards;
 
-public class GetTotalInformationQueryHandler : IQueryHandler<Query.GetTotalInformationQuery, Response.GetTotalInformationResponse>
+public class GetTotalInformationQueryHandler : IQueryHandler<Query.GetTotalInformationQuery, Responses.GetTotalInformationResponse>
 {
     private readonly IRepositoryBase<Clinic, Guid> _clinicRepository;
     private readonly IRepositoryBase<UserClinic, Guid> _userClinicRepository;
@@ -18,9 +18,9 @@ public class GetTotalInformationQueryHandler : IQueryHandler<Query.GetTotalInfor
         _clinicServiceRepository = clinicServiceRepository;
     }
 
-    public async Task<Result<Response.GetTotalInformationResponse>> Handle(Query.GetTotalInformationQuery request, CancellationToken cancellationToken)
+    public async Task<Result<Responses.GetTotalInformationResponse>> Handle(Query.GetTotalInformationQuery request, CancellationToken cancellationToken)
     {
-        var result = new Response.GetTotalInformationResponse();
+        var result = new Responses.GetTotalInformationResponse();
 
         if (request.RoleName == "Clinic Admin")
         {

@@ -5,7 +5,7 @@ public static class Query
     public record GetTotalInformationQuery(
         string RoleName,
         Guid ClinicId)
-        : IQuery<Response.GetTotalInformationResponse>;
+        : IQuery<Responses.GetTotalInformationResponse>;
     
     public record GetDaytimeInformationQuery(
         string RoleName,
@@ -14,5 +14,17 @@ public static class Query
         DateOnly? EndDate,
         bool? IsDisplayWeek,
         DateOnly? Date)
-        : IQuery<Response.GetDaytimeInformationResponse>;
+        : IQuery<Responses.GetDaytimeInformationResponse>;
+    
+    public record GetSystemTotalInformationQuery(
+        string RoleName)
+        : IQuery<Responses.GetSystemTotalInformationResponse>;
+    
+    public record GetSystemDaytimeInformationQuery(
+        string RoleName,
+        DateOnly? StartDate,
+        DateOnly? EndDate,
+        bool? IsDisplayWeek,
+        DateOnly? Date)
+        : IQuery<Responses.GetSystemDaytimeInformationResponse>;
 }
