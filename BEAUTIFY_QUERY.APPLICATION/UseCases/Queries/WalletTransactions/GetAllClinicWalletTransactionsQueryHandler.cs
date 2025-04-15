@@ -1,5 +1,6 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.WalletTransactions;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,9 @@ internal sealed class GetAllClinicWalletTransactionsQueryHandler(
         CancellationToken cancellationToken)
     {
         // Build the query to get all clinic transactions
-        var query = walletTransactionRepository.FindAll(x => x.ClinicId != null && !x.IsDeleted);
+        var query = walletTransactionRepository.FindAll(x =>
+            x.ClinicId != null && !x.IsDeleted &&
+            x.Status == Constant.WalletConstants.TransactionStatus.WAITING_APPROVAL);
 
         // Apply filters
         query = ApplyFilters(query, request);
@@ -45,87 +48,85 @@ internal sealed class GetAllClinicWalletTransactionsQueryHandler(
     {
         var searchTerm = request.SearchTerm?.Trim().ToLower();
 
-        if (!string.IsNullOrWhiteSpace(searchTerm))
+        if (string.IsNullOrWhiteSpace(searchTerm)) return query;
+        // Check if search term contains "to" for date or amount range
+        if (searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
         {
-            // Check if search term contains "to" for date or amount range
-            if (searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
+            var parts = searchTerm.Split("to", StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 2)
             {
-                var parts = searchTerm.Split("to", StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length == 2)
-                {
-                    var part1 = parts[0].Trim();
-                    var part2 = parts[1].Trim();
+                var part1 = parts[0].Trim();
+                var part2 = parts[1].Trim();
 
-                    // Try to parse as a date range
-                    if (DateTimeOffset.TryParse(part1, out var dateFrom) &&
-                        DateTimeOffset.TryParse(part2, out var dateTo))
-                    {
-                        // Normalize dateTo to end of day
-                        dateTo = dateTo.Date.AddDays(1).AddTicks(-1);
-                        query = query.Where(x => x.TransactionDate >= dateFrom && x.TransactionDate <= dateTo);
-                    }
-                    // Try to parse as an amount range
-                    else if (decimal.TryParse(part1, out var amountFrom) &&
-                             decimal.TryParse(part2, out var amountTo))
-                    {
-                        query = query.Where(x => x.Amount >= amountFrom && x.Amount <= amountTo);
-                    }
-                    else
-                    {
-                        // If the range parts can't be parsed, fall back to a standard contains search
-                        query = ApplyStandardSearch(query, searchTerm);
-                    }
+                // Try to parse as a date range
+                if (DateTimeOffset.TryParse(part1, out var dateFrom) &&
+                    DateTimeOffset.TryParse(part2, out var dateTo))
+                {
+                    // Normalize dateTo to end of day
+                    dateTo = dateTo.Date.AddDays(1).AddTicks(-1);
+                    query = query.Where(x => x.TransactionDate >= dateFrom && x.TransactionDate <= dateTo);
+                }
+                // Try to parse as an amount range
+                else if (decimal.TryParse(part1, out var amountFrom) &&
+                         decimal.TryParse(part2, out var amountTo))
+                {
+                    query = query.Where(x => x.Amount >= amountFrom && x.Amount <= amountTo);
                 }
                 else
                 {
-                    // If "to" is present but splitting doesn't yield exactly two parts,
-                    // use the standard search
+                    // If the range parts can't be parsed, fall back to a standard contains search
                     query = ApplyStandardSearch(query, searchTerm);
                 }
             }
-            // Check for clinic name matches
-            else if (searchTerm.StartsWith("clinic:", StringComparison.OrdinalIgnoreCase))
-            {
-                var clinicName = searchTerm.Substring(7).Trim();
-                query = query.Where(x => x.Clinic != null && 
-                                         x.Clinic.Name.ToLower().Contains(clinicName));
-            }
-            // Check for transaction types
-            else if (searchTerm.Equals("deposit", StringComparison.OrdinalIgnoreCase) ||
-                     searchTerm.Equals("withdrawal", StringComparison.OrdinalIgnoreCase) ||
-                     searchTerm.Equals("transfer", StringComparison.OrdinalIgnoreCase))
-            {
-                query = query.Where(x => x.TransactionType != null && 
-                                         x.TransactionType.ToLower() == searchTerm);
-            }
-            // Check for status types
-            else if (searchTerm.Equals("pending", StringComparison.OrdinalIgnoreCase) ||
-                     searchTerm.Equals("completed", StringComparison.OrdinalIgnoreCase) ||
-                     searchTerm.Equals("failed", StringComparison.OrdinalIgnoreCase) ||
-                     searchTerm.Equals("cancelled", StringComparison.OrdinalIgnoreCase))
-            {
-                query = query.Where(x => x.Status != null && 
-                                         x.Status.ToLower() == searchTerm);
-            }
-            // Check for date
-            else if (DateTimeOffset.TryParse(searchTerm, out var singleDate))
-            {
-                var endOfDay = singleDate.Date.AddDays(1).AddTicks(-1);
-                query = query.Where(x => x.TransactionDate >= singleDate.Date && 
-                                         x.TransactionDate <= endOfDay);
-            }
-            // Standard search for all other cases
             else
             {
+                // If "to" is present but splitting doesn't yield exactly two parts,
+                // use the standard search
                 query = ApplyStandardSearch(query, searchTerm);
             }
+        }
+        // Check for clinic name matches
+        else if (searchTerm.StartsWith("clinic:", StringComparison.OrdinalIgnoreCase))
+        {
+            var clinicName = searchTerm.Substring(7).Trim();
+            query = query.Where(x => x.Clinic != null &&
+                                     x.Clinic.Name.ToLower().Contains(clinicName));
+        }
+        // Check for transaction types
+        else if (searchTerm.Equals("deposit", StringComparison.OrdinalIgnoreCase) ||
+                 searchTerm.Equals("withdrawal", StringComparison.OrdinalIgnoreCase) ||
+                 searchTerm.Equals("transfer", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(x => x.TransactionType != null &&
+                                     x.TransactionType.ToLower() == searchTerm);
+        }
+        // Check for status types
+        else if (searchTerm.Equals("pending", StringComparison.OrdinalIgnoreCase) ||
+                 searchTerm.Equals("completed", StringComparison.OrdinalIgnoreCase) ||
+                 searchTerm.Equals("failed", StringComparison.OrdinalIgnoreCase) ||
+                 searchTerm.Equals("cancelled", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(x => x.Status != null &&
+                                     x.Status.ToLower() == searchTerm);
+        }
+        // Check for date
+        else if (DateTimeOffset.TryParse(searchTerm, out var singleDate))
+        {
+            var endOfDay = singleDate.Date.AddDays(1).AddTicks(-1);
+            query = query.Where(x => x.TransactionDate >= singleDate.Date &&
+                                     x.TransactionDate <= endOfDay);
+        }
+        // Standard search for all other cases
+        else
+        {
+            query = ApplyStandardSearch(query, searchTerm);
         }
 
         return query;
     }
 
     private static IQueryable<WalletTransaction> ApplyStandardSearch(
-        IQueryable<WalletTransaction> query, 
+        IQueryable<WalletTransaction> query,
         string searchTerm)
     {
         return query.Where(x =>
@@ -133,7 +134,7 @@ internal sealed class GetAllClinicWalletTransactionsQueryHandler(
             EF.Functions.Like(x.Amount.ToString(), $"%{searchTerm}%") ||
             (x.TransactionType != null && EF.Functions.Like(x.TransactionType.ToLower(), $"%{searchTerm}%")) ||
             (x.Status != null && EF.Functions.Like(x.Status.ToLower(), $"%{searchTerm}%")) ||
-            (x.Clinic != null && x.Clinic.Name != null && 
+            (x.Clinic != null && x.Clinic.Name != null &&
              EF.Functions.Like(x.Clinic.Name.ToLower(), $"%{searchTerm}%")));
     }
 
