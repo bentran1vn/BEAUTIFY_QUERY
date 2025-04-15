@@ -6,6 +6,7 @@ using BEAUTIFY_QUERY.DOMAIN.Entities;
 using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.EntityEvents;
 using MongoDB.Driver.Linq;
+using User = BEAUTIFY_QUERY.DOMAIN.Entities.User;
 
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Bookings;
