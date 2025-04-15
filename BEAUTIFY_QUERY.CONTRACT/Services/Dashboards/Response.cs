@@ -55,7 +55,6 @@ public class Responses
     {
         public int TotalCountBranding { get; set; }
         public int TotalCountBranches { get; set; }
-        public int TotalCountBrandPending{ get; set; }
         public int TotalCountService { get; set; }
         public int TotalCountDoctor { get; set; }
         public int TotalCountBronzeSubscription { get; set; }
