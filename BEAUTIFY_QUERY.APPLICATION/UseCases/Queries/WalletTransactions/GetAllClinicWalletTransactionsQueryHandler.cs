@@ -17,7 +17,7 @@ internal sealed class GetAllClinicWalletTransactionsQueryHandler(
         // Build the query to get all clinic transactions
         var query = walletTransactionRepository.FindAll(x =>
             x.ClinicId != null && !x.IsDeleted &&
-            x.Status == Constant.WalletConstants.TransactionStatus.WAITING_APPROVAL);
+            x.Status != Constant.WalletConstants.TransactionStatus.PENDING);
 
         // Apply filters
         query = ApplyFilters(query, request);
