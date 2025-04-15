@@ -267,14 +267,6 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
                 !x.IsDeleted 
                 && x.IsParent == false, cancellationToken);
         
-        infor.TotalCountBrandPending = await clinicOnBoardingRequestQuery
-            .Where(x => 
-                !x.IsDeleted 
-                && x.Status == 0)
-            .Select(x => x.ClinicId)
-            .Distinct()
-            .CountAsync(cancellationToken);
-        
         infor.TotalCountService = await serviceQuery
             .CountAsync(x => 
                 !x.IsDeleted, cancellationToken);
