@@ -1,6 +1,6 @@
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Dashboards;
 
-public class Response
+public class Responses
 {
     public class GetTotalInformationResponse
     {
@@ -8,6 +8,18 @@ public class Response
         public int? TotalBranchActive { get; set; }
         public int? TotalBranchInActive { get; set; }
         public int? TotalStaff { get; set; }
+        public int TotalService { get; set; }
+        public int TotalDoctor { get; set; }
+    };
+    
+    public class GetSystemTotalInformationResponse
+    {
+        public int? TotalClinics { get; set; }
+        public int? TotalBranding { get; set; }
+        public int? TotalBranches { get; set; }
+        public int? TotalBranchActive { get; set; }
+        public int? TotalBranchInActive { get; set; }
+        public int TotalBrandPending{ get; set; }
         public int TotalService { get; set; }
         public int TotalDoctor { get; set; }
     };
@@ -37,5 +49,36 @@ public class Response
         public Information Information { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
+    }
+    
+    public class SystemInformation
+    {
+        public int TotalCountBranding { get; set; }
+        public int TotalCountBranches { get; set; }
+        public int TotalCountBrandPending{ get; set; }
+        public int TotalCountService { get; set; }
+        public int TotalCountDoctor { get; set; }
+        public int TotalCountBronzeSubscription { get; set; }
+        public int TotalCountSilverSubscription { get; set; }
+        public int TotalCountGoldSubscription { get; set; }
+        public decimal TotalSumRevenue { get; set; }
+        public decimal TotalSystemSumRevenue { get; set; }
+        public decimal TotalSumBronzeSubscriptionRevenue { get; set; }
+        public decimal TotalSumSilverSubscriptionRevenue { get; set; }
+        public decimal TotalSumGoldSubscriptionRevenue { get; set; }
+        public decimal TotalSumClinicRevenue { get; set; }
+    }
+    
+    public class SystemDatetimeInformation
+    {
+        public SystemInformation Information { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
+    }
+    
+    public class GetSystemDaytimeInformationResponse
+    {
+        public SystemInformation? SystemInformation { get; set; }
+        public List<SystemDatetimeInformation>? SystemInformationList { get; set; }
     }
 }
