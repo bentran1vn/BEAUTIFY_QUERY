@@ -1,6 +1,7 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
+using BEAUTIFY_QUERY.DOMAIN;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,24 +13,19 @@ internal sealed class GetSubClinicByIdQueryHandler(
     : IQueryHandler<Query.GetSubClinicByIdQuery, Response.ClinicBranchDto>
 {
     public async Task<Result<Response.ClinicBranchDto>> Handle(
-        Query.GetSubClinicByIdQuery request, 
+        Query.GetSubClinicByIdQuery request,
         CancellationToken cancellationToken)
     {
         // Get the current user's clinic ID
         var adminClinicId = currentUserService.ClinicId;
-        
+
         // Find the requested clinic
         var requestedClinic = await clinicRepository.FindByIdAsync(request.Id, cancellationToken);
-        
+
         if (requestedClinic == null || requestedClinic.IsDeleted)
-            return Result.Failure<Response.ClinicBranchDto>(new Error("404", "Clinic not found"));
-            
+            return Result.Failure<Response.ClinicBranchDto>(new Error("404", ErrorMessages.Clinic.ClinicNotFound));
+
         // Check if the requested clinic is a child of the admin's clinic
-        if (requestedClinic.ParentId != adminClinicId)
-        {
-            return Result.Failure<Response.ClinicBranchDto>(
-                new Error("403", "You can only access clinics that are branches of your main clinic"));
-        }
 
         // Get pending withdrawals for the clinic
         var pendingWithdrawals = await walletTransactionRepository
