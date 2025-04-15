@@ -7,7 +7,7 @@ using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Dashboards;
 
-public class GetDaytimeInformationQueryHandler : IQueryHandler<Query.GetDaytimeInformationQuery, Response.GetDaytimeInformationResponse>
+public class GetDaytimeInformationQueryHandler : IQueryHandler<Query.GetDaytimeInformationQuery, Responses.GetDaytimeInformationResponse>
 {
     private readonly IRepositoryBase<Order, Guid> _orderRepository;
     private readonly IRepositoryBase<CustomerSchedule, Guid> _customerScheduleRepository;
@@ -15,7 +15,12 @@ public class GetDaytimeInformationQueryHandler : IQueryHandler<Query.GetDaytimeI
     private readonly IRepositoryBase<Clinic, Guid> _clinicRepository;
     private readonly IRepositoryBase<ClinicTransaction, Guid> _clinicTransactionRepository;
 
-    public GetDaytimeInformationQueryHandler(IRepositoryBase<Order, Guid> orderRepository, IRepositoryBase<CustomerSchedule, Guid> customerScheduleRepository, IRepositoryBase<ClinicService, Guid> clinicServiceRepository, IRepositoryBase<Clinic, Guid> clinicRepository, IRepositoryBase<ClinicTransaction, Guid> clinicTransactionRepository)
+    public GetDaytimeInformationQueryHandler(
+        IRepositoryBase<Order, Guid> orderRepository, 
+        IRepositoryBase<CustomerSchedule, Guid> customerScheduleRepository, 
+        IRepositoryBase<ClinicService, Guid> clinicServiceRepository, 
+        IRepositoryBase<Clinic, Guid> clinicRepository, 
+        IRepositoryBase<ClinicTransaction, Guid> clinicTransactionRepository)
     {
         _orderRepository = orderRepository;
         _customerScheduleRepository = customerScheduleRepository;
@@ -24,227 +29,187 @@ public class GetDaytimeInformationQueryHandler : IQueryHandler<Query.GetDaytimeI
         _clinicTransactionRepository = clinicTransactionRepository;
     }
 
-    public async Task<Result<Response.GetDaytimeInformationResponse>> Handle(Query.GetDaytimeInformationQuery request, CancellationToken cancellationToken)
+    public async Task<Result<Responses.GetDaytimeInformationResponse>> Handle(Query.GetDaytimeInformationQuery request, CancellationToken cancellationToken)
     {
-        if (request.StartDate != null || request.EndDate != null)
+        // Validate date parameters
+        if ((request.StartDate == null && request.EndDate != null) || 
+            (request.StartDate != null && request.EndDate == null))
         {
-            if (!(request.StartDate != null && request.EndDate != null))
-            {
-                return Result.Failure<Response.GetDaytimeInformationResponse>(new Error("400", "Start date and end date cannot be null"));
-            }
+            return Result.Failure<Responses.GetDaytimeInformationResponse>(
+                new Error("400", "Start date and end date must both be provided or both be null"));
         }
             
-        var orderQuery = _orderRepository
-            .FindAll(x => !x.IsDeleted);
-        
-        var customerScheduleQuery = _customerScheduleRepository
-            .FindAll(x => !x.IsDeleted);
+        // Base queries with deleted filter
+        var orderQuery = _orderRepository.FindAll(x => !x.IsDeleted);
+        var customerScheduleQuery = _customerScheduleRepository.FindAll(x => !x.IsDeleted);
 
+        // Apply date filters
         if (request.Date != null)
         {
             orderQuery = orderQuery.Where(x => x.OrderDate.Equals(request.Date));
             customerScheduleQuery = customerScheduleQuery.Where(x => x.Date.Equals(request.Date));
         }
-        else
+        else if (request.StartDate != null && request.EndDate != null)
         {
             orderQuery = orderQuery.Where(x => x.OrderDate >= request.StartDate && x.OrderDate <= request.EndDate);
             customerScheduleQuery = customerScheduleQuery.Where(x => x.Date >= request.StartDate && x.Date <= request.EndDate);
         }
         
-        List<Guid> serviceIds = new();
+        // Apply role-based filters
+        const string ROLE_CLINIC_ADMIN = "Clinic Admin";
+        const string ROLE_CLINIC_STAFF = "Clinic Staff";
         
-        if(request.RoleName == "Clinic Admin")
+        if(request.RoleName == ROLE_CLINIC_ADMIN)
         {
-            var clinicIds = _clinicRepository
+            var clinicIds = await _clinicRepository
                 .FindAll(x => x.ParentId.Equals(request.ClinicId))
                 .Select(x => x.Id)
-                .ToList();
+                .ToListAsync(cancellationToken);
             
             clinicIds.Add(request.ClinicId);
             
-            var orders = _clinicTransactionRepository
-                .FindAll(x => clinicIds.Contains((Guid)x.ClinicId!))
+            var orders = await _clinicTransactionRepository
+                .FindAll(x => x.ClinicId.HasValue && clinicIds.Contains((Guid)x.ClinicId))
                 .Select(x => x.OrderId)
-                .ToList();
+                .ToListAsync(cancellationToken);
             
-            orderQuery = orderQuery.Where(
-                x => orders.Contains(x.Id));
+            orderQuery = orderQuery.Where(x => orders.Contains(x.Id));
         }
-        else if(request.RoleName == "Clinic Staff")
+        else if(request.RoleName == ROLE_CLINIC_STAFF)
         {
-            var orders = _clinicTransactionRepository
+            var orders = await _clinicTransactionRepository
                 .FindAll(x => x.ClinicId.Equals(request.ClinicId))
                 .Select(x => x.OrderId)
-                .ToList();
+                .ToListAsync(cancellationToken);
             
-            orderQuery = orderQuery.Where(
-                x => orders.Contains(x.Id));
+            orderQuery = orderQuery.Where(x => orders.Contains(x.Id));
         }
         
-        var result = new Response.GetDaytimeInformationResponse();
+        var result = new Responses.GetDaytimeInformationResponse();
         
+        // Handle single date request
         if (request.Date != null)
         {
-            var infor = new Response.Information();
-            infor.TotalSumRevenue = await orderQuery
-                .Where(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED)
-                .SumAsync(x => x.FinalAmount, cancellationToken) ?? 0;
-            infor.TotalSumRevenueNormal = await orderQuery
-                .Where(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED)
-                .Where(x => x.LivestreamRoomId == null)
-                .SumAsync(x => x.FinalAmount, cancellationToken) ?? 0;
-            infor.TotalCountOrderPending = await orderQuery
-                .Where(x => x.Status == Constant.OrderStatus.ORDER_PENDING)
-                .CountAsync( cancellationToken);
-            infor.TotalSumRevenueLiveStream = await orderQuery
-                .Where(x => x.LivestreamRoomId != null)
-                .SumAsync(x => x.FinalAmount, cancellationToken) ?? 0;
-            infor.TotalCountOrderCustomer = await orderQuery
-                .Select(x => x.CustomerId)
-                .Distinct()
-                .CountAsync(cancellationToken);
-            infor.TotalCountScheduleCustomer = await customerScheduleQuery
-                .Select(x => x.CustomerId)
-                .Distinct()
-                .CountAsync(cancellationToken);
-            infor.TotalCountCustomerSchedule = await customerScheduleQuery
-                .CountAsync(cancellationToken);
-            infor.TotalCountCustomerSchedulePending = await customerScheduleQuery
-                .Where(x => x.Status == Constant.OrderStatus.ORDER_PENDING)
-                .CountAsync(cancellationToken);
-            infor.TotalCountCustomerScheduleInProgress = await customerScheduleQuery
-                .Where(x => x.Status == Constant.OrderStatus.ORDER_IN_PROGRESS)
-                .CountAsync(cancellationToken);
-            infor.TotalCountCustomerScheduleCompleted = await customerScheduleQuery
-                .Where(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED)
-                .CountAsync(cancellationToken);
-            
-            result.DatetimeInformation = infor;
+            result.DatetimeInformation = await GetInformationForQueries(
+                orderQuery, customerScheduleQuery, cancellationToken);
         }
-        else
+        else if (request.StartDate != null && request.EndDate != null)
         {
-            var listInfor = new List<Response.DatetimeInformation>();
+            var listInfor = new List<Responses.DatetimeInformation>();
+            DateOnly startDate = request.StartDate.Value;
+            DateOnly endDate = request.EndDate.Value;
+            
             if (request.IsDisplayWeek == true)
             {
-                DateOnly startDate = request.StartDate.Value;
-                DateOnly endDate = request.EndDate.Value;
-            
-                // Find the first Monday in or before the start date to begin our week
-                int daysToSubtract = (int)startDate.DayOfWeek - 1;
-                if (daysToSubtract < 0) daysToSubtract += 7; // If it's Sunday (0), we want to go back 6 days
-            
+                // Find the first Monday in or before the start date
+                int daysToSubtract = ((int)startDate.DayOfWeek - 1 + 7) % 7;
                 DateOnly weekStart = startDate.AddDays(-daysToSubtract);
                 
                 while (weekStart <= endDate)
                 {
-                    // Calculate the end of the week (Sunday)
+                    // Calculate week end (Sunday)
                     DateOnly weekEnd = weekStart.AddDays(6);
-                
-                    // If the week extends beyond the requested end date, cap it
+                    
+                    // Only include complete weeks that fall within the range
                     if (weekEnd > endDate)
-                        weekEnd = endDate;
+                        break;
                 
-                    var weekInfo = new Response.DatetimeInformation
+                    // Filter queries for this specific week
+                    var ordersInWeek = orderQuery.Where(x => x.OrderDate >= weekStart && x.OrderDate <= weekEnd);
+                    var schedulesInWeek = customerScheduleQuery.Where(x => x.Date >= weekStart && x.Date <= weekEnd);
+                    
+                    var weekInfo = new Responses.DatetimeInformation
                     {
                         StartDate = weekStart,
                         EndDate = weekEnd,
-                        Information = await GetInformationForDateRange(orderQuery, customerScheduleQuery, weekStart, weekEnd, cancellationToken)
+                        Information = await GetInformationForQueries(ordersInWeek, schedulesInWeek, cancellationToken)
                     };
                 
                     listInfor.Add(weekInfo);
-                
-                    // Move to next week
                     weekStart = weekStart.AddDays(7);
                 }
             }
             else
             {
-                // Display by Month
-                DateOnly startDate = request.StartDate.Value;
-                DateOnly endDate = request.EndDate.Value;
-            
-                // Start from the first day of the start month
+                // Display by Month - Start from the first day of the start month
                 DateOnly monthStart = new DateOnly(startDate.Year, startDate.Month, 1);
             
                 while (monthStart <= endDate)
                 {
                     // Calculate the end of the month
                     DateOnly monthEnd = monthStart.AddMonths(1).AddDays(-1);
-                
-                    // If the month extends beyond the requested end date, cap it
+                    
+                    // Only include complete months that fall within the range
                     if (monthEnd > endDate)
-                        monthEnd = endDate;
+                        break;
                 
-                    var monthInfo = new Response.DatetimeInformation
+                    // Filter queries for this specific month
+                    var ordersInMonth = orderQuery.Where(x => x.OrderDate >= monthStart && x.OrderDate <= monthEnd);
+                    var schedulesInMonth = customerScheduleQuery.Where(x => x.Date >= monthStart && x.Date <= monthEnd);
+                    
+                    var monthInfo = new Responses.DatetimeInformation
                     {
                         StartDate = monthStart,
                         EndDate = monthEnd,
-                        Information = await GetInformationForDateRange(orderQuery, customerScheduleQuery, monthStart, monthEnd, cancellationToken)
+                        Information = await GetInformationForQueries(ordersInMonth, schedulesInMonth, cancellationToken)
                     };
                 
                     listInfor.Add(monthInfo);
-                
-                    // Move to next month
                     monthStart = monthStart.AddMonths(1);
                 }
             }
             result.DatetimeInformationList = listInfor;
         }
+        
         return Result.Success(result);
     }
     
-    private async Task<Response.Information> GetInformationForDateRange(
-    IQueryable<Order> orderQuery, 
-    IQueryable<CustomerSchedule> customerScheduleQuery,
-    DateOnly startDate,
-    DateOnly endDate,
-    CancellationToken cancellationToken)
+    // Combined the two information methods into one reusable method
+    private async Task<Responses.Information> GetInformationForQueries(
+        IQueryable<Order> orderQuery, 
+        IQueryable<CustomerSchedule> customerScheduleQuery,
+        CancellationToken cancellationToken)
     {
-        // Filter queries for the specific date range
-        var ordersInRange = orderQuery.Where(x => x.OrderDate >= startDate && x.OrderDate <= endDate);
-        var schedulesInRange = customerScheduleQuery.Where(x => x.Date >= startDate && x.Date <= endDate);
-        
-        var info = new Response.Information
+        var info = new Responses.Information
         {
-            TotalSumRevenue = await ordersInRange
+            TotalSumRevenue = await orderQuery
                 .Where(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED)
                 .SumAsync(x => x.FinalAmount, cancellationToken) ?? 0,
                 
-            TotalSumRevenueNormal = await ordersInRange
-                .Where(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED)
-                .Where(x => x.LivestreamRoomId == null)
+            TotalSumRevenueNormal = await orderQuery
+                .Where(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED && x.LivestreamRoomId == null)
                 .SumAsync(x => x.FinalAmount, cancellationToken) ?? 0,
                 
-            TotalCountOrderPending = await ordersInRange
+            TotalCountOrderPending = await orderQuery
                 .Where(x => x.Status == Constant.OrderStatus.ORDER_PENDING)
                 .CountAsync(cancellationToken),
                 
-            TotalSumRevenueLiveStream = await ordersInRange
+            TotalSumRevenueLiveStream = await orderQuery
                 .Where(x => x.LivestreamRoomId != null)
                 .SumAsync(x => x.FinalAmount, cancellationToken) ?? 0,
                 
-            TotalCountOrderCustomer = await ordersInRange
+            TotalCountOrderCustomer = await orderQuery
                 .Select(x => x.CustomerId)
                 .Distinct()
                 .CountAsync(cancellationToken),
                 
-            TotalCountScheduleCustomer = await schedulesInRange
+            TotalCountScheduleCustomer = await customerScheduleQuery
                 .Select(x => x.CustomerId)
                 .Distinct()
                 .CountAsync(cancellationToken),
                 
-            TotalCountCustomerSchedule = await schedulesInRange
+            TotalCountCustomerSchedule = await customerScheduleQuery
                 .CountAsync(cancellationToken),
                 
-            TotalCountCustomerSchedulePending = await schedulesInRange
+            TotalCountCustomerSchedulePending = await customerScheduleQuery
                 .Where(x => x.Status == Constant.OrderStatus.ORDER_PENDING)
                 .CountAsync(cancellationToken),
                 
-            TotalCountCustomerScheduleInProgress = await schedulesInRange
+            TotalCountCustomerScheduleInProgress = await customerScheduleQuery
                 .Where(x => x.Status == Constant.OrderStatus.ORDER_IN_PROGRESS)
                 .CountAsync(cancellationToken),
                 
-            TotalCountCustomerScheduleCompleted = await schedulesInRange
+            TotalCountCustomerScheduleCompleted = await customerScheduleQuery
                 .Where(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED)
                 .CountAsync(cancellationToken)
         };

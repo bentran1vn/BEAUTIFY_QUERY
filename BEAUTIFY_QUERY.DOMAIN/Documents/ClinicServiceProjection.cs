@@ -20,6 +20,7 @@ public class ClinicServiceProjection : Document
     public ICollection<Clinic> Clinic { get; set; }
     public ICollection<Procedure> Procedures { get; set; } = Array.Empty<Procedure>();
     public ICollection<Promotion> Promotions { get; set; } = Array.Empty<Promotion>();
+    public ICollection<Feedback> Feedbacks { get; set; } = Array.Empty<Feedback>();
 }
 
 public record Category(Guid Id, string Name, string Description);
@@ -68,4 +69,27 @@ public class Image
     public Guid Id { get; set; }
     public int Index { get; set; }
     public string Url { get; set; }
+}
+
+public class Feedback
+{
+    public Guid FeedbackId { get; set; }
+    public Guid ServiceId { get; set; }
+    public ICollection<string> Images { get; set; }
+    public string Content { get; set; }
+    public int Rating { get; set; }
+    public User User { get; set; }
+    public bool IsView { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public class User
+{
+    public Guid Id { get; set; }
+    public string Avatar { get; set; }
+    public string PhoneNumber { get; set; }
+    public string FullName { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Address { get; set; }
 }
