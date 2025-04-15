@@ -1,4 +1,4 @@
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 public static class Query
@@ -50,5 +50,5 @@ public static class Query
     
     public record GetClinicBranchesQuery : IQuery<Response.GetClinicBranchesResponse>;
 
-   
+    public record GetClinicByIdQuery(Guid Id) : IQuery<Response.ClinicBranchDto>;
 }

@@ -21,12 +21,22 @@ public class ClinicApi : ApiEndpoint, ICarterModule
             .RequireAuthorization(Constant.Role.CLINIC_ADMIN)
             .WithName("Get Clinic Branches")
             .WithSummary("Get all branches for the current clinic admin");
+        gr1.MapGet("branches/{id:guid}", GetClinicBranchById)
+            .RequireAuthorization(Constant.Role.CLINIC_ADMIN);
+    }
+
+    private static async Task<IResult> GetClinicBranchById(
+        ISender sender,
+        Guid id)
+    {
+        var result = await sender.Send(new Query.GetClinicByIdQuery(id));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
     private static async Task<IResult> GetClinicBranches(ISender sender)
     {
         var result = await sender.Send(new Query.GetClinicBranchesQuery());
-        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result.Value);
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
     private static async Task<IResult> GetAllClinics(
