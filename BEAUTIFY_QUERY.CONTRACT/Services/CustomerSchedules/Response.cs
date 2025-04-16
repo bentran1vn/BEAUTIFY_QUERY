@@ -16,7 +16,7 @@ public static class Response
         string ProcedurePriceTypeName,
         string StepIndex,
         bool IsFirstCheckIn = false);
-    
+
     public record StaffCheckInCustomerScheduleResponse1(
         Guid Id,
         Guid OrderId,
@@ -54,4 +54,10 @@ public static class Response
         string Name,
         string StepIndex,
         DateOnly? Date);
+
+    public record CustomerBusyTimeInADay(
+        TimeSpan? Start,
+        TimeSpan? End,
+        DateOnly? Date
+    );
 }

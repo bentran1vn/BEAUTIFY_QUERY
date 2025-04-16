@@ -1,4 +1,4 @@
-﻿﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,6 +31,18 @@ public class Apis : ApiEndpoint, ICarterModule
             .WithName("Check Next Schedule Availability")
             .WithSummary("Check if next schedule is available")
             .WithDescription("Check if the next customer schedule is not scheduled yet");
+        gr1.MapGet("{customerId:guid}/busy-time/{date:date}", GetAllCustomerBusyTime)
+            .RequireAuthorization(Constant.Role.CUSTOMER);
+    }
+
+
+    private static async Task<IResult> GetAllCustomerBusyTime(
+        ISender sender,
+        [FromRoute] Guid customerId,
+        [FromRoute] DateOnly date)
+    {
+        var result = await sender.Send(new Query.GetAllCustomerBusyTime(customerId, date));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
     private static async Task<IResult> CheckIfNextCustomerScheduleIsNotScheduledYet(

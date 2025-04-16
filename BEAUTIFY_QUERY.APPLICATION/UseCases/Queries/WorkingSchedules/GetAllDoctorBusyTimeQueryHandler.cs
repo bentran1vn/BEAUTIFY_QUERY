@@ -4,7 +4,7 @@ using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
-internal sealed class GetAllDoctorFreeTimeQueryHandler(IMongoRepository<WorkingScheduleProjection> repository)
+internal sealed class GetAllDoctorBusyTimeQueryHandler(IMongoRepository<WorkingScheduleProjection> repository)
     : IQueryHandler<Query.GetAllDoctorFreeTime, IReadOnlyList<Response.DoctorBusyTimeInADay>>
 {
     public async Task<Result<IReadOnlyList<Response.DoctorBusyTimeInADay>>> Handle(Query.GetAllDoctorFreeTime request,
