@@ -25,11 +25,15 @@ internal sealed class CheckIfNextCustomerScheduleIsNotQueryHandler(
             return Result.Success("Last Step");
         }
 
-        var nextStep = int.Parse(customerSchedule.CurrentProcedure.StepIndex)+1;
+        var nextStep = int.Parse(customerSchedule.CurrentProcedure.StepIndex) + 1;
         var nextCustomerSchedule = await mongoRepository.AsQueryable(x =>
                 x.OrderId == customerSchedule.OrderId &&
-                x.CurrentProcedure.StepIndex ==  nextStep.ToString())
+                x.CurrentProcedure.StepIndex == nextStep.ToString())
             .FirstOrDefaultAsync(cancellationToken);
-        return Result.Success(nextCustomerSchedule.Date is null ? "Need to schedule for next step" : "Already scheduled for next step");
+        if (nextCustomerSchedule is null)
+            return Result.Failure<string>(new Error("404", "Next Customer Schedule Not Found !"));
+        return Result.Success(nextCustomerSchedule.Date is null
+            ? "Need to schedule for next step"
+            : "Already scheduled for next step");
     }
 }
