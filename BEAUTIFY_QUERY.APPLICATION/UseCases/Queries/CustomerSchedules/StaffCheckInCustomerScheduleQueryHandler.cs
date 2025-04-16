@@ -38,7 +38,7 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
         var customerSchedules = await customerScheduleRepositoryBase.FindAll(
                 x => users.Select(u => u.Id).Contains(x.CustomerId) &&
                      x.Doctor.ClinicId == currentUserService.ClinicId &&
-                     x.Date == DateOnly.FromDateTime(currentTime) && x.StartTime != null)
+                    /* x.Date == DateOnly.FromDateTime(currentTime) &&*/ x.StartTime != null)
             .Include(x => x.Service)
             .Include(x => x.Doctor)
             .ThenInclude(d => d.User)
