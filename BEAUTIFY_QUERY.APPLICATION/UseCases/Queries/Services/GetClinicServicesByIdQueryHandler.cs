@@ -99,7 +99,28 @@ public class GetClinicServicesByIdQueryHandler(
                                 ExpiryDate = c.ExpiryDate,
                                 Note = c.Note
                             }).ToList()
-                    ))).ToList());
+                    ))).ToList(),
+                isServiceExisted.Feedbacks.Select(z => new Response.Feedback()
+                {
+                    FeedbackId = z.FeedbackId,
+                    ServiceId = z.ServiceId,
+                    Content = z.Content,
+                    IsView = z.IsView,
+                    Rating = z.Rating,
+                    User = new Response.User()
+                    {
+                        Id = z.User.Id,
+                        FullName = z.User.FullName,
+                        LastName = z.User.LastName,
+                        FirstName = z.User.FirstName,
+                        Address = z.User.Address,
+                        PhoneNumber = z.User.PhoneNumber,
+                        Avatar = z.User.Avatar
+                    },
+                    Images = z.Images,
+                    CreatedAt = z.CreatedAt,
+                    UpdatedAt = z.UpdatedAt
+                }).ToList());
         else
             result = new Response.GetAllServiceByIdResponse(
                 isServiceExisted.DocumentId,
@@ -165,7 +186,29 @@ public class GetClinicServicesByIdQueryHandler(
                                 CertificateName = c.CertificateName,
                                 ExpiryDate = c.ExpiryDate,
                                 Note = c.Note
-                            }).ToList()))).ToList());
+                            }).ToList()))).ToList(),
+                isServiceExisted.Feedbacks.Select(z => new Response.Feedback()
+                {
+                    FeedbackId = z.FeedbackId,
+                    ServiceId = z.ServiceId,
+                    Content = z.Content,
+                    IsView = z.IsView,
+                    Rating = z.Rating,
+                    User = new Response.User()
+                    {
+                        Id = z.User.Id,
+                        FullName = z.User.FullName,
+                        LastName = z.User.LastName,
+                        FirstName = z.User.FirstName,
+                        Address = z.User.Address,
+                        PhoneNumber = z.User.PhoneNumber,
+                        Avatar = z.User.Avatar
+                    },
+                    Images = z.Images,
+                    CreatedAt = z.CreatedAt,
+                    UpdatedAt = z.UpdatedAt
+                }).ToList()
+            );
 
         return Result.Success(result);
     }
