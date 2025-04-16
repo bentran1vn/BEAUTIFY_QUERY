@@ -23,6 +23,7 @@ internal sealed class GetClinicsQueryHandler(
                      && !x.IsDeleted
             );
 
+        clinicsQuery.Where(x=>x.Status==1);
         if (request.Role is null or Constant.Role.CUSTOMER)
         {
             clinicsQuery = clinicsQuery
