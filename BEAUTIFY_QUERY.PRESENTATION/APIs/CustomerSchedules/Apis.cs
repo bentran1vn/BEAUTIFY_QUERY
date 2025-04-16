@@ -1,4 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
+﻿﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,11 +43,13 @@ public class Apis : ApiEndpoint, ICarterModule
     }
 
     private static async Task<IResult> StaffCheckInCustomerSchedule(ISender sender,
-        [FromRoute] string customerName, [FromQuery] string customerPhone)
-
+        [FromRoute] string customerName,
+        [FromQuery] string customerPhone,
+        [FromQuery] int pageIndex = 1,
+        [FromQuery] int pageSize = 10)
     {
         var result = await sender.Send(
-            new Query.StaffCheckInCustomerScheduleQuery(customerName, customerPhone));
+            new Query.StaffCheckInCustomerScheduleQuery(customerName, customerPhone, pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 

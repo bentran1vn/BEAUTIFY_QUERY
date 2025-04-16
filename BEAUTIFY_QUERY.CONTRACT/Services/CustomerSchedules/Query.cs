@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿﻿using System.Collections.ObjectModel;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 
 namespace BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
@@ -6,8 +6,10 @@ public static class Query
 {
     public record StaffCheckInCustomerScheduleQuery(
         string CustomerName,
-        string? CustomerPhone)
-        : IQuery<List<Response.StaffCheckInCustomerScheduleResponse>>;
+        string? CustomerPhone,
+        int PageIndex = 1,
+        int PageSize = 10)
+        : IQuery<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>;
 
     public record GetAllCustomerSchedule(
         string? SearchTerm,

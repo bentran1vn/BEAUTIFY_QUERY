@@ -1,4 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+﻿﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -9,14 +9,14 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
     IRepositoryBase<User, Guid> userRepositoryBase,
     ICurrentUserService currentUserService,
     IRepositoryBase<CustomerSchedule, Guid> customerScheduleRepositoryBase)
-    : IQueryHandler<Query.StaffCheckInCustomerScheduleQuery, List<Response.StaffCheckInCustomerScheduleResponse>>
+    : IQueryHandler<Query.StaffCheckInCustomerScheduleQuery, PagedResult<Response.StaffCheckInCustomerScheduleResponse>>
 {
-    public async Task<Result<List<Response.StaffCheckInCustomerScheduleResponse>>> Handle(
+    public async Task<Result<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>> Handle(
         Query.StaffCheckInCustomerScheduleQuery request, CancellationToken cancellationToken)
     {
         // Validate input parameters
         if (string.IsNullOrWhiteSpace(request.CustomerName))
-            return Result.Failure<List<Response.StaffCheckInCustomerScheduleResponse>>(
+            return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(
                 new Error("400", "Customer name is required"));
 
         // Create a dynamic user filter based on available information
@@ -27,15 +27,15 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             .ToListAsync(cancellationToken);
 
         if (users.Count == 0)
-            return Result.Failure<List<Response.StaffCheckInCustomerScheduleResponse>>(
+            return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(
                 new Error("404", "No matching users found"));
 
         var VietNameTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
         var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, VietNameTimeZone);
-        
-        
-        // Fetch customer schedules efficiently with includes
-        var customerSchedules = await customerScheduleRepositoryBase.FindAll(
+
+
+        // Create query for customer schedules with includes
+        var query = customerScheduleRepositoryBase.FindAll(
                 x => users.Select(u => u.Id).Contains(x.CustomerId) &&
                      x.Doctor.ClinicId == currentUserService.ClinicId &&
                     /* x.Date == DateOnly.FromDateTime(currentTime) &&*/ x.StartTime != null)
@@ -44,22 +44,36 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             .ThenInclude(d => d.User)
             .Include(x => x.ProcedurePriceType)
             .Include(x => x.Order)
-            .ToListAsync(cancellationToken);
+            .OrderBy(x => x.StartTime);
 
-        if (customerSchedules.Count == 0)
-            return Result.Failure<List<Response.StaffCheckInCustomerScheduleResponse>>(
+        // Apply pagination
+        var pagedCustomerSchedules = await PagedResult<CustomerSchedule>.CreateAsync(
+            query,
+            request.PageIndex,
+            request.PageSize
+        );
+
+        if (pagedCustomerSchedules.Items.Count == 0)
+            return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(
                 new Error("404", "No customer schedules found"));
 
         // Create a dictionary for quick user lookup
         var userDict = users.ToDictionary(u => u.Id);
 
         // Map to response with null-safe navigation and optimized projection
-        var responses = customerSchedules
+        var responses = pagedCustomerSchedules.Items
             .Select(schedule => MapToResponse(schedule, userDict))
-            .OrderBy(x => x.StartTime)
             .ToList();
 
-        return Result.Success(responses);
+        // Create paged result with mapped items
+        var result = new PagedResult<Response.StaffCheckInCustomerScheduleResponse>(
+            responses,
+            pagedCustomerSchedules.PageIndex,
+            pagedCustomerSchedules.PageSize,
+            pagedCustomerSchedules.TotalCount
+        );
+
+        return Result.Success(result);
     }
 
     private static Expression<Func<User, bool>> CreateUserFilter(Query.StaffCheckInCustomerScheduleQuery request)
