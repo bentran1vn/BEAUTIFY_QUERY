@@ -79,8 +79,7 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
                 x.LivestreamRoomId != null,
                 x.LivestreamRoomId != null ? x.LivestreamRoom.Name : null
             ))
-            .OrderBy(x => x.OrderDate)
-            .ThenBy(x => x.Status)
+            .OrderBy(x => x.Status)
             .ToList();
 
         return new PagedResult<Response.Order>(mapped, orders.PageIndex, orders.PageSize, orders.TotalCount);
@@ -93,6 +92,7 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
             "total amount" => projection => projection.TotalAmount,
             "discount" => projection => projection.Discount,
             "final amount" => projection => projection.FinalAmount,
+            "date" => projection => projection.OrderDate,
             _ => projection => projection.OrderDate
         };
     }
