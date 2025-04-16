@@ -13,7 +13,8 @@ public class Response
         ICollection<Image> CoverImage,
         ICollection<Clinic> Clinics,
         Category Category,
-        ICollection<DoctorService>? DoctorServices);
+        ICollection<DoctorService>? DoctorServices,
+        ICollection<Feedback> Feedbacks);
 
 
     public record DoctorService(
@@ -66,6 +67,31 @@ public class Response
         public decimal DiscountMinPrice { get; set; }
         public ICollection<Image> CoverImage { get; set; }
     }
+    
+    public class Feedback
+    {
+        public Guid FeedbackId { get; set; }
+        public Guid ServiceId { get; set; }
+        public ICollection<string> Images { get; set; }
+        public string Content { get; set; }
+        public int Rating { get; set; }
+        public User User { get; set; }
+        public bool IsView { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
+    }
+    
+    public class User
+    {
+        public Guid Id { get; set; }
+        public string Avatar { get; set; }
+        public string PhoneNumber { get; set; }
+        public string FullName { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Address { get; set; }
+    }
+
 
     public record GetAllServiceByIdResponse(
         Guid Id,
@@ -82,7 +108,8 @@ public class Response
         Category Category,
         ICollection<Procedure> Procedures,
         ICollection<Promotion>? Promotions,
-        ICollection<DoctorService>? DoctorServices);
+        ICollection<DoctorService>? DoctorServices,
+        ICollection<Feedback> Feedbacks);
 
     public record Procedure(
         Guid Id,

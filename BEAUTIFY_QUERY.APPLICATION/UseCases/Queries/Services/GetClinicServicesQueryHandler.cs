@@ -61,7 +61,29 @@ public class
             new Response.Category(x.Category.Id, x.Category.Name, x.Category.Description), x.DoctorServices.Select(y =>
                 new Response.DoctorService(y.Id, y.ServiceId,
                     new Response.UserEntity(y.Doctor.Id, y.Doctor.FullName, y.Doctor.Email, y.Doctor.PhoneNumber,
-                        y.Doctor.ProfilePictureUrl, []))).ToList())
+                        y.Doctor.ProfilePictureUrl, []))).ToList(),
+            x.Feedbacks.Select(z => new Response.Feedback()
+            {
+                FeedbackId = z.FeedbackId,
+                ServiceId = z.ServiceId,
+                Content = z.Content,
+                IsView = z.IsView,
+                Rating = z.Rating,
+                User = new Response.User()
+                {
+                    Id = z.User.Id,
+                    FullName = z.User.FullName,
+                    LastName = z.User.LastName,
+                    FirstName = z.User.FirstName,
+                    Address = z.User.Address,
+                    PhoneNumber = z.User.PhoneNumber,
+                    Avatar = z.User.Avatar
+                },
+                Images = z.Images,
+                CreatedAt = z.CreatedAt,
+                UpdatedAt = z.UpdatedAt
+            }).ToList()
+            )
         ).ToList();
 
         var result =
