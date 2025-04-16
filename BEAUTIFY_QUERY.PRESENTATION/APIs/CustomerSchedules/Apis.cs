@@ -31,7 +31,7 @@ public class Apis : ApiEndpoint, ICarterModule
             .WithName("Check Next Schedule Availability")
             .WithSummary("Check if next schedule is available")
             .WithDescription("Check if the next customer schedule is not scheduled yet");
-        gr1.MapGet("{customerId:guid}/busy-time/{date:date}", GetAllCustomerBusyTime)
+        gr1.MapGet("{customerId:guid}/busy-time/{date}", GetAllCustomerBusyTime)
             .RequireAuthorization(Constant.Role.CUSTOMER);
     }
 
