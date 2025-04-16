@@ -5,6 +5,7 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.EntityEvents;
 using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
+using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.CustomerSchedules;
 internal sealed class GetCustomerScheduleByIdQueryHandler(
@@ -19,6 +20,24 @@ internal sealed class GetCustomerScheduleByIdQueryHandler(
         if (customerSchedule is null)
             return Result.Failure<Response.CustomerScheduleWithProceduresResponse>(
                 new Error("404", "Customer Schedule Not Found !"));
+        if (!request.IsNext) return Result.Success(mapTopResponse(customerSchedule));
+        {
+            var nextCustomerSchedule = await customerScheduleRepository.AsQueryable(x =>
+                    x.OrderId == customerSchedule.OrderId &&
+                    x.CurrentProcedure.StepIndex ==
+                    (int.Parse(customerSchedule.CurrentProcedure.StepIndex) + 1).ToString())
+                .FirstOrDefaultAsync(cancellationToken);
+            if (nextCustomerSchedule is null)
+                return Result.Failure<Response.CustomerScheduleWithProceduresResponse>(
+                    new Error("404", "Next Customer Schedule Not Found !"));
+            return Result.Success(mapTopResponse(nextCustomerSchedule));
+        }
+    }
+
+
+    private static Response.CustomerScheduleWithProceduresResponse mapTopResponse(
+        CustomerScheduleProjection customerSchedule)
+    {
         var currentProcedure = new Response.ProcedureDetailResponse(
             customerSchedule.CurrentProcedure.Id,
             customerSchedule.CurrentProcedure.Name,
@@ -35,6 +54,7 @@ internal sealed class GetCustomerScheduleByIdQueryHandler(
             customerSchedule.DoctorNote ?? string.Empty,
             customerSchedule.DoctorId.Value,
             currentProcedure);
-        return Result.Success(response);
+
+        return response;
     }
 }

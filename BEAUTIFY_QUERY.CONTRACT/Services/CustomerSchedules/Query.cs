@@ -16,9 +16,10 @@ public static class Query
         int PageIndex,
         int PageSize) : IQuery<PagedResult<Response.StaffCheckInCustomerScheduleResponse1>>;
 
-    public record GetCustomerScheduleById(Guid Id) : IQuery<Response.CustomerScheduleWithProceduresResponse>;
+    public record GetCustomerScheduleById(Guid Id, bool IsNext = false)
+        : IQuery<Response.CustomerScheduleWithProceduresResponse>;
 
-    
+
     public record CheckIfNextCustomerScheduleIsNotScheduledYet(
         Guid CustomerScheduleId) : IQuery<string>;
 }
