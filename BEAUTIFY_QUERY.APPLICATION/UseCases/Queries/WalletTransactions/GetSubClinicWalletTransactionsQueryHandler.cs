@@ -23,16 +23,12 @@ internal sealed class GetSubClinicWalletTransactionsQueryHandler(
         var parentClinic =
             await clinicRepository.FindByIdAsync(currentClinicId.Value, cancellationToken, x => x.Children);
         if (parentClinic == null)
-        {
             return Result.Failure<PagedResult<Response.WalletTransactionResponse>>(
                 new Error("404", ErrorMessages.Clinic.ClinicNotFound));
-        }
 
         if (parentClinic.IsParent != true || parentClinic.Children.Count == 0)
-        {
             return Result.Failure<PagedResult<Response.WalletTransactionResponse>>(
                 new Error("400", ErrorMessages.Clinic.ParentClinicNotFoundOrChildren));
-        }
 
         // Get all sub-clinic IDs
         var subClinicIds = parentClinic.Children.Select(c => c.Id).ToList();
@@ -164,10 +160,8 @@ internal sealed class GetSubClinicWalletTransactionsQueryHandler(
         Query.GetSubClinicWalletTransactions request)
     {
         if (string.IsNullOrWhiteSpace(request.SortColumn))
-        {
             // Default sorting by transaction date descending
             return query.OrderByDescending(x => x.TransactionDate);
-        }
 
         var sortOrder = request.SortOrder ?? SortOrder.Descending;
 

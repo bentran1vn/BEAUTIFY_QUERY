@@ -24,7 +24,7 @@ public class CategoryApi : ApiEndpoint, ICarterModule
         if (pageIndex != null && pageSize == null) result = await sender.Send(new Query.GetAllCategoriesQuery());
         else
             result = await sender.Send(
-                new Query.GetAllCategoriesPagingQuery(searchTerm, (int)pageIndex!, (int)pageSize!));
+                new Query.GetAllCategoriesPagingQuery(searchTerm, pageIndex!, pageSize!));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 

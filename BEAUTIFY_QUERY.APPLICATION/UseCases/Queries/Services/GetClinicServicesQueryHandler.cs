@@ -28,11 +28,10 @@ public class
 
         // 3. If a search term was provided, filter further
         if (!string.IsNullOrEmpty(searchTerm))
-            query = query.Where(
-                x => x.Name.Contains(searchTerm) ||
-                     x.Description.Contains(searchTerm) ||
-                     x.Category.Name
-                         .Contains(searchTerm)
+            query = query.Where(x => x.Name.Contains(searchTerm) ||
+                                     x.Description.Contains(searchTerm) ||
+                                     x.Category.Name
+                                         .Contains(searchTerm)
             );
 
         query = request.SortOrder == SortOrder.Descending
@@ -47,42 +46,44 @@ public class
         );
 
         var mapList = services.Items.Select(x => new Response.GetAllServiceResponse(
-            x.DocumentId, x.Name,
-            new Response.Clinic(x.Branding.Id, x.Branding.Name, x.Branding.Email,
-                x.Branding.Address, x.Branding.PhoneNumber, x.Branding.ProfilePictureUrl,
-                x.Branding.IsParent,
-                x.Branding.IsActivated,
-                x.Branding.ParentId),
-            x.MaxPrice, x.MinPrice, (x.DiscountPercent * 100).ToString(),
-            x.DiscountMaxPrice, x.DiscountMinPrice,
-            x.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
-            x.Clinic.Select(y => new Response.Clinic(y.Id, y.Name, y.Email,
-                y.Address, y.PhoneNumber, y.ProfilePictureUrl, y.IsParent, y.IsActivated, y.ParentId)).ToList(),
-            new Response.Category(x.Category.Id, x.Category.Name, x.Category.Description), x.DoctorServices.Select(y =>
-                new Response.DoctorService(y.Id, y.ServiceId,
-                    new Response.UserEntity(y.Doctor.Id, y.Doctor.FullName, y.Doctor.Email, y.Doctor.PhoneNumber,
-                        y.Doctor.ProfilePictureUrl, []))).ToList(),
-            x.Feedbacks.Select(z => new Response.Feedback()
-            {
-                FeedbackId = z.FeedbackId,
-                ServiceId = z.ServiceId,
-                Content = z.Content,
-                IsView = z.IsView,
-                Rating = z.Rating,
-                User = new Response.User()
+                x.DocumentId, x.Name,
+                new Response.Clinic(x.Branding.Id, x.Branding.Name, x.Branding.Email,
+                    x.Branding.Address, x.Branding.PhoneNumber, x.Branding.ProfilePictureUrl,
+                    x.Branding.IsParent,
+                    x.Branding.IsActivated,
+                    x.Branding.ParentId),
+                x.MaxPrice, x.MinPrice, (x.DiscountPercent * 100).ToString(),
+                x.DiscountMaxPrice, x.DiscountMinPrice,
+                x.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
+                x.Clinic.Select(y => new Response.Clinic(y.Id, y.Name, y.Email,
+                    y.Address, y.PhoneNumber, y.ProfilePictureUrl, y.IsParent, y.IsActivated, y.ParentId)).ToList(),
+                new Response.Category(x.Category.Id, x.Category.Name, x.Category.Description), x.DoctorServices
+                    .Select(y =>
+                        new Response.DoctorService(y.Id, y.ServiceId,
+                            new Response.UserEntity(y.Doctor.Id, y.Doctor.FullName, y.Doctor.Email,
+                                y.Doctor.PhoneNumber,
+                                y.Doctor.ProfilePictureUrl, []))).ToList(),
+                x.Feedbacks.Select(z => new Response.Feedback
                 {
-                    Id = z.User.Id,
-                    FullName = z.User.FullName,
-                    LastName = z.User.LastName,
-                    FirstName = z.User.FirstName,
-                    Address = z.User.Address,
-                    PhoneNumber = z.User.PhoneNumber,
-                    Avatar = z.User.Avatar
-                },
-                Images = z.Images,
-                CreatedAt = z.CreatedAt,
-                UpdatedAt = z.UpdatedAt
-            }).ToList()
+                    FeedbackId = z.FeedbackId,
+                    ServiceId = z.ServiceId,
+                    Content = z.Content,
+                    IsView = z.IsView,
+                    Rating = z.Rating,
+                    User = new Response.User
+                    {
+                        Id = z.User.Id,
+                        FullName = z.User.FullName,
+                        LastName = z.User.LastName,
+                        FirstName = z.User.FirstName,
+                        Address = z.User.Address,
+                        PhoneNumber = z.User.PhoneNumber,
+                        Avatar = z.User.Avatar
+                    },
+                    Images = z.Images,
+                    CreatedAt = z.CreatedAt,
+                    UpdatedAt = z.UpdatedAt
+                }).ToList()
             )
         ).ToList();
 

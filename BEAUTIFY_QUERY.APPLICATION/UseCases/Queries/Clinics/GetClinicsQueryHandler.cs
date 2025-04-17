@@ -16,19 +16,16 @@ internal sealed class GetClinicsQueryHandler(
     {
         var clinicsQuery = string.IsNullOrWhiteSpace(request.SearchTerm)
             ? clinicRepository.FindAll(x => !x.IsDeleted && x.IsParent.Value)
-            : clinicRepository.FindAll(
-                x => (x.Name.ToLower().Contains(request.SearchTerm.ToLower())
-                      || x.Email.ToLower().Contains(request.SearchTerm.ToLower())
-                      || x.Address.ToLower().Contains(request.SearchTerm.ToLower()))
-                     && !x.IsDeleted
+            : clinicRepository.FindAll(x => (x.Name.ToLower().Contains(request.SearchTerm.ToLower())
+                                             || x.Email.ToLower().Contains(request.SearchTerm.ToLower())
+                                             || x.Address.ToLower().Contains(request.SearchTerm.ToLower()))
+                                            && !x.IsDeleted
             );
 
-        clinicsQuery.Where(x=>x.Status==1);
+        clinicsQuery.Where(x => x.Status == 1);
         if (request.Role is null or Constant.Role.CUSTOMER)
-        {
             clinicsQuery = clinicsQuery
                 .Where(x => x.IsActivated);
-        }
 
         clinicsQuery = request.SortOrder == SortOrder.Descending
             ? clinicsQuery.OrderByDescending(GetSortProperty(request))

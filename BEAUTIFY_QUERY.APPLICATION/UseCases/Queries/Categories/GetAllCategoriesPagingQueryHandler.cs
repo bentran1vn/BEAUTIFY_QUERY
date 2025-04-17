@@ -15,8 +15,10 @@ public class GetAllCategoriesPagingQueryHandler(IRepositoryBase<Category, Guid> 
         // Handle complex search terms with both IsParent and name conditions
         if (searchTerm.Contains("and", StringComparison.OrdinalIgnoreCase))
         {
-            var parts = searchTerm.Split(["and"], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var isParentCondition = parts.FirstOrDefault(p => p.Contains("IsParent==", StringComparison.OrdinalIgnoreCase));
+            var parts = searchTerm.Split(["and"],
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var isParentCondition =
+                parts.FirstOrDefault(p => p.Contains("IsParent==", StringComparison.OrdinalIgnoreCase));
             var nameCondition = parts.FirstOrDefault(p => p.Contains("name=", StringComparison.OrdinalIgnoreCase));
 
             var query = categoryRepository.FindAll(x => !x.IsDeleted);
@@ -24,19 +26,13 @@ public class GetAllCategoriesPagingQueryHandler(IRepositoryBase<Category, Guid> 
             if (!string.IsNullOrEmpty(isParentCondition))
             {
                 var isParentValue = isParentCondition.Split('=').Last().Trim().Trim('"');
-                if (bool.TryParse(isParentValue, out var isParent))
-                {
-                    query = query.Where(x => x.IsParent == isParent);
-                }
+                if (bool.TryParse(isParentValue, out var isParent)) query = query.Where(x => x.IsParent == isParent);
             }
 
             if (!string.IsNullOrEmpty(nameCondition))
             {
                 var nameValue = nameCondition.Split('=').Last().Trim().Trim('"');
-                if (!string.IsNullOrEmpty(nameValue))
-                {
-                    query = query.Where(x => x.Name.Contains(nameValue));
-                }
+                if (!string.IsNullOrEmpty(nameValue)) query = query.Where(x => x.Name.Contains(nameValue));
             }
 
             var categories = await PagedResult<Category>.CreateAsync(
@@ -46,7 +42,8 @@ public class GetAllCategoriesPagingQueryHandler(IRepositoryBase<Category, Guid> 
             );
 
             var list = categories.Items.Select(x =>
-                    new Response.GetAllCategories(x.Id, x.Name, x.Description ?? "", x.IsParent, x.ParentId, x.IsDeleted))
+                    new Response.GetAllCategories(x.Id, x.Name, x.Description ?? "", x.IsParent, x.ParentId,
+                        x.IsDeleted))
                 .ToList();
 
             var result = new PagedResult<Response.GetAllCategories>(list, categories.PageIndex, categories.PageSize,
@@ -67,17 +64,11 @@ public class GetAllCategoriesPagingQueryHandler(IRepositoryBase<Category, Guid> 
         if (!string.IsNullOrEmpty(searchTerm))
         {
             if (searchTerm.Equals("true", StringComparison.OrdinalIgnoreCase))
-            {
                 simpleQuery = simpleQuery.Where(x => x.IsParent);
-            }
             else if (searchTerm.Equals("false", StringComparison.OrdinalIgnoreCase))
-            {
                 simpleQuery = simpleQuery.Where(x => !x.IsParent);
-            }
             else
-            {
                 simpleQuery = simpleQuery.Where(x => x.Name.Contains(searchTerm));
-            }
         }
 
         var simpleCategories = await PagedResult<Category>.CreateAsync(
@@ -90,10 +81,10 @@ public class GetAllCategoriesPagingQueryHandler(IRepositoryBase<Category, Guid> 
                 new Response.GetAllCategories(x.Id, x.Name, x.Description ?? "", x.IsParent, x.ParentId, x.IsDeleted))
             .ToList();
 
-        var simpleResult = new PagedResult<Response.GetAllCategories>(simpleList, simpleCategories.PageIndex, simpleCategories.PageSize,
+        var simpleResult = new PagedResult<Response.GetAllCategories>(simpleList, simpleCategories.PageIndex,
+            simpleCategories.PageSize,
             simpleCategories.TotalCount);
 
         return Result.Success(simpleResult);
-        
     }
 }

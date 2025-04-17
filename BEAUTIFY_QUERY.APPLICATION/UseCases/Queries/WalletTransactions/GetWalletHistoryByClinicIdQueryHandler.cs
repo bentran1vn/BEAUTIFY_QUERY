@@ -18,41 +18,35 @@ internal sealed class GetWalletHistoryByClinicIdQueryHandler(
         CancellationToken cancellationToken)
     {
         // Verify the current user has admin role
-        if (currentUserService.Role != Constant.Role.CLINIC_ADMIN && 
+        if (currentUserService.Role != Constant.Role.CLINIC_ADMIN &&
             currentUserService.Role != Constant.Role.SYSTEM_ADMIN)
 
-        // If the user is a clinic admin, verify they are requesting data for their own clinic or a sub-clinic
-        if (currentUserService.Role == Constant.Role.CLINIC_ADMIN)
-        {
-            var adminClinicId = currentUserService.ClinicId;
-            
-            // If requesting data for a different clinic than their own
-            if (request.ClinicId != adminClinicId)
+            // If the user is a clinic admin, verify they are requesting data for their own clinic or a sub-clinic
+            if (currentUserService.Role == Constant.Role.CLINIC_ADMIN)
             {
-                // Check if the requested clinic is a sub-clinic of the admin's clinic
-                var requestedClinic = await clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken);
-                
-                if (requestedClinic == null)
+                var adminClinicId = currentUserService.ClinicId;
+
+                // If requesting data for a different clinic than their own
+                if (request.ClinicId != adminClinicId)
                 {
-                    return Result.Failure<PagedResult<Response.WalletTransactionResponse>>(
-                        new Error("404", ErrorMessages.Clinic.ClinicNotFound));
-                }
-                
-                if (requestedClinic.ParentId != adminClinicId)
-                {
-                    return Result.Failure<PagedResult<Response.WalletTransactionResponse>>(
-                        new Error("403", "You can only access wallet history for your own clinic or its branches"));
+                    // Check if the requested clinic is a sub-clinic of the admin's clinic
+                    var requestedClinic = await clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken);
+
+                    if (requestedClinic == null)
+                        return Result.Failure<PagedResult<Response.WalletTransactionResponse>>(
+                            new Error("404", ErrorMessages.Clinic.ClinicNotFound));
+
+                    if (requestedClinic.ParentId != adminClinicId)
+                        return Result.Failure<PagedResult<Response.WalletTransactionResponse>>(
+                            new Error("403", "You can only access wallet history for your own clinic or its branches"));
                 }
             }
-        }
 
         // Verify the clinic exists
         var clinic = await clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken);
         if (clinic == null)
-        {
             return Result.Failure<PagedResult<Response.WalletTransactionResponse>>(
                 new Error("404", ErrorMessages.Clinic.ClinicNotFound));
-        }
 
         // Build the query to get transactions for the specified clinic
         var query = walletTransactionRepository.FindAll(x => x.ClinicId == request.ClinicId && !x.IsDeleted);

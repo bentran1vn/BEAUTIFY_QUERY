@@ -32,9 +32,7 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                     // Try to parse as a date range
                     if (DateOnly.TryParse(part1, out var dateFrom) &&
                         DateOnly.TryParse(part2, out var dateTo))
-                    {
                         query = query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
-                    }
                 }
             }
             else
@@ -42,11 +40,11 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                 // Fallback to standard contains search with null checks
                 // Use EF.Functions.Like for case-insensitive search instead of Contains with StringComparison
                 query = query.Where(x =>
-                    x.Customer != null &&
-                    (x.Customer.FirstName != null &&
-                     EF.Functions.Like(x.Customer.FirstName, $"%{searchTerm}%") ||
-                     x.Customer.LastName != null &&
-                     EF.Functions.Like(x.Customer.LastName, $"%{searchTerm}%")) ||
+                    (x.Customer != null &&
+                     ((x.Customer.FirstName != null &&
+                       EF.Functions.Like(x.Customer.FirstName, $"%{searchTerm}%")) ||
+                      (x.Customer.LastName != null &&
+                       EF.Functions.Like(x.Customer.LastName, $"%{searchTerm}%")))) ||
                     EF.Functions.Like(x.Status, $"%{searchTerm}%"));
             }
         }

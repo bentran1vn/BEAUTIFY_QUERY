@@ -3,7 +3,6 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.Feedbacks;
-
 public class CreateFeedbackEventHandler(IMongoRepository<ClinicServiceProjection> clinicServiceRepository)
     : ICommandHandler<DomainEvents.CreateFeedback>
 {
@@ -18,7 +17,7 @@ public class CreateFeedbackEventHandler(IMongoRepository<ClinicServiceProjection
 
         var feedbacks = isServiceExisted.Feedbacks;
 
-        var feedback = new Feedback()
+        var feedback = new Feedback
         {
             FeedbackId = serviceRequest.FeedbackId,
             Content = serviceRequest.Content,
@@ -26,7 +25,7 @@ public class CreateFeedbackEventHandler(IMongoRepository<ClinicServiceProjection
             Images = serviceRequest.Images,
             Rating = serviceRequest.Rating,
             IsView = true,
-            User = new User()
+            User = new User
             {
                 Id = serviceRequest.User.Id,
                 PhoneNumber = serviceRequest.User.PhoneNumber,
@@ -37,13 +36,13 @@ public class CreateFeedbackEventHandler(IMongoRepository<ClinicServiceProjection
                 LastName = serviceRequest.User.LastName
             }
         };
-        
+
         feedbacks.Add(feedback);
-        
+
         isServiceExisted.Feedbacks = feedbacks;
-        
+
         await clinicServiceRepository.ReplaceOneAsync(isServiceExisted);
-        
+
         return Result.Success();
     }
 }

@@ -92,7 +92,7 @@ internal sealed class GetClinicWalletTransactionsQueryHandler(
                      searchTerm.Equals("withdrawal", StringComparison.OrdinalIgnoreCase) ||
                      searchTerm.Equals("transfer", StringComparison.OrdinalIgnoreCase))
             {
-                query = query.Where(x => x.TransactionType != null && 
+                query = query.Where(x => x.TransactionType != null &&
                                          x.TransactionType.ToLower() == searchTerm);
             }
             // Check for status types
@@ -101,14 +101,14 @@ internal sealed class GetClinicWalletTransactionsQueryHandler(
                      searchTerm.Equals("failed", StringComparison.OrdinalIgnoreCase) ||
                      searchTerm.Equals("cancelled", StringComparison.OrdinalIgnoreCase))
             {
-                query = query.Where(x => x.Status != null && 
+                query = query.Where(x => x.Status != null &&
                                          x.Status.ToLower() == searchTerm);
             }
             // Check for date
             else if (DateTimeOffset.TryParse(searchTerm, out var singleDate))
             {
                 var endOfDay = singleDate.Date.AddDays(1).AddTicks(-1);
-                query = query.Where(x => x.TransactionDate >= singleDate.Date && 
+                query = query.Where(x => x.TransactionDate >= singleDate.Date &&
                                          x.TransactionDate <= endOfDay);
             }
             // Standard search for all other cases
@@ -122,7 +122,7 @@ internal sealed class GetClinicWalletTransactionsQueryHandler(
     }
 
     private static IQueryable<WalletTransaction> ApplyStandardSearch(
-        IQueryable<WalletTransaction> query, 
+        IQueryable<WalletTransaction> query,
         string searchTerm)
     {
         return query.Where(x =>
@@ -137,10 +137,8 @@ internal sealed class GetClinicWalletTransactionsQueryHandler(
         Query.GetClinicWalletTransactions request)
     {
         if (string.IsNullOrWhiteSpace(request.SortColumn))
-        {
             // Default sorting by transaction date descending
             return query.OrderByDescending(x => x.TransactionDate);
-        }
 
         var sortOrder = request.SortOrder ?? SortOrder.Descending;
 

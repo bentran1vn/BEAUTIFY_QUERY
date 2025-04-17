@@ -67,7 +67,7 @@ public class Response
         public decimal DiscountMinPrice { get; set; }
         public ICollection<Image> CoverImage { get; set; }
     }
-    
+
     public class Feedback
     {
         public Guid FeedbackId { get; set; }
@@ -80,7 +80,7 @@ public class Response
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset? UpdatedAt { get; set; }
     }
-    
+
     public class User
     {
         public Guid Id { get; set; }

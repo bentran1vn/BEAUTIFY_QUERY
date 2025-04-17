@@ -26,12 +26,12 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
                 Id = serviceRequest.Branding.Id,
                 Name = serviceRequest.Branding.Name,
                 Email = serviceRequest.Branding.Email,
-                City =serviceRequest.Branding.City,
+                City = serviceRequest.Branding.City,
                 Address = serviceRequest.Branding.Address,
                 District = serviceRequest.Branding.District,
                 Ward = serviceRequest.Branding.Ward,
                 FullAddress = serviceRequest.Branding.FullAddress,
-                PhoneNumber =  serviceRequest.Branding.PhoneNumber,
+                PhoneNumber = serviceRequest.Branding.PhoneNumber,
                 ProfilePictureUrl = serviceRequest.Branding.ProfilePictureUrl,
                 IsParent = serviceRequest.Branding.IsParent,
                 IsActivated = true,
@@ -48,21 +48,21 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
                 serviceRequest.Category.Description
             ),
             Clinic = serviceRequest.Clinic.Select(x => new Clinic
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Email = x.Email,
-                    City = x.City,
-                    Address = x.Address,
-                    District = x.District,
-                    Ward = x.Ward,
-                    FullAddress = x.FullAddress,
-                    PhoneNumber = x.PhoneNumber,
-                    ProfilePictureUrl = x.ProfilePictureUrl,
-                    IsParent = x.IsParent,
-                    IsActivated = true,
-                    ParentId = x.ParentId
-                }).ToList(),
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Email = x.Email,
+                City = x.City,
+                Address = x.Address,
+                District = x.District,
+                Ward = x.Ward,
+                FullAddress = x.FullAddress,
+                PhoneNumber = x.PhoneNumber,
+                ProfilePictureUrl = x.ProfilePictureUrl,
+                IsParent = x.IsParent,
+                IsActivated = true,
+                ParentId = x.ParentId
+            }).ToList(),
             Procedures = []
         };
 

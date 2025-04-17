@@ -1,10 +1,8 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+﻿using System.Linq.Expressions;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Booking;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
-using BEAUTIFY_QUERY.DOMAIN.Entities;
-using System.Linq.Expressions;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.EntityEvents;
 using MongoDB.Driver.Linq;
 using User = BEAUTIFY_QUERY.DOMAIN.Entities.User;
 
@@ -28,7 +26,6 @@ internal sealed class GetBookingPagedResultQueryHandler(
         var query = customerScheduleRepositoryBase.AsQueryable(x => x.CustomerId == user.Id);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
             if (searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
             {
                 var parts = searchTerm.Split("to", StringSplitOptions.RemoveEmptyEntries);
@@ -62,7 +59,6 @@ internal sealed class GetBookingPagedResultQueryHandler(
                     );
                 }
             }
-        }
 
         query = request.SortOrder == SortOrder.Descending
             ? query.OrderByDescending(GetSortProperty(request))

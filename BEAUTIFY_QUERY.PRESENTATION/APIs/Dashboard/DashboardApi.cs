@@ -1,8 +1,7 @@
 using BEAUTIFY_QUERY.CONTRACT.Services.Dashboards;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Dashboard;
-
-public class DashboardApi: ApiEndpoint, ICarterModule
+public class DashboardApi : ApiEndpoint, ICarterModule
 {
     private const string BaseUrl = "api/v{version:apiVersion}/dashboards";
 
@@ -11,20 +10,20 @@ public class DashboardApi: ApiEndpoint, ICarterModule
         var gr1 = app.NewVersionedApi("Dashboards")
             .MapGroup(BaseUrl)
             .HasApiVersion(1);
-        
+
         gr1.MapGet("clinics", GetTotalInformation)
             .RequireAuthorization();
-        
+
         gr1.MapGet("clinics/datetime", GetDaytimeInformation)
             .RequireAuthorization();
-        
+
         gr1.MapGet("systems", GetSystemTotalInformation)
             .RequireAuthorization();
-        
+
         gr1.MapGet("systems/datetime", GetSystemDaytimeInformation)
             .RequireAuthorization();
     }
-    
+
     private static async Task<IResult> GetTotalInformation(
         ISender sender,
         HttpContext httpContext)
@@ -34,7 +33,7 @@ public class DashboardApi: ApiEndpoint, ICarterModule
         var result = await sender.Send(new Query.GetTotalInformationQuery(roleName, new Guid(clinicId)));
         return result.IsSuccess ? Results.Ok(result) : HandlerFailure(result);
     }
-    
+
     private static async Task<IResult> GetDaytimeInformation(
         ISender sender,
         HttpContext httpContext,
@@ -54,7 +53,7 @@ public class DashboardApi: ApiEndpoint, ICarterModule
             date));
         return result.IsSuccess ? Results.Ok(result) : HandlerFailure(result);
     }
-    
+
     private static async Task<IResult> GetSystemTotalInformation(
         ISender sender,
         HttpContext httpContext)
@@ -63,7 +62,7 @@ public class DashboardApi: ApiEndpoint, ICarterModule
         var result = await sender.Send(new Query.GetSystemTotalInformationQuery(roleName));
         return result.IsSuccess ? Results.Ok(result) : HandlerFailure(result);
     }
-    
+
     private static async Task<IResult> GetSystemDaytimeInformation(
         ISender sender,
         HttpContext httpContext,

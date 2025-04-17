@@ -21,9 +21,7 @@ internal sealed class CheckIfNextCustomerScheduleIsNotQueryHandler(
         if (service is null)
             return Result.Failure<string>(new Error("404", "Service Not Found !"));
         if (service.Procedures.Count.ToString() == customerSchedule.CurrentProcedure.StepIndex)
-        {
             return Result.Success("Last Step");
-        }
 
         var nextStep = int.Parse(customerSchedule.CurrentProcedure.StepIndex) + 1;
         var nextCustomerSchedule = await mongoRepository.AsQueryable(x =>

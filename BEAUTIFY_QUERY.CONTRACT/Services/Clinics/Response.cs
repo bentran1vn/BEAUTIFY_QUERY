@@ -14,11 +14,13 @@ public static class Response
         public string? Logo { get; set; }
         public decimal Balance { get; set; }
         public decimal PendingWithdrawals { get; set; }
+
         public decimal TotalEarnings { get; set; }
+
         //bank account
         public string? BankName { get; set; } = string.Empty;
         public string? BankAccountNumber { get; set; } = string.Empty;
-        
+
         public bool? IsMainClinic { get; set; } = false;
     }
 

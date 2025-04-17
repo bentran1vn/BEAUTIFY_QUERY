@@ -46,13 +46,13 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
         }).ToList();
 
         isServiceExisted.CoverImage = serviceRequest.CoverImages
-            .Select(x => new Image()
+            .Select(x => new Image
             {
                 Id = x.Id,
                 Index = x.Index,
                 Url = x.Url
             }).ToList();
-            
+
 
         // Save updated service back to the database
         await _clinicServiceRepository.ReplaceOneAsync(isServiceExisted);

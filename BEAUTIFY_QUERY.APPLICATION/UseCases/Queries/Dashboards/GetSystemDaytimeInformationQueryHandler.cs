@@ -3,27 +3,26 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Dashboards;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Dashboards;
-
-public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSystemDaytimeInformationQuery, Responses.GetSystemDaytimeInformationResponse>
+public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSystemDaytimeInformationQuery,
+    Responses.GetSystemDaytimeInformationResponse>
 {
-    private readonly IRepositoryBase<Clinic, Guid> _clinicRepository;
-    private readonly IRepositoryBase<Service, Guid> _serviceRepository;
     private readonly IRepositoryBase<ClinicOnBoardingRequest, Guid> _clinicOnBoardingRequestRepository;
-    private readonly IRepositoryBase<UserClinic, Guid> _doctorReRepository;
-    private readonly IRepositoryBase<SystemTransaction, Guid> _systemTransactionRepository;
+    private readonly IRepositoryBase<Clinic, Guid> _clinicRepository;
     private readonly IRepositoryBase<ClinicTransaction, Guid> _clinicTransactionRepository;
+    private readonly IRepositoryBase<UserClinic, Guid> _doctorReRepository;
     private readonly IRepositoryBase<Order, Guid> _orderRepository;
+    private readonly IRepositoryBase<Service, Guid> _serviceRepository;
+    private readonly IRepositoryBase<SystemTransaction, Guid> _systemTransactionRepository;
 
     public GetSystemDaytimeInformationQueryHandler(
-        IRepositoryBase<Clinic, Guid> clinicRepository, 
-        IRepositoryBase<Service, Guid> serviceRepository, 
-        IRepositoryBase<UserClinic, Guid> doctorReRepository, 
-        IRepositoryBase<SystemTransaction, Guid> systemTransactionRepository, 
-        IRepositoryBase<ClinicTransaction, Guid> clinicTransactionRepository, 
-        IRepositoryBase<ClinicOnBoardingRequest, Guid> clinicOnBoardingRequestRepository, 
+        IRepositoryBase<Clinic, Guid> clinicRepository,
+        IRepositoryBase<Service, Guid> serviceRepository,
+        IRepositoryBase<UserClinic, Guid> doctorReRepository,
+        IRepositoryBase<SystemTransaction, Guid> systemTransactionRepository,
+        IRepositoryBase<ClinicTransaction, Guid> clinicTransactionRepository,
+        IRepositoryBase<ClinicOnBoardingRequest, Guid> clinicOnBoardingRequestRepository,
         IRepositoryBase<Order, Guid> orderRepository)
     {
         _clinicRepository = clinicRepository;
@@ -35,15 +34,14 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
         _orderRepository = orderRepository;
     }
 
-    public async Task<Result<Responses.GetSystemDaytimeInformationResponse>> Handle(Query.GetSystemDaytimeInformationQuery request, CancellationToken cancellationToken)
+    public async Task<Result<Responses.GetSystemDaytimeInformationResponse>> Handle(
+        Query.GetSystemDaytimeInformationQuery request, CancellationToken cancellationToken)
     {
         // Validate date parameters
-        if ((request.StartDate == null && request.EndDate != null) || 
+        if ((request.StartDate == null && request.EndDate != null) ||
             (request.StartDate != null && request.EndDate == null))
-        {
             return Result.Failure<Responses.GetSystemDaytimeInformationResponse>(
                 new Error("400", "Start date and end date must both be provided or both be null"));
-        }
 
         // Initialize base queries with deleted filter
         var systemTransactionQuery = _systemTransactionRepository.FindAll(x => !x.IsDeleted);
@@ -55,7 +53,7 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
         var orderQuery = _orderRepository.FindAll(x => !x.IsDeleted);
 
         var result = new Responses.GetSystemDaytimeInformationResponse();
-        
+
         // Handle single date request
         if (request.Date != null)
         {
@@ -67,7 +65,7 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
             doctorQuery = doctorQuery.Where(x => x.CreatedOnUtc.Equals(request.Date));
             clinicOnBoardingRequestQuery = clinicOnBoardingRequestQuery.Where(x => x.CreatedOnUtc.Equals(request.Date));
             orderQuery = orderQuery.Where(x => x.OrderDate.Equals(request.Date));
-            
+
             // Get information for single date
             result.SystemInformation = await GetInformationForQueries(
                 clinicQuery,
@@ -85,78 +83,78 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
             systemTransactionQuery = systemTransactionQuery
                 .Where(x => DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= request.StartDate &&
                             DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= request.EndDate);
-            
+
             clinicTransactionQuery = clinicTransactionQuery
                 .Where(x => DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= request.StartDate &&
                             DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= request.EndDate);
-            
+
             clinicQuery = clinicQuery
                 .Where(x => DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= request.StartDate &&
                             DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= request.EndDate);
-            
+
             serviceQuery = serviceQuery
                 .Where(x => DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= request.StartDate &&
                             DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= request.EndDate);
-            
+
             doctorQuery = doctorQuery
                 .Where(x => DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= request.StartDate &&
                             DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= request.EndDate);
-            
+
             clinicOnBoardingRequestQuery = clinicOnBoardingRequestQuery
                 .Where(x => DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= request.StartDate &&
                             DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= request.EndDate);
-            
+
             orderQuery = orderQuery
                 .Where(x => x.OrderDate >= request.StartDate && x.OrderDate <= request.EndDate);
-            
+
             var listInfor = new List<Responses.SystemDatetimeInformation>();
-            DateOnly startDate = request.StartDate.Value;
-            DateOnly endDate = request.EndDate.Value;
-            
+            var startDate = request.StartDate.Value;
+            var endDate = request.EndDate.Value;
+
             if (request.IsDisplayWeek == true)
             {
                 // Find the first Monday in or before the start date
-                int daysToSubtract = ((int)startDate.DayOfWeek - 1 + 7) % 7;
-                DateOnly weekStart = startDate.AddDays(-daysToSubtract);
-                
+                var daysToSubtract = ((int)startDate.DayOfWeek - 1 + 7) % 7;
+                var weekStart = startDate.AddDays(-daysToSubtract);
+
                 while (weekStart <= endDate)
                 {
                     // Calculate week end (Sunday)
-                    DateOnly weekEnd = weekStart.AddDays(6);
-                    
+                    var weekEnd = weekStart.AddDays(6);
+
                     // Only include complete weeks that fall within the range
                     if (weekEnd > endDate)
                         break;
-                    
+
                     // Filter queries for this specific week
-                    var systemTransactionsInWeek = systemTransactionQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart && 
+                    var systemTransactionsInWeek = systemTransactionQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= weekEnd);
-                    
-                    var clinicTransactionsInWeek = clinicTransactionQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart && 
+
+                    var clinicTransactionsInWeek = clinicTransactionQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= weekEnd);
-                    
-                    var clinicsInWeek = clinicQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart && 
+
+                    var clinicsInWeek = clinicQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= weekEnd);
-                    
-                    var servicesInWeek = serviceQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart && 
+
+                    var servicesInWeek = serviceQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= weekEnd);
-                    
-                    var doctorsInWeek = doctorQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart && 
+
+                    var doctorsInWeek = doctorQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= weekEnd);
-                    
-                    var clinicOnBoardingRequestsInWeek = clinicOnBoardingRequestQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart && 
+
+                    var clinicOnBoardingRequestsInWeek = clinicOnBoardingRequestQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= weekStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= weekEnd);
-                    
-                    var ordersInWeek = orderQuery.Where(x => 
-                        x.OrderDate >= weekStart && 
+
+                    var ordersInWeek = orderQuery.Where(x =>
+                        x.OrderDate >= weekStart &&
                         x.OrderDate <= weekEnd);
-                    
+
                     var weekInfo = new Responses.SystemDatetimeInformation
                     {
                         StartDate = weekStart,
@@ -171,7 +169,7 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
                             ordersInWeek,
                             cancellationToken)
                     };
-                    
+
                     listInfor.Add(weekInfo);
                     weekStart = weekStart.AddDays(7);
                 }
@@ -179,46 +177,46 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
             else
             {
                 // Display by Month - Start from the first day of the start month
-                DateOnly monthStart = new DateOnly(startDate.Year, startDate.Month, 1);
-                
+                var monthStart = new DateOnly(startDate.Year, startDate.Month, 1);
+
                 while (monthStart <= endDate)
                 {
                     // Calculate the end of the month
-                    DateOnly monthEnd = monthStart.AddMonths(1).AddDays(-1);
-                    
+                    var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
                     // Only include complete months that fall within the range
                     if (monthEnd > endDate)
                         break;
-                    
+
                     // Filter queries for this specific month
-                    var systemTransactionsInMonth = systemTransactionQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart && 
+                    var systemTransactionsInMonth = systemTransactionQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= monthEnd);
-                    
-                    var clinicTransactionsInMonth = clinicTransactionQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart && 
+
+                    var clinicTransactionsInMonth = clinicTransactionQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= monthEnd);
-                    
-                    var clinicsInMonth = clinicQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart && 
+
+                    var clinicsInMonth = clinicQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= monthEnd);
-                    
-                    var servicesInMonth = serviceQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart && 
+
+                    var servicesInMonth = serviceQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= monthEnd);
-                    
-                    var doctorsInMonth = doctorQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart && 
+
+                    var doctorsInMonth = doctorQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= monthEnd);
-                    
-                    var clinicOnBoardingRequestsInMonth = clinicOnBoardingRequestQuery.Where(x => 
-                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart && 
+
+                    var clinicOnBoardingRequestsInMonth = clinicOnBoardingRequestQuery.Where(x =>
+                        DateOnly.FromDateTime(x.CreatedOnUtc.Date) >= monthStart &&
                         DateOnly.FromDateTime(x.CreatedOnUtc.Date) <= monthEnd);
-                    
-                    var ordersInMonth = orderQuery.Where(x => 
-                        x.OrderDate >= monthStart && 
+
+                    var ordersInMonth = orderQuery.Where(x =>
+                        x.OrderDate >= monthStart &&
                         x.OrderDate <= monthEnd);
-                    
+
                     var monthInfo = new Responses.SystemDatetimeInformation
                     {
                         StartDate = monthStart,
@@ -233,18 +231,18 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
                             ordersInMonth,
                             cancellationToken)
                     };
-                    
+
                     listInfor.Add(monthInfo);
                     monthStart = monthStart.AddMonths(1);
                 }
             }
-            
+
             result.SystemInformationList = listInfor;
         }
-        
+
         return Result.Success(result);
     }
-    
+
     private async Task<Responses.SystemInformation> GetInformationForQueries(
         IQueryable<Clinic> clinicQuery,
         IQueryable<Service> serviceQuery,
@@ -256,25 +254,25 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
         CancellationToken cancellationToken)
     {
         var infor = new Responses.SystemInformation();
-        
+
         infor.TotalCountBranding = await clinicQuery
-            .CountAsync(x => 
-                !x.IsDeleted 
+            .CountAsync(x =>
+                !x.IsDeleted
                 && x.IsParent == true, cancellationToken);
-        
+
         infor.TotalCountBranches = await clinicQuery
-            .CountAsync(x => 
-                !x.IsDeleted 
+            .CountAsync(x =>
+                !x.IsDeleted
                 && x.IsParent == false, cancellationToken);
-        
+
         infor.TotalCountService = await serviceQuery
-            .CountAsync(x => 
+            .CountAsync(x =>
                 !x.IsDeleted, cancellationToken);
-        
+
         infor.TotalCountDoctor = await doctorQuery
-            .Where(x => 
-                    x.IsDeleted == false &&
-                    x.User.Role.Name.Equals("Doctor"))
+            .Where(x =>
+                x.IsDeleted == false &&
+                x.User.Role.Name.Equals("Doctor"))
             .GroupBy(x => x.UserId)
             .CountAsync(cancellationToken);
 
@@ -284,44 +282,44 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
                 x.AdditionBranches == null &&
                 x.AdditionLivestreams == null &&
                 x.SubscriptionPackage.Name.Equals("Đồng"), cancellationToken);
-        
+
         infor.TotalCountSilverSubscription = await systemTransactionQuery
             .CountAsync(x =>
                 !x.IsDeleted && x.Status == 1 &&
                 x.AdditionBranches == null &&
                 x.AdditionLivestreams == null &&
                 x.SubscriptionPackage.Name.Equals("Bạc"), cancellationToken);
-        
+
         infor.TotalCountGoldSubscription = await systemTransactionQuery
             .CountAsync(x =>
                 !x.IsDeleted && x.Status == 1 &&
                 x.AdditionBranches == null &&
                 x.AdditionLivestreams == null &&
                 x.SubscriptionPackage.Name.Equals("Vàng"), cancellationToken);
-        
+
         infor.TotalSumGoldSubscriptionRevenue = await systemTransactionQuery
             .Where(x =>
                 !x.IsDeleted && x.Status == 1 &&
                 x.SubscriptionPackage.Name.Equals("Vàng"))
             .SumAsync(x => x.Amount, cancellationToken);
-        
+
         infor.TotalSumSilverSubscriptionRevenue = await systemTransactionQuery
             .Where(x =>
                 !x.IsDeleted && x.Status == 1 &&
                 x.SubscriptionPackage.Name.Equals("Bạc"))
             .SumAsync(x => x.Amount, cancellationToken);
-        
+
         infor.TotalSumBronzeSubscriptionRevenue = await systemTransactionQuery
             .Where(x =>
                 !x.IsDeleted && x.Status == 1 &&
                 x.SubscriptionPackage.Name.Equals("Đồng"))
             .SumAsync(x => x.Amount, cancellationToken);
-        
+
         infor.TotalSumClinicRevenue = await orderQuery
             .Where(x =>
                 !x.IsDeleted && x.Status == Constant.OrderStatus.ORDER_COMPLETED)
             .SumAsync(x => x.FinalAmount, cancellationToken) ?? 0;
-        
+
         // Calculate total system revenue
         infor.TotalSystemSumRevenue = await systemTransactionQuery
             .Where(x => !x.IsDeleted && x.Status == 1)

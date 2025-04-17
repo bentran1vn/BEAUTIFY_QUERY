@@ -40,7 +40,7 @@ public class Clinic
     public bool? IsParent { get; set; }
     public bool IsActivated { get; set; }
     public Guid? ParentId { get; set; }
-};
+}
 
 public class Procedure
 {

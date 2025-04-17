@@ -13,10 +13,8 @@ internal sealed class GetTotalAppointmentQueryHandler(
         CancellationToken cancellationToken)
     {
         if (!TryParseDate(request.date, out var firstDayOfMonth, out var lastDayOfMonth))
-        {
             return Result.Failure<Response.GetTotalAppointmentResponse>(new Error("400",
                 "Invalid date format. Use MM-yyyy."));
-        }
 
         var filteredAppointments = await GetFilteredAppointmentsAsync(firstDayOfMonth, lastDayOfMonth);
         var dayCounts = CalculateDayCounts(filteredAppointments);

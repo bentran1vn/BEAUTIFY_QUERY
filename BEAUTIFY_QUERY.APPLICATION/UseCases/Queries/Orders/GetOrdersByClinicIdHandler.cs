@@ -1,7 +1,6 @@
 ﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Orders;
 internal sealed class GetOrdersByClinicIdHandler(
@@ -18,12 +17,10 @@ internal sealed class GetOrdersByClinicIdHandler(
             x.Service.ClinicServices.FirstOrDefault().ClinicId == currentUserService.ClinicId);
 
         if (!string.IsNullOrEmpty(searchTerm))
-        {
             query = query.Where(x => x.Customer.FullName.Contains(searchTerm) ||
                                      x.Service.Name.Contains(searchTerm) ||
                                      x.Customer.PhoneNumber.Contains(searchTerm) ||
                                      x.FinalAmount.ToString().Contains(searchTerm));
-        }
 
         var orders = await PagedResult<Order>.CreateAsync(query, request.PageIndex, request.PageSize);
 

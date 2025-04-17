@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace BEAUTIFY_QUERY.DOMAIN.Entities;
-public class Staff : AggregateRoot<Guid>,IAuditableEntity
+public class Staff : AggregateRoot<Guid>, IAuditableEntity
 {
     [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)(\.[a-zA-Z]{2,})$", ErrorMessage = "Invalid Email Format")]
     [MaxLength(100)]

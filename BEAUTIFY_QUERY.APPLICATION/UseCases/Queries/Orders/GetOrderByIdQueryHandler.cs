@@ -6,7 +6,8 @@ namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Orders;
 internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orderRepositoryBase)
     : IQueryHandler<Query.GetOrderById, Response.OrderById>
 {
-    public async Task<Result<Response.OrderById>> Handle(Query.GetOrderById request, CancellationToken cancellationToken)
+    public async Task<Result<Response.OrderById>> Handle(Query.GetOrderById request,
+        CancellationToken cancellationToken)
     {
         // 1. Fetch order with necessary relationships
         var order = await orderRepositoryBase.FindSingleAsync(

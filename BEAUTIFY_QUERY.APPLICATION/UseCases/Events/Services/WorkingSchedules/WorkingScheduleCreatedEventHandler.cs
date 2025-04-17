@@ -26,7 +26,7 @@ internal sealed class WorkingScheduleCreatedEventHandler(IMongoRepository<Workin
                 ServiceId = x.CustomerScheduleEntity.ServiceId,
                 ServiceName = x.CustomerScheduleEntity.ServiceName,
                 CurrentProcedureName = x.CustomerScheduleEntity.CurrentProcedure.Name,
-                IsDeleted = x.IsDeleted,
+                IsDeleted = x.IsDeleted
             })
             .ToList();
         await repository.InsertManyAsync(workingSchedule);

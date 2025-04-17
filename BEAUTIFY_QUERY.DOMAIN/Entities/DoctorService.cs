@@ -1,7 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Services.DoctorServices;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.EntityEvents;
-
-namespace BEAUTIFY_QUERY.DOMAIN.Entities;
+﻿namespace BEAUTIFY_QUERY.DOMAIN.Entities;
 public class DoctorService : AggregateRoot<Guid>, IAuditableEntity
 {
     public Guid DoctorId { get; set; }

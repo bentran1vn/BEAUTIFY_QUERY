@@ -47,7 +47,7 @@ internal sealed class GetBookingDetailByIdQueryHandler(
             Service = new Response.ServiceResponse
             {
                 Id = booking.ServiceId,
-                Name = booking.ServiceName,
+                Name = booking.ServiceName
             },
             Doctor = new Response.DoctorResponse
             {
@@ -64,7 +64,7 @@ internal sealed class GetBookingDetailByIdQueryHandler(
             ProcedureHistory = procedureHistory
                 .OrderBy(x => x.DateCompleted)
                 .ThenBy(x => x.TimeCompleted)
-                .ToList(),
+                .ToList()
         };
         return Result.Success(response);
     }

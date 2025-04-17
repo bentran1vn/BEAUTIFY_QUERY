@@ -66,7 +66,6 @@ public static class JwtExtensions
             .AddPolicy(Constant.Policy.POLICY_DOCTOR_AND_CUSTOMER,
                 policy => policy.RequireRole(Constant.Role.DOCTOR, Constant.Role.CUSTOMER));
 
-       
 
         // services.AddScoped<CustomJwtBearerEvents>();
     }

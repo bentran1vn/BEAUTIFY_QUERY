@@ -1,6 +1,4 @@
-﻿using BEAUTIFY_QUERY.DOMAIN.Documents;
-
-namespace BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
+﻿namespace BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 public static class Response
 {
     public class GetWorkingScheduleResponse

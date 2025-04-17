@@ -1,14 +1,12 @@
 ﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
-using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
 internal sealed class GetWorkingScheduleOfDoctorIdQueryHandler(
     IRepositoryBase<WorkingSchedule, Guid> workingScheduleRepository,
-    ICurrentUserService currentUserService) 
+    ICurrentUserService currentUserService)
 {
     public async Task<Result<PagedResult<Response.GetWorkingScheduleResponse>>> Handle(
         Query.GetWorkingScheduleOfDoctorId request, CancellationToken cancellationToken)
@@ -30,15 +28,11 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandler(
                     // Try to parse as a date range
                     if (DateOnly.TryParse(part1, out var dateFrom) &&
                         DateOnly.TryParse(part2, out var dateTo))
-                    {
                         query = query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
-                    }
                     // Otherwise, try to parse as a time range
                     else if (TimeSpan.TryParse(part1, out var timeFrom) &&
                              TimeSpan.TryParse(part2, out var timeTo))
-                    {
                         query = query.Where(x => x.StartTime >= timeFrom && x.EndTime <= timeTo);
-                    }
                 }
             }
             else
@@ -82,7 +76,7 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandler(
             ServiceId = x.CustomerSchedule.ServiceId,
             ServiceName = x.CustomerSchedule.Service.Name,
             CustomerScheduleId = x.CustomerScheduleId,
-            CurrentProcedureName = x.CustomerSchedule.ProcedurePriceType.Name,
+            CurrentProcedureName = x.CustomerSchedule.ProcedurePriceType.Name
         }).ToList();
         var mapped = new PagedResult<Response.GetWorkingScheduleResponse>(
             result,

@@ -35,10 +35,10 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
 
 
         // Create query for customer schedules with includes
-        var query = customerScheduleRepositoryBase.FindAll(
-                x => users.Select(u => u.Id).Contains(x.CustomerId) &&
-                     x.Doctor.ClinicId == currentUserService.ClinicId &&
-                     /* x.Date == DateOnly.FromDateTime(currentTime) &&*/ x.StartTime != null)
+        var query = customerScheduleRepositoryBase.FindAll(x => users.Select(u => u.Id).Contains(x.CustomerId) &&
+                                                                x.Doctor.ClinicId == currentUserService.ClinicId &&
+                                                                /* x.Date == DateOnly.FromDateTime(currentTime) &&*/
+                                                                x.StartTime != null)
             .Include(x => x.Service)
             .Include(x => x.Doctor)
             .ThenInclude(d => d.User)
@@ -83,11 +83,9 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
 
         // If phone is provided, include it in the filter
         if (!string.IsNullOrWhiteSpace(request.CustomerPhone))
-        {
             return u => nameParts.Any(part =>
                 (u.FirstName.Contains(part) || u.LastName.Contains(part)) &&
                 u.PhoneNumber.Contains(request.CustomerPhone));
-        }
 
         // Filter only by name parts
         return u => nameParts.Any(part =>
@@ -104,26 +102,26 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             : throw new InvalidOperationException("User not found for schedule");
 
         return new Response.StaffCheckInCustomerScheduleResponse(
-            Id: schedule.Id,
-            OrderId: schedule.OrderId.Value,
-            ServicePrice: schedule.Order?.TotalAmount ?? 0,
-            DiscountAmount: schedule.Order?.Discount ?? 0,
-            DepositAmount: schedule.Order?.DepositAmount ?? 0,
-            Amount: schedule.Order?.FinalAmount ?? 0,
-            CustomerName: $"{user.FirstName} {user.LastName}".Trim(),
-            CustomerEmail: user.Email,
-            CustomerPhoneNumber: user.PhoneNumber,
-            ServiceName: schedule.Service?.Name ?? string.Empty,
-            DoctorName: schedule.Doctor?.User is not null
+            schedule.Id,
+            schedule.OrderId.Value,
+            schedule.Order?.TotalAmount ?? 0,
+            schedule.Order?.Discount ?? 0,
+            schedule.Order?.DepositAmount ?? 0,
+            schedule.Order?.FinalAmount ?? 0,
+            $"{user.FirstName} {user.LastName}".Trim(),
+            user.Email,
+            user.PhoneNumber,
+            schedule.Service?.Name ?? string.Empty,
+            schedule.Doctor?.User is not null
                 ? $"{schedule.Doctor.User.FirstName} {schedule.Doctor.User.LastName}".Trim()
                 : string.Empty,
-            BookingDate: schedule.Date,
-            StartTime: schedule.StartTime,
-            EndTime: schedule.EndTime,
-            Status: schedule.Status,
-            ProcedurePriceTypeName: schedule.ProcedurePriceType?.Name ?? string.Empty,
-            ProcedureName: schedule.ProcedurePriceType?.Procedure.Name ?? string.Empty,
-            StepIndex: schedule.ProcedurePriceType?.Procedure.StepIndex.ToString(),
+            schedule.Date,
+            schedule.StartTime,
+            schedule.EndTime,
+            schedule.Status,
+            schedule.ProcedurePriceType?.Name ?? string.Empty,
+            schedule.ProcedurePriceType?.Procedure.Name ?? string.Empty,
+            schedule.ProcedurePriceType?.Procedure.StepIndex.ToString(),
             schedule.ProcedurePriceType.Procedure.StepIndex == 1
         );
     }

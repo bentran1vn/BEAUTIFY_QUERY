@@ -26,10 +26,8 @@ internal sealed class GetClinicBranchesQueryHandler(
             .FirstOrDefaultAsync(cancellationToken);
 
         if (parentClinic == null)
-        {
             return Result.Failure<Response.GetClinicBranchesResponse>(
                 new Error("404", "Parent clinic not found"));
-        }
 
         // Get all branches for this parent clinic
         var branches = await clinicRepository
@@ -73,7 +71,7 @@ internal sealed class GetClinicBranchesQueryHandler(
                 TotalEarnings = totalEarnings.TryGetValue(clinic.Id, out var earnings) ? earnings : 0,
                 BankName = clinic.BankName,
                 BankAccountNumber = clinic.BankAccountNumber,
-                IsMainClinic = clinic.IsParent,
+                IsMainClinic = clinic.IsParent
             }).ToList(),
             Totals = new Response.TotalSummaryDto
             {

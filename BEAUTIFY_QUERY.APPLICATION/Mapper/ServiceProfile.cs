@@ -12,7 +12,7 @@ public class ServiceProfile : Profile
                 opt => opt.MapFrom(src => src.PriceMoreBranch))
             .ForMember(dest => dest.PriceLiveStreamAddition,
                 opt => opt.MapFrom(src => src.PriceMoreLivestream));
-        
+
         CreateMap<PagedResult<SubscriptionPackage>, PagedResult<Response.GetSubscriptionResponse>>();
 
 

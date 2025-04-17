@@ -56,7 +56,8 @@ internal sealed class GetServiceByCategoryIdQueryHandler(
             x.DiscountPercent.ToString(),
             x.DiscountMaxPrice,
             x.DiscountMinPrice,
-            x.CoverImage?.Select(img => new Response.Image(img.Id, img.Index, img.Url)).ToList() ?? new List<Response.Image>(),
+            x.CoverImage?.Select(img => new Response.Image(img.Id, img.Index, img.Url)).ToList() ??
+            new List<Response.Image>(),
             x.Clinic?.Select(clinic => new Response.Clinic(
                 clinic.Id,
                 clinic.Name,
@@ -81,7 +82,8 @@ internal sealed class GetServiceByCategoryIdQueryHandler(
                     pt.Name,
                     pt.Duration,
                     pt.Price,
-                    pt.IsDefault)).ToList() ?? new List<Response.ProcedurePriceType>())).ToList() ?? new List<Response.Procedure>(),
+                    pt.IsDefault)).ToList() ?? new List<Response.ProcedurePriceType>())).ToList() ??
+            new List<Response.Procedure>(),
             x.Promotions?
                 .Where(p => p.IsActivated)
                 .Select(promo => new Response.Promotion(
@@ -113,14 +115,14 @@ internal sealed class GetServiceByCategoryIdQueryHandler(
                                 ExpiryDate = c.ExpiryDate,
                                 Note = c.Note
                             }).ToList()))).ToList() ?? new List<Response.DoctorService>(),
-            x.Feedbacks.Select(z => new Response.Feedback()
+            x.Feedbacks.Select(z => new Response.Feedback
             {
                 FeedbackId = z.FeedbackId,
                 ServiceId = z.ServiceId,
                 Content = z.Content,
                 IsView = z.IsView,
                 Rating = z.Rating,
-                User = new Response.User()
+                User = new Response.User
                 {
                     Id = z.User.Id,
                     FullName = z.User.FullName,

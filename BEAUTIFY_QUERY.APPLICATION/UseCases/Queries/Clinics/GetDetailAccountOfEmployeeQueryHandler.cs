@@ -4,33 +4,33 @@ using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
-
 public class GetDetailAccountOfEmployeeQueryHandler(
-        IRepositoryBase<Clinic, Guid> clinicRepository,
-        IRepositoryBase<UserClinic, Guid> userClinicRepository):
+    IRepositoryBase<Clinic, Guid> clinicRepository,
+    IRepositoryBase<UserClinic, Guid> userClinicRepository) :
     IQueryHandler<Query.GetDetailAccountOfEmployeeQuery,
         Response.GetAccountOfEmployee>
 {
-    public async Task<Result<Response.GetAccountOfEmployee>> Handle(Query.GetDetailAccountOfEmployeeQuery request, CancellationToken cancellationToken)
+    public async Task<Result<Response.GetAccountOfEmployee>> Handle(Query.GetDetailAccountOfEmployeeQuery request,
+        CancellationToken cancellationToken)
     {
-        var isExistClinic = await  clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken, x => x.Children);
+        var isExistClinic = await clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken, x => x.Children);
         if (isExistClinic == null)
             return Result.Failure<Response.GetAccountOfEmployee>(new Error("404", "Clinic Not Found"));
-        
-        var query =  userClinicRepository
+
+        var query = userClinicRepository
             .FindAll(x => x.IsDeleted == false && x.UserId == request.StaffId);
-        
+
         query = query.Include(x => x.User)
             .ThenInclude(x => x.DoctorCertificates);
 
         Response.GetAccountOfEmployee? result = null;
-        
+
         if (isExistClinic.IsParent == true)
         {
             var childrenIds = isExistClinic.Children.Select(x => x.Id).ToList();
             childrenIds.Add(request.ClinicId);
             query = query.Where(x => childrenIds.Contains(x.ClinicId));
-            
+
             var groupByQuery = query
                 .GroupBy(x => x.UserId)
                 .Select(g => new Response.GetAccountOfEmployee
@@ -67,29 +67,31 @@ public class GetDetailAccountOfEmployeeQueryHandler(
                             Note = x.Note
                         }).ToList()
                 });
-            
+
             var list = await groupByQuery.ToListAsync(cancellationToken);
             result = list.FirstOrDefault();
         }
         else
         {
             query = query.Where(x => x.ClinicId == request.ClinicId);
-            
+
             var isExist = await query.FirstOrDefaultAsync(cancellationToken);
-        
+
             if (isExist == null)
                 return Result.Failure<Response.GetAccountOfEmployee>(new Error("404", "Staff Not Found"));
-        
+
             result = new Response.GetAccountOfEmployee
             {
-                Branchs = [new Response.GetClinicBranches(
-                    isExist.Clinic.Id, isExist.Clinic.Name,
-                    isExist.Clinic.Email, isExist.Clinic.City,
-                    isExist.Clinic.Address, isExist.Clinic.District,
-                    isExist.Clinic.Ward, isExist.Clinic.FullAddress,
-                    isExist.Clinic.TaxCode, isExist.Clinic.BusinessLicenseUrl,
-                    isExist.Clinic.OperatingLicenseUrl, isExist.Clinic.OperatingLicenseExpiryDate,
-                    isExist.Clinic.ProfilePictureUrl, isExist.Clinic.IsActivated
+                Branchs =
+                [
+                    new Response.GetClinicBranches(
+                        isExist.Clinic.Id, isExist.Clinic.Name,
+                        isExist.Clinic.Email, isExist.Clinic.City,
+                        isExist.Clinic.Address, isExist.Clinic.District,
+                        isExist.Clinic.Ward, isExist.Clinic.FullAddress,
+                        isExist.Clinic.TaxCode, isExist.Clinic.BusinessLicenseUrl,
+                        isExist.Clinic.OperatingLicenseUrl, isExist.Clinic.OperatingLicenseExpiryDate,
+                        isExist.Clinic.ProfilePictureUrl, isExist.Clinic.IsActivated
                     )
                 ],
                 EmployeeId = isExist.User!.Id,
@@ -115,7 +117,7 @@ public class GetDetailAccountOfEmployeeQueryHandler(
                 }).ToList()
             };
         }
-        
+
         return Result.Success(result);
     }
 }

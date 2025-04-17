@@ -100,14 +100,14 @@ public class GetClinicServicesByIdQueryHandler(
                                 Note = c.Note
                             }).ToList()
                     ))).ToList(),
-                isServiceExisted.Feedbacks.Select(z => new Response.Feedback()
+                isServiceExisted.Feedbacks.Select(z => new Response.Feedback
                 {
                     FeedbackId = z.FeedbackId,
                     ServiceId = z.ServiceId,
                     Content = z.Content,
                     IsView = z.IsView,
                     Rating = z.Rating,
-                    User = new Response.User()
+                    User = new Response.User
                     {
                         Id = z.User.Id,
                         FullName = z.User.FullName,
@@ -187,14 +187,14 @@ public class GetClinicServicesByIdQueryHandler(
                                 ExpiryDate = c.ExpiryDate,
                                 Note = c.Note
                             }).ToList()))).ToList(),
-                isServiceExisted.Feedbacks.Select(z => new Response.Feedback()
+                isServiceExisted.Feedbacks.Select(z => new Response.Feedback
                 {
                     FeedbackId = z.FeedbackId,
                     ServiceId = z.ServiceId,
                     Content = z.Content,
                     IsView = z.IsView,
                     Rating = z.Rating,
-                    User = new Response.User()
+                    User = new Response.User
                     {
                         Id = z.User.Id,
                         FullName = z.User.FullName,

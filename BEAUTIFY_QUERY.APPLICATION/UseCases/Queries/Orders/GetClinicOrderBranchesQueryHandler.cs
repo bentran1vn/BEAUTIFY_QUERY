@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
@@ -21,7 +22,8 @@ internal sealed class GetClinicOrderBranchesQueryHandler(
 
         // Check if the clinic is a parent clinic
         if (currentClinic.IsParent != true)
-            return Result.Failure<PagedResult<Response.Order>>(new Error("403", "Only parent clinics can access this endpoint"));
+            return Result.Failure<PagedResult<Response.Order>>(new Error("403",
+                "Only parent clinics can access this endpoint"));
 
         // Get all child clinic IDs
         var childClinicIds = await clinicRepository
@@ -38,15 +40,13 @@ internal sealed class GetClinicOrderBranchesQueryHandler(
             childClinicIds.Contains(x.Service.ClinicServices.FirstOrDefault().ClinicId));
 
         if (!string.IsNullOrEmpty(searchTerm))
-        {
             query = query.Where(x => x.Customer.FullName.Contains(searchTerm) ||
                                      x.Service.Name.Contains(searchTerm) ||
                                      x.Customer.PhoneNumber.Contains(searchTerm) ||
                                      x.FinalAmount.ToString().Contains(searchTerm));
-        }
 
         // Apply sorting
-        query = request.SortOrder == BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations.SortOrder.Descending
+        query = request.SortOrder == SortOrder.Descending
             ? query.OrderByDescending(GetSortProperty(request))
             : query.OrderBy(GetSortProperty(request));
 

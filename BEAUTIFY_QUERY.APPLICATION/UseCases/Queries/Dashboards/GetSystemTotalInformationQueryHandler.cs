@@ -4,15 +4,18 @@ using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Dashboards;
-
-public class GetSystemTotalInformationQueryHandler : IQueryHandler<Query.GetSystemTotalInformationQuery, Responses.GetSystemTotalInformationResponse>
+public class GetSystemTotalInformationQueryHandler : IQueryHandler<Query.GetSystemTotalInformationQuery,
+    Responses.GetSystemTotalInformationResponse>
 {
-    private readonly IRepositoryBase<Clinic, Guid> _clinicRepository;
     private readonly IRepositoryBase<ClinicOnBoardingRequest, Guid> _clinicOnBoardingRequestRepository;
+    private readonly IRepositoryBase<Clinic, Guid> _clinicRepository;
     private readonly IRepositoryBase<Service, Guid> _serviceRepository;
     private readonly IRepositoryBase<UserClinic, Guid> _userClinicRepository;
 
-    public GetSystemTotalInformationQueryHandler(IRepositoryBase<Clinic, Guid> clinicRepository, IRepositoryBase<UserClinic, Guid> userClinicRepository, IRepositoryBase<ClinicOnBoardingRequest, Guid> clinicOnBoardingRequestRepository, IRepositoryBase<Service, Guid> serviceRepository)
+    public GetSystemTotalInformationQueryHandler(IRepositoryBase<Clinic, Guid> clinicRepository,
+        IRepositoryBase<UserClinic, Guid> userClinicRepository,
+        IRepositoryBase<ClinicOnBoardingRequest, Guid> clinicOnBoardingRequestRepository,
+        IRepositoryBase<Service, Guid> serviceRepository)
     {
         _clinicRepository = clinicRepository;
         _userClinicRepository = userClinicRepository;
@@ -20,7 +23,8 @@ public class GetSystemTotalInformationQueryHandler : IQueryHandler<Query.GetSyst
         _serviceRepository = serviceRepository;
     }
 
-    public async Task<Result<Responses.GetSystemTotalInformationResponse>> Handle(Query.GetSystemTotalInformationQuery request, CancellationToken cancellationToken)
+    public async Task<Result<Responses.GetSystemTotalInformationResponse>> Handle(
+        Query.GetSystemTotalInformationQuery request, CancellationToken cancellationToken)
     {
         var result = new Responses.GetSystemTotalInformationResponse();
 
@@ -32,9 +36,9 @@ public class GetSystemTotalInformationQueryHandler : IQueryHandler<Query.GetSyst
             result.TotalClinics = await query.CountAsync(x => true, cancellationToken);
             result.TotalBranding = await query.CountAsync(x => x.IsParent == true, cancellationToken);
             result.TotalBranches = await query.CountAsync(x => x.IsParent == false, cancellationToken);
-            result.TotalBranchActive = await query.CountAsync(x => 
+            result.TotalBranchActive = await query.CountAsync(x =>
                 x.IsParent == false && x.IsActivated == true, cancellationToken);
-            result.TotalBranchInActive = await query.CountAsync(x => 
+            result.TotalBranchInActive = await query.CountAsync(x =>
                 x.IsParent == false && x.IsActivated != true, cancellationToken);
         }
 
@@ -42,8 +46,8 @@ public class GetSystemTotalInformationQueryHandler : IQueryHandler<Query.GetSyst
             .FindAll(x => x.IsDeleted == false);
 
         result.TotalBrandPending = await requestQuery
-            .Where(x => 
-                !x.IsDeleted 
+            .Where(x =>
+                !x.IsDeleted
                 && x.Status == 0)
             .Select(x => x.ClinicId)
             .Distinct()
@@ -52,9 +56,9 @@ public class GetSystemTotalInformationQueryHandler : IQueryHandler<Query.GetSyst
         var serviceQuery = _serviceRepository.FindAll(x => x.IsDeleted == false);
 
         result.TotalService = await serviceQuery.CountAsync(x => true, cancellationToken);
-        
+
         var doctorQuery = _userClinicRepository
-            .FindAll(x => 
+            .FindAll(x =>
                 x.IsDeleted == false &&
                 x.User.Role.Name.Equals("Doctor")
             ).GroupBy(x => x.UserId);

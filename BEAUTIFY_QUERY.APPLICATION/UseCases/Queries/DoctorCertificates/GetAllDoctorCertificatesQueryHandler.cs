@@ -16,10 +16,7 @@ public class GetAllDoctorCertificatesQueryHandler(
         var query = doctorCertificateRepository.FindAll();
 
         // Apply search filter
-        if (!string.IsNullOrEmpty(searchTerm))
-        {
-            query = ApplySearchFilter(query, searchTerm);
-        }
+        if (!string.IsNullOrEmpty(searchTerm)) query = ApplySearchFilter(query, searchTerm);
 
         // Apply sorting
         query = ApplySorting(query, request);

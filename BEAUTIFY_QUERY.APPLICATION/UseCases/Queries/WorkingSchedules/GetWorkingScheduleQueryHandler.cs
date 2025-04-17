@@ -16,10 +16,7 @@ internal sealed class GetWorkingScheduleQueryHandler(
         var searchTerm = request.searchTerm?.Trim();
         var query = repository.AsQueryable(x => !x.IsDeleted);
 
-        if (!string.IsNullOrEmpty(searchTerm))
-        {
-            query = ApplySearchFilter(query, searchTerm);
-        }
+        if (!string.IsNullOrEmpty(searchTerm)) query = ApplySearchFilter(query, searchTerm);
 
         query = ApplySorting(query, request);
 
@@ -54,14 +51,10 @@ internal sealed class GetWorkingScheduleQueryHandler(
             var part2 = parts[1].Trim();
 
             if (TryParseDateRange(part1, part2, out var dateFrom, out var dateTo))
-            {
                 return query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
-            }
 
             if (TryParseTimeRange(part1, part2, out var timeFrom, out var timeTo))
-            {
                 return query.Where(x => x.StartTime >= timeFrom && x.EndTime <= timeTo);
-            }
         }
 
         return query.Where(x =>
