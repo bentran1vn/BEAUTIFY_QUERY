@@ -19,10 +19,7 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
 
         var query = workingScheduleRepository.AsQueryable(x => !x.IsDeleted && x.DoctorId.Equals(doctorId));
 
-        if (!string.IsNullOrEmpty(searchTerm))
-        {
-            query = ApplySearchFilter(query, searchTerm);
-        }
+        if (!string.IsNullOrEmpty(searchTerm)) query = ApplySearchFilter(query, searchTerm);
 
         query = ApplySorting(query, request.SortOrder);
         var total = await PagedResult<WorkingScheduleProjection>.CreateAsyncMongoLinq(
@@ -59,15 +56,11 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
 
             if (DateOnly.TryParse(part1, out var dateFrom) &&
                 DateOnly.TryParse(part2, out var dateTo))
-            {
                 return query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
-            }
 
             if (TimeSpan.TryParse(part1, out var timeFrom) &&
                 TimeSpan.TryParse(part2, out var timeTo))
-            {
                 return query.Where(x => x.StartTime >= timeFrom && x.EndTime <= timeTo);
-            }
         }
 
         return query.Where(x =>

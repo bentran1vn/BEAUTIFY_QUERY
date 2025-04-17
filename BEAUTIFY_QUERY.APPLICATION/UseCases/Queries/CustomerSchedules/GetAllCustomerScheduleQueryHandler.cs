@@ -32,9 +32,7 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                     // Try to parse as a date range
                     if (DateOnly.TryParse(part1, out var dateFrom) &&
                         DateOnly.TryParse(part2, out var dateTo))
-                    {
                         query = query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
-                    }
                 }
             }
             else
@@ -42,11 +40,11 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                 // Fallback to standard contains search with null checks
                 // Use EF.Functions.Like for case-insensitive search instead of Contains with StringComparison
                 query = query.Where(x =>
-                    x.Customer != null &&
-                    (x.Customer.FirstName != null &&
-                     EF.Functions.Like(x.Customer.FirstName, $"%{searchTerm}%") ||
-                     x.Customer.LastName != null &&
-                     EF.Functions.Like(x.Customer.LastName, $"%{searchTerm}%")) ||
+                    (x.Customer != null &&
+                     ((x.Customer.FirstName != null &&
+                       EF.Functions.Like(x.Customer.FirstName, $"%{searchTerm}%")) ||
+                      (x.Customer.LastName != null &&
+                       EF.Functions.Like(x.Customer.LastName, $"%{searchTerm}%")))) ||
                     EF.Functions.Like(x.Status, $"%{searchTerm}%"));
             }
         }
@@ -58,29 +56,31 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
             request.PageIndex,
             request.PageSize
         );
-        
+
         var orders = await orderRepositoryBase
             .FindAll(x => !x.IsDeleted)
             .ToListAsync(cancellationToken);
-        
-        var mapped = customerSchedules.Items.Select(x =>
-        {
-            return new Response.StaffCheckInCustomerScheduleResponse(
-                x.Id,
-                x.OrderId.Value,
-                x.Order.FinalAmount.Value,
-                x.Customer.FullName,
-                x.Customer.PhoneNumber,
-                x.Service.Name,
-                x.Doctor.User.FullName,
-                x.Date,
-                x.StartTime,
-                x.EndTime, x.Status,
-                x.ProcedurePriceType.Name,
-                x.ProcedurePriceType?.Procedure.StepIndex.ToString(),
-                x.ProcedurePriceType.Procedure.StepIndex == 1
-            );
-        }).ToList();
+
+        var mapped = customerSchedules.Items.Select(x => new Response.StaffCheckInCustomerScheduleResponse(
+            x.Id,
+            x.OrderId.Value,
+            x.Order.TotalAmount,
+            x.Order.Discount,
+            x.Order.DepositAmount,
+            x.Order.FinalAmount,
+            x.Customer.FullName,
+            x.Customer.Email,
+            x.Customer.PhoneNumber,
+            x.Service.Name,
+            x.Doctor.User.FullName,
+            x.Date,
+            x.StartTime,
+            x.EndTime, x.Status,
+            x.ProcedurePriceType.Name,
+            x.ProcedurePriceType.Procedure.Name,
+            x.ProcedurePriceType?.Procedure.StepIndex.ToString(),
+            x.ProcedurePriceType.Procedure.StepIndex == 1
+        )).ToList();
 
         var resultList = mapped.Join(orders,
             schedule => schedule.OrderId,
@@ -89,8 +89,12 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                 schedule.Id,
                 schedule.OrderId,
                 order.CustomerId,
-                schedule.Amount,
+                order.TotalAmount,
+                order.Discount,
+                order.DepositAmount,
+                schedule.Amount.Value,
                 schedule.CustomerName,
+                schedule.CustomerEmail,
                 schedule.CustomerPhoneNumber,
                 schedule.ServiceName,
                 schedule.DoctorName,
@@ -99,15 +103,16 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                 schedule.EndTime,
                 schedule.Status,
                 schedule.ProcedurePriceTypeName,
+                schedule.ProcedureName,
                 schedule.StepIndex,
                 schedule.IsFirstCheckIn
             )).ToList();
-        
+
         var result = new PagedResult<Response.StaffCheckInCustomerScheduleResponse1>(resultList,
             customerSchedules.PageIndex,
             customerSchedules.PageSize,
             customerSchedules.TotalCount);
-        
+
         return Result.Success(result);
     }
 }

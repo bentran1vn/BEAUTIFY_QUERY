@@ -27,7 +27,8 @@ public class ClinicApi : ApiEndpoint, ICarterModule
             .RequireAuthorization(Constant.Role.CLINIC_STAFF)
             .WithName("Get Sub Clinic By Id")
             .WithSummary("Get a specific sub-clinic by ID")
-            .WithDescription("Retrieves details of a specific sub-clinic that belongs to the current clinic admin's main clinic");
+            .WithDescription(
+                "Retrieves details of a specific sub-clinic that belongs to the current clinic admin's main clinic");
     }
 
     private static async Task<IResult> GetSubClinicById(

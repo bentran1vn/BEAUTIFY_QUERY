@@ -42,7 +42,7 @@ public class Apis : ApiEndpoint, ICarterModule
             .WithSummary("Get wallet transactions for the current customer")
             .WithDescription(
                 "Retrieves wallet transactions for the authenticated customer with filtering, sorting, and pagination options");
-                
+
         // 5. Endpoint to get wallet history for a specific clinic by ID
         gr1.MapGet("clinics/{clinicId:guid}", GetWalletHistoryByClinicId)
             .RequireAuthorization(Constant.Role.CLINIC_ADMIN, Constant.Role.SYSTEM_ADMIN)

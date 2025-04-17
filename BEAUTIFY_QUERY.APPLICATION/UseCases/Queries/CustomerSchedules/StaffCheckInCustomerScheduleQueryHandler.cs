@@ -1,22 +1,22 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+﻿using System.Linq.Expressions;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.CustomerSchedules;
 internal sealed class StaffCheckInCustomerScheduleQueryHandler(
     IRepositoryBase<User, Guid> userRepositoryBase,
     ICurrentUserService currentUserService,
     IRepositoryBase<CustomerSchedule, Guid> customerScheduleRepositoryBase)
-    : IQueryHandler<Query.StaffCheckInCustomerScheduleQuery, List<Response.StaffCheckInCustomerScheduleResponse>>
+    : IQueryHandler<Query.StaffCheckInCustomerScheduleQuery, PagedResult<Response.StaffCheckInCustomerScheduleResponse>>
 {
-    public async Task<Result<List<Response.StaffCheckInCustomerScheduleResponse>>> Handle(
+    public async Task<Result<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>> Handle(
         Query.StaffCheckInCustomerScheduleQuery request, CancellationToken cancellationToken)
     {
         // Validate input parameters
         if (string.IsNullOrWhiteSpace(request.CustomerName))
-            return Result.Failure<List<Response.StaffCheckInCustomerScheduleResponse>>(
+            return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(
                 new Error("400", "Customer name is required"));
 
         // Create a dynamic user filter based on available information
@@ -27,39 +27,53 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             .ToListAsync(cancellationToken);
 
         if (users.Count == 0)
-            return Result.Failure<List<Response.StaffCheckInCustomerScheduleResponse>>(
+            return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(
                 new Error("404", "No matching users found"));
 
         var VietNameTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
         var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, VietNameTimeZone);
-        
-        
-        // Fetch customer schedules efficiently with includes
-        var customerSchedules = await customerScheduleRepositoryBase.FindAll(
-                x => users.Select(u => u.Id).Contains(x.CustomerId) &&
-                     x.Doctor.ClinicId == currentUserService.ClinicId &&
-                     x.Date == DateOnly.FromDateTime(currentTime) && x.StartTime != null)
+
+
+        // Create query for customer schedules with includes
+        var query = customerScheduleRepositoryBase.FindAll(x => users.Select(u => u.Id).Contains(x.CustomerId) &&
+                                                                x.Doctor.ClinicId == currentUserService.ClinicId &&
+                                                                /* x.Date == DateOnly.FromDateTime(currentTime) &&*/
+                                                                x.StartTime != null)
             .Include(x => x.Service)
             .Include(x => x.Doctor)
             .ThenInclude(d => d.User)
             .Include(x => x.ProcedurePriceType)
             .Include(x => x.Order)
-            .ToListAsync(cancellationToken);
+            .OrderBy(x => x.StartTime);
 
-        if (customerSchedules.Count == 0)
-            return Result.Failure<List<Response.StaffCheckInCustomerScheduleResponse>>(
+        // Apply pagination
+        var pagedCustomerSchedules = await PagedResult<CustomerSchedule>.CreateAsync(
+            query,
+            request.PageIndex,
+            request.PageSize
+        );
+
+        if (pagedCustomerSchedules.Items.Count == 0)
+            return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(
                 new Error("404", "No customer schedules found"));
 
         // Create a dictionary for quick user lookup
         var userDict = users.ToDictionary(u => u.Id);
 
         // Map to response with null-safe navigation and optimized projection
-        var responses = customerSchedules
+        var responses = pagedCustomerSchedules.Items
             .Select(schedule => MapToResponse(schedule, userDict))
-            .OrderBy(x => x.StartTime)
             .ToList();
 
-        return Result.Success(responses);
+        // Create paged result with mapped items
+        var result = new PagedResult<Response.StaffCheckInCustomerScheduleResponse>(
+            responses,
+            pagedCustomerSchedules.PageIndex,
+            pagedCustomerSchedules.PageSize,
+            pagedCustomerSchedules.TotalCount
+        );
+
+        return Result.Success(result);
     }
 
     private static Expression<Func<User, bool>> CreateUserFilter(Query.StaffCheckInCustomerScheduleQuery request)
@@ -69,11 +83,9 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
 
         // If phone is provided, include it in the filter
         if (!string.IsNullOrWhiteSpace(request.CustomerPhone))
-        {
             return u => nameParts.Any(part =>
                 (u.FirstName.Contains(part) || u.LastName.Contains(part)) &&
                 u.PhoneNumber.Contains(request.CustomerPhone));
-        }
 
         // Filter only by name parts
         return u => nameParts.Any(part =>
@@ -90,21 +102,26 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             : throw new InvalidOperationException("User not found for schedule");
 
         return new Response.StaffCheckInCustomerScheduleResponse(
-            Id: schedule.Id,
-            OrderId: schedule.OrderId.Value,
-            Amount: schedule.Order?.FinalAmount ?? 0,
-            CustomerName: $"{user.FirstName} {user.LastName}".Trim(),
-            CustomerPhoneNumber: user.PhoneNumber,
-            ServiceName: schedule.Service?.Name ?? string.Empty,
-            DoctorName: schedule.Doctor?.User is not null
+            schedule.Id,
+            schedule.OrderId.Value,
+            schedule.Order?.TotalAmount ?? 0,
+            schedule.Order?.Discount ?? 0,
+            schedule.Order?.DepositAmount ?? 0,
+            schedule.Order?.FinalAmount ?? 0,
+            $"{user.FirstName} {user.LastName}".Trim(),
+            user.Email,
+            user.PhoneNumber,
+            schedule.Service?.Name ?? string.Empty,
+            schedule.Doctor?.User is not null
                 ? $"{schedule.Doctor.User.FirstName} {schedule.Doctor.User.LastName}".Trim()
                 : string.Empty,
-            BookingDate: schedule.Date,
-            StartTime: schedule.StartTime,
-            EndTime: schedule.EndTime,
-            Status: schedule.Status,
-            ProcedurePriceTypeName: schedule.ProcedurePriceType?.Name ?? string.Empty,
-            StepIndex: schedule.ProcedurePriceType?.Procedure.StepIndex.ToString(),
+            schedule.Date,
+            schedule.StartTime,
+            schedule.EndTime,
+            schedule.Status,
+            schedule.ProcedurePriceType?.Name ?? string.Empty,
+            schedule.ProcedurePriceType?.Procedure.Name ?? string.Empty,
+            schedule.ProcedurePriceType?.Procedure.StepIndex.ToString(),
             schedule.ProcedurePriceType.Procedure.StepIndex == 1
         );
     }

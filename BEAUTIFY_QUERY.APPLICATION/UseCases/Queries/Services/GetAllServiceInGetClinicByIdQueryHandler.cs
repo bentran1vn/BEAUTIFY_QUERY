@@ -16,7 +16,7 @@ internal sealed class GetAllServiceInGetClinicByIdQueryHandler(
 
         var result = await PagedResult<ClinicServiceProjection>.CreateAsyncMongoLinq(query,
             request.PageNumber, request.PageSize);
-        
+
         var mapList = result.Items.Select(x => new Response.GetAllServiceInGetClinicById
         {
             Id = x.DocumentId,
@@ -27,9 +27,9 @@ internal sealed class GetAllServiceInGetClinicByIdQueryHandler(
             DiscountPercent = (x.DiscountPercent * 100).ToString(),
             DiscountMaxPrice = x.DiscountMaxPrice,
             DiscountMinPrice = x.DiscountMinPrice,
-            CoverImage = x.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
+            CoverImage = x.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList()
         }).ToList();
-        
+
         return Result.Success(new PagedResult<Response.GetAllServiceInGetClinicById>(mapList,
             result.PageIndex, result.PageSize, result.TotalCount));
     }

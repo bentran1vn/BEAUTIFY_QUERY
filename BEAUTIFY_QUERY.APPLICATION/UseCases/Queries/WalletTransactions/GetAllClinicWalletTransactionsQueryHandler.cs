@@ -143,10 +143,8 @@ internal sealed class GetAllClinicWalletTransactionsQueryHandler(
         Query.GetAllClinicWalletTransactions request)
     {
         if (string.IsNullOrWhiteSpace(request.SortColumn))
-        {
             // Default sorting by transaction date descending
             return query.OrderByDescending(x => x.TransactionDate);
-        }
 
         var sortOrder = request.SortOrder ?? SortOrder.Descending;
 

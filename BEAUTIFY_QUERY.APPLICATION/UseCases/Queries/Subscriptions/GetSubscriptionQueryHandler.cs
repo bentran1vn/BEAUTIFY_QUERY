@@ -56,7 +56,7 @@ internal sealed class
         return request.SortColumn?.ToLower() switch
         {
             "name" => projection => projection.Name,
-            _ => projection => projection.Price,
+            _ => projection => projection.Price
         };
     }
 }

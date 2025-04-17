@@ -25,7 +25,7 @@ public class MongoRepository<TDocument> : IMongoRepository<TDocument>
             ? _collection.AsQueryable().Where(filterExpression)
             : _collection.AsQueryable();
     }
-    
+
     public virtual async Task<UpdateResult> UpdateOneAsync(
         FilterDefinition<TDocument> filter,
         UpdateDefinition<TDocument> update,

@@ -23,7 +23,7 @@ public class
         var applyRequest = await PagedResult<ClinicOnBoardingRequest>
             .CreateAsync(requestQuery, request.PageIndex, request.PageSize);
 
-        PagedResult<Response.GetApplyRequest> result = new PagedResult<Response.GetApplyRequest>(applyRequest.Items
+        var result = new PagedResult<Response.GetApplyRequest>(applyRequest.Items
                 .Select(x =>
                     new Response.GetApplyRequest(x.Id, x.Clinic!.Name, x.Clinic.Email, x.Clinic.FullAddress,
                         x.Clinic.TotalApply)).ToList(), applyRequest.PageIndex, applyRequest.PageSize,

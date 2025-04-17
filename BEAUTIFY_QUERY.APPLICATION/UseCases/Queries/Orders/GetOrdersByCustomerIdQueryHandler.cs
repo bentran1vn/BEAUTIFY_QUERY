@@ -22,13 +22,9 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
 
     private IQueryable<Order> BuildQuery(Query.GetOrdersByCustomerId request)
     {
-        var query = orderRepositoryBase.FindAll(x => x.CustomerId == currentUserService.UserId)
-            ;
+        var query = orderRepositoryBase.FindAll(x => x.CustomerId == currentUserService.UserId);
 
-        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-        {
-            ApplySearchFilter(ref query, request.SearchTerm.Trim());
-        }
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm)) ApplySearchFilter(ref query, request.SearchTerm.Trim());
 
         query = query.Include(x => x.Service).Include(x => x.LivestreamRoom);
         query = ApplySorting(query, request);
@@ -45,15 +41,11 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
         var part2 = parts[1].Trim();
 
         if (DateOnly.TryParse(part1, out var dateFrom) && DateOnly.TryParse(part2, out var dateTo))
-        {
             query = query.Where(x => x.OrderDate >= dateFrom && x.OrderDate <= dateTo);
-        }
         else if (decimal.TryParse(part1, out var priceFrom) && decimal.TryParse(part2, out var priceTo))
-        {
-            query = query.Where(x => x.FinalAmount >= priceFrom && x.FinalAmount <= priceTo ||
-                                     x.Discount >= priceFrom && x.Discount <= priceTo ||
-                                     x.TotalAmount >= priceFrom && x.TotalAmount <= priceTo);
-        }
+            query = query.Where(x => (x.FinalAmount >= priceFrom && x.FinalAmount <= priceTo) ||
+                                     (x.Discount >= priceFrom && x.Discount <= priceTo) ||
+                                     (x.TotalAmount >= priceFrom && x.TotalAmount <= priceTo));
     }
 
     private static IQueryable<Order> ApplySorting(IQueryable<Order> query, Query.GetOrdersByCustomerId request)
@@ -71,6 +63,7 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
                 x.Service.Name,
                 x.TotalAmount,
                 x.Discount,
+                x.DepositAmount,
                 x.FinalAmount,
                 DateOnly.Parse(x.OrderDate.ToString("yyyy-MM-dd")),
                 x.Status,
@@ -79,8 +72,7 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
                 x.LivestreamRoomId != null,
                 x.LivestreamRoomId != null ? x.LivestreamRoom.Name : null
             ))
-            .OrderBy(x => x.OrderDate)
-            .ThenBy(x => x.Status)
+            .OrderBy(x => x.Status)
             .ToList();
 
         return new PagedResult<Response.Order>(mapped, orders.PageIndex, orders.PageSize, orders.TotalCount);
@@ -93,6 +85,7 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
             "total amount" => projection => projection.TotalAmount,
             "discount" => projection => projection.Discount,
             "final amount" => projection => projection.FinalAmount,
+            "date" => projection => projection.CreatedOnUtc,
             _ => projection => projection.OrderDate
         };
     }

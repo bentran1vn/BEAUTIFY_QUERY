@@ -1,6 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.EntityEvents;
-
-namespace BEAUTIFY_QUERY.CONTRACT.Services.Booking;
+﻿namespace BEAUTIFY_QUERY.CONTRACT.Services.Booking;
 public static class Response
 {
     public record GetBookingResponse(
@@ -45,11 +43,11 @@ public static class Response
 
     public class ProcedurePriceTypeEntity
     {
-        public Guid Id;
-        public string StepIndex;
-        public string Name;
-        public int Duration;
         public DateOnly? DateCompleted;
+        public int Duration;
+        public Guid Id;
+        public string Name;
+        public string StepIndex;
     }
 
     public record GetTotalAppointmentResponse

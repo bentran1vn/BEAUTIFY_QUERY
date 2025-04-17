@@ -4,7 +4,7 @@ namespace BEAUTIFY_QUERY.CONTRACT.Services.WalletTransactions;
 public static class Query
 {
     /// <summary>
-    /// Query to get wallet transactions for the current clinic
+    ///     Query to get wallet transactions for the current clinic
     /// </summary>
     public record GetClinicWalletTransactions(
         string? SearchTerm,
@@ -14,7 +14,7 @@ public static class Query
         int PageSize) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
 
     /// <summary>
-    /// Query to get wallet transactions for all sub-clinics of a parent clinic
+    ///     Query to get wallet transactions for all sub-clinics of a parent clinic
     /// </summary>
     public record GetSubClinicWalletTransactions(
         string? SearchTerm,
@@ -24,7 +24,7 @@ public static class Query
         int PageSize) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
 
     /// <summary>
-    /// Query to get wallet transactions for all clinics (admin only)
+    ///     Query to get wallet transactions for all clinics (admin only)
     /// </summary>
     public record GetAllClinicWalletTransactions(
         string? SearchTerm,
@@ -34,7 +34,7 @@ public static class Query
         int PageSize) : IQuery<PagedResult<Response.WalletTransactionResponse>>;
 
     /// <summary>
-    /// Query to get wallet transactions for a specific clinic by ID
+    ///     Query to get wallet transactions for a specific clinic by ID
     /// </summary>
     public record GetWalletHistoryByClinicId(
         Guid ClinicId,

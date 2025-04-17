@@ -3,12 +3,14 @@
 namespace BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 public static class Query
 {
-    public record GetWorkingScheduleEachDayInMonth(DateOnly Date): IQuery<Response.GetWorkingScheduleEachDayInMonthResponse>;
-    
-    public record GetWorkingScheduleDaily(DateOnly Date): IQuery<IReadOnlyList<Response.GetWorkingScheduleResponseDaily>>;
-    
+    public record GetWorkingScheduleEachDayInMonth(DateOnly Date)
+        : IQuery<Response.GetWorkingScheduleEachDayInMonthResponse>;
+
+    public record GetWorkingScheduleDaily(DateOnly Date)
+        : IQuery<IReadOnlyList<Response.GetWorkingScheduleResponseDaily>>;
+
     public record GetWorkingScheduleDetail(Guid Id) : IQuery<Response.GetWorkingScheduleDetailResponse>;
-    
+
     public record GetWorkingSchedule(
         string? searchTerm,
         string? SortColumn,
@@ -25,6 +27,4 @@ public static class Query
         SortOrder SortOrder,
         int PageNumber,
         int PageSize) : IQuery<PagedResult<Response.GetWorkingScheduleResponse>>;
-    
-    
 }

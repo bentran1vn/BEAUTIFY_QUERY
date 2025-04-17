@@ -27,30 +27,6 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
             .RequireAuthorization(Constant.Role.DOCTOR);
     }
 
-    #region GetWorkingSchedules
-
-    private static async Task<IResult> GetWorkingScheduleById(
-        ISender sender,
-        [FromRoute] Guid id)
-    {
-        var result = await sender.Send(new Query.GetWorkingScheduleDetail(id));
-        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
-    }
-
-    private static async Task<IResult> GetWorkingSchedules(ISender sender, string? searchTerm = null,
-        string? sortColumn = null,
-        string? sortOrder = null,
-        int pageIndex = 1,
-        int pageSize = 10)
-    {
-        var result = await sender.Send(new Query.GetWorkingSchedule(searchTerm,
-            sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
-            pageIndex, pageSize));
-        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
-    }
-
-    #endregion
-
     #region GetDoctorBusyTimeInADay
 
     private static async Task<IResult> GetDoctorBusyTimeInADay(
@@ -93,4 +69,28 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
             pageNumber, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
+
+    #region GetWorkingSchedules
+
+    private static async Task<IResult> GetWorkingScheduleById(
+        ISender sender,
+        [FromRoute] Guid id)
+    {
+        var result = await sender.Send(new Query.GetWorkingScheduleDetail(id));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetWorkingSchedules(ISender sender, string? searchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        int pageIndex = 1,
+        int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.GetWorkingSchedule(searchTerm,
+            sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageIndex, pageSize));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+
+    #endregion
 }

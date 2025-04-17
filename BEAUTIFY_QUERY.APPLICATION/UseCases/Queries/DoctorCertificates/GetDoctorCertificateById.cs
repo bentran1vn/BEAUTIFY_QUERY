@@ -4,7 +4,6 @@ using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.DoctorCertificates;
-
 internal sealed class GetDoctorCertificatesByDoctorIdHandler(
     IRepositoryBase<Staff, Guid> staffRepository,
     IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository)

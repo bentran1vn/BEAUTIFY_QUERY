@@ -53,13 +53,11 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
         }
 
         if (request.SearchTerm != null)
-        {
             query = query.Where(x =>
                 x.User.FirstName.Contains(request.SearchTerm) ||
                 x.User.LastName.Contains(request.SearchTerm) ||
                 x.User.Email.Contains(request.SearchTerm) ||
                 x.Clinic.Address.Contains(request.SearchTerm));
-        }
 
         var groupByQuery = query
             .GroupBy(x => x.UserId)
@@ -89,7 +87,7 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
                 FullAddress = g.Select(x => x.User.FullAddress).FirstOrDefault(),
                 Address = g.Select(x => x.User.Address).FirstOrDefault(),
                 ProfilePictureUrl = g.Select(x => x.User.ProfilePicture).FirstOrDefault(),
-                Role = g.Select(x => x.User.Role.Name).FirstOrDefault(),
+                Role = g.Select(x => x.User.Role.Name).FirstOrDefault()
             });
 
         var result =

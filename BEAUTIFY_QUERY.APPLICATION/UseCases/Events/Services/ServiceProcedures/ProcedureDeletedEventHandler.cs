@@ -3,8 +3,8 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.ServiceProcedures;
-
-public class ProcedureDeletedEventHandler(IMongoRepository<ClinicServiceProjection> clinicServiceRepository): ICommandHandler<DomainEvents.ProcedureDelete>
+public class ProcedureDeletedEventHandler(IMongoRepository<ClinicServiceProjection> clinicServiceRepository)
+    : ICommandHandler<DomainEvents.ProcedureDelete>
 {
     public async Task<Result> Handle(DomainEvents.ProcedureDelete request, CancellationToken cancellationToken)
     {
@@ -18,18 +18,19 @@ public class ProcedureDeletedEventHandler(IMongoRepository<ClinicServiceProjecti
         var procedures = isServiceExisted.Procedures?.ToList() ?? [];
 
         var existPro = procedures.FirstOrDefault(x => x.Id == deleteRequest.Id)!;
-        
+
         isServiceExisted.Procedures = procedures.Select(x => x.StepIndex > existPro.StepIndex
-            ? new Procedure()
+            ? new Procedure
             {
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,
                 StepIndex = x.StepIndex - 1,
-                ProcedurePriceTypes = x.ProcedurePriceTypes.Select(y => new ProcedurePriceType(y.Id, y.Name, y.Price, y.Duration, y.IsDefault)).ToList()
+                ProcedurePriceTypes = x.ProcedurePriceTypes
+                    .Select(y => new ProcedurePriceType(y.Id, y.Name, y.Price, y.Duration, y.IsDefault)).ToList()
             }
             : x).ToList();
-        
+
         isServiceExisted.Procedures.Remove(existPro);
 
         isServiceExisted.MinPrice = deleteRequest.MinPrice;

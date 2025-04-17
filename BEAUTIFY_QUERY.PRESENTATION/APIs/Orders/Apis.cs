@@ -1,4 +1,4 @@
-﻿﻿﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Orders;
@@ -40,7 +40,7 @@ public class Apis : ApiEndpoint, ICarterModule
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
-    private static async Task<IResult> GetOrderById(ISender sender, string id)
+    private static async Task<IResult> GetOrderById(ISender sender, Guid id)
     {
         var result = await sender.Send(new Query.GetOrderById(id));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);

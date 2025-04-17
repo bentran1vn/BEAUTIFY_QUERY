@@ -31,6 +31,18 @@ public class Apis : ApiEndpoint, ICarterModule
             .WithName("Check Next Schedule Availability")
             .WithSummary("Check if next schedule is available")
             .WithDescription("Check if the next customer schedule is not scheduled yet");
+        gr1.MapGet("{customerId:guid}/busy-time/{date}", GetAllCustomerBusyTime)
+            .RequireAuthorization(Constant.Role.CUSTOMER);
+    }
+
+
+    private static async Task<IResult> GetAllCustomerBusyTime(
+        ISender sender,
+        [FromRoute] Guid customerId,
+        [FromRoute] DateOnly date)
+    {
+        var result = await sender.Send(new Query.GetAllCustomerBusyTime(customerId, date));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
     private static async Task<IResult> CheckIfNextCustomerScheduleIsNotScheduledYet(
@@ -43,11 +55,13 @@ public class Apis : ApiEndpoint, ICarterModule
     }
 
     private static async Task<IResult> StaffCheckInCustomerSchedule(ISender sender,
-        [FromRoute] string customerName, [FromQuery] string customerPhone)
-
+        [FromRoute] string customerName,
+        [FromQuery] string customerPhone,
+        [FromQuery] int pageIndex = 1,
+        [FromQuery] int pageSize = 10)
     {
         var result = await sender.Send(
-            new Query.StaffCheckInCustomerScheduleQuery(customerName, customerPhone));
+            new Query.StaffCheckInCustomerScheduleQuery(customerName, customerPhone, pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 

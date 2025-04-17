@@ -5,7 +5,6 @@ using BEAUTIFY_QUERY.DOMAIN.Documents;
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.UserClinics;
 public class DoctorFromClinicDeletedEventHandler(
     IMongoRepository<ClinicServiceProjection> clinicServiceRepository
-
     /*,IMongoRepository<WorkingScheduleProjection> workingScheduleRepository,
       IMongoRepository<CustomerScheduleProjection> customerScheduleRepository*/)
     : ICommandHandler<DomainEvents.DoctorFromClinicDeleted>
@@ -23,16 +22,10 @@ public class DoctorFromClinicDeletedEventHandler(
                 .Where(ds => ds.Doctor.Id == request.IdDoctor)
                 .ToList();
 
-            foreach (var doctorService in doctorServicesToRemove)
-            {
-                service.DoctorServices.Remove(doctorService);
-            }
+            foreach (var doctorService in doctorServicesToRemove) service.DoctorServices.Remove(doctorService);
 
             // Save changes if any doctor services were removed
-            if (doctorServicesToRemove.Count != 0)
-            {
-                await clinicServiceRepository.ReplaceOneAsync(service);
-            }
+            if (doctorServicesToRemove.Count != 0) await clinicServiceRepository.ReplaceOneAsync(service);
         }
 /*
         // 2. Mark all working schedules for this doctor as deleted

@@ -34,10 +34,9 @@ internal sealed class CustomerScheduleCreateEventHandler(
                 Id = service.CurrentProcedure.Id,
                 StepIndex = service.CurrentProcedure.StepIndex,
                 DateCompleted = service.Date,
-                Duration = 0,
+                Duration = 0
             },
-            Status = service.Status,
-
+            Status = service.Status
         };
         await customerScheduleRepository.InsertOneAsync(customerSchedule);
         return Result.Success();

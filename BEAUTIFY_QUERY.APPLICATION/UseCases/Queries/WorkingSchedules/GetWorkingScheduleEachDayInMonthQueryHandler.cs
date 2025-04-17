@@ -3,7 +3,6 @@ using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 using MongoDB.Driver;
 
-
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
 internal sealed class GetWorkingScheduleEachDayInMonthQueryHandler(
     IMongoRepository<WorkingScheduleProjection> mongoRepository,

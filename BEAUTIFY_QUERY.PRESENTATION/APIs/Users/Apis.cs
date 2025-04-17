@@ -1,6 +1,5 @@
 ﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Users;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BEAUTIFY_QUERY.PRESENTATION.APIs.Users;
 public class Apis : ApiEndpoint, ICarterModule

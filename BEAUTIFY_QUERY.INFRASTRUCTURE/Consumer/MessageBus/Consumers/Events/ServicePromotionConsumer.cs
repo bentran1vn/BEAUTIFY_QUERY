@@ -9,10 +9,10 @@ public class ServicePromotionConsumer
 {
     public class ServicePromotionCreatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.ServicePromotionCreated>(sender, repository);
-    
+
     public class ServicePromotionUpdatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.ServicePromotionUpdated>(sender, repository);
-    
+
     public class ServicePromotionDeletedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.ServicePromotionDeleted>(sender, repository);
 }

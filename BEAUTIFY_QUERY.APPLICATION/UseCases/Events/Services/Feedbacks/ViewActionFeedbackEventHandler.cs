@@ -3,7 +3,6 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.Feedbacks;
-
 public class ViewActionFeedbackEventHandler(IMongoRepository<ClinicServiceProjection> clinicServiceRepository)
     : ICommandHandler<DomainEvents.ViewActionFeedback>
 {
@@ -15,19 +14,16 @@ public class ViewActionFeedbackEventHandler(IMongoRepository<ClinicServiceProjec
         var isServiceExisted = await clinicServiceRepository
                                    .FindOneAsync(p => p.DocumentId == serviceRequest.ServiceId)
                                ?? throw new Exception($"Service {serviceRequest.ServiceId} not found");
-        
+
         isServiceExisted.Feedbacks = isServiceExisted.Feedbacks
             .Select(x =>
             {
-                if (x.FeedbackId == serviceRequest.FeedbackId)
-                {
-                    x.IsView = serviceRequest.IsView;
-                }
+                if (x.FeedbackId == serviceRequest.FeedbackId) x.IsView = serviceRequest.IsView;
                 return x;
             }).ToList();
-        
+
         await clinicServiceRepository.ReplaceOneAsync(isServiceExisted);
-        
+
         return Result.Success();
     }
 }

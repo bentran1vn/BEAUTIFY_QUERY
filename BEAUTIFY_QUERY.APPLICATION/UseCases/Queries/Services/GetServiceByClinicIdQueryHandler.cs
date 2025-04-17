@@ -3,7 +3,6 @@ using BEAUTIFY_QUERY.CONTRACT.Services.Services;
 using BEAUTIFY_QUERY.DOMAIN.Documents;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
-using Promotion = BEAUTIFY_QUERY.DOMAIN.Entities.Promotion;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Services;
 internal sealed class GetServiceByClinicIdQueryHandler(
@@ -17,8 +16,7 @@ internal sealed class GetServiceByClinicIdQueryHandler(
         CancellationToken cancellationToken)
     {
         var clinicServices =
-            repository.FilterBy(
-                    x => x.Clinic.Any(x => x.Id == request.ClinicId && x.IsActivated))
+            repository.FilterBy(x => x.Clinic.Any(x => x.Id == request.ClinicId && x.IsActivated))
                 .OrderBy(x => x.Name)
                 .ToList();
         if (clinicServices.Count == 0)
@@ -113,14 +111,14 @@ internal sealed class GetServiceByClinicIdQueryHandler(
                                 ExpiryDate = c.ExpiryDate,
                                 Note = c.Note
                             }).ToList()))).ToList(),
-                x.Feedbacks.Select(z => new Response.Feedback()
+                x.Feedbacks.Select(z => new Response.Feedback
                 {
                     FeedbackId = z.FeedbackId,
                     ServiceId = z.ServiceId,
                     Content = z.Content,
                     IsView = z.IsView,
                     Rating = z.Rating,
-                    User = new Response.User()
+                    User = new Response.User
                     {
                         Id = z.User.Id,
                         FullName = z.User.FullName,

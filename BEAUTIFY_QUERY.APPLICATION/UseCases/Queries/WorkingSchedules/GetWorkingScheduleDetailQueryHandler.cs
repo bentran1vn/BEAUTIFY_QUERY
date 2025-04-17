@@ -30,12 +30,12 @@ internal sealed class GetWorkingScheduleDetailQueryHandler(IMongoRepository<Work
             Status = workingSchedule.Status,
             CustomerScheduleId = workingSchedule.CustomerScheduleId,
             IsNoted = workingSchedule.IsNoted,
-            Note = workingSchedule.Note,
+            Note = workingSchedule.Note
         };
 
         var response = new Response.GetWorkingScheduleDetailResponse
         {
-            Appointment = appointment,
+            Appointment = appointment
         };
 
 

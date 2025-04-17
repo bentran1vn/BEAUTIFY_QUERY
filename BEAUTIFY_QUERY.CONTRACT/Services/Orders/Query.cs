@@ -1,4 +1,4 @@
-﻿﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 public static class Query
@@ -11,7 +11,6 @@ public static class Query
         int PageSize) : IQuery<PagedResult<Response.Order>>;
 
 
-
     //Todo Check roles
     public record GetOrdersByClinicId(
         string? SearchTerm,
@@ -21,7 +20,7 @@ public static class Query
         int PageSize) : IQuery<PagedResult<Response.Order>>;
 
 
-    public record GetOrderById(string Id) : IQuery<Response.Order>;
+    public record GetOrderById(Guid Id) : IQuery<Response.OrderById>;
 
     public record GetClinicOrderBranchesQuery(
         string? SearchTerm,

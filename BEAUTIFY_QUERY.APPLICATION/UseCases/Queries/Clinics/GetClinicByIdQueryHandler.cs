@@ -11,11 +11,11 @@ internal sealed class GetClinicByIdQueryHandler(
     : IQueryHandler<Query.GetClinicByIdQuery, Response.ClinicBranchDto>
 {
     public async Task<Result<Response.ClinicBranchDto>> Handle(
-        Query.GetClinicByIdQuery request, 
+        Query.GetClinicByIdQuery request,
         CancellationToken cancellationToken)
     {
         var clinic = await clinicRepository.FindByIdAsync(request.Id, cancellationToken);
-        
+
         if (clinic == null || clinic.IsDeleted)
             return Result.Failure<Response.ClinicBranchDto>(new Error("404", "Clinic not found"));
 

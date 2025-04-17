@@ -3,6 +3,12 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Clinics;
 public static class Query
 {
+    public enum Roles
+    {
+        DOCTOR = 1,
+        CLINIC_STAFF = 2
+    }
+
     public record GetClinicsQuery(
         string? SearchTerm,
         string? Role,
@@ -35,22 +41,16 @@ public static class Query
     public record GetDetailAccountOfEmployeeQuery(Guid ClinicId, Guid StaffId)
         : IQuery<Response.GetAccountOfEmployee>;
 
-    public enum Roles
-    {
-        DOCTOR = 1,
-        CLINIC_STAFF = 2
-    }
-
     public record GetAllClinicBranchQuery(
         string? SearchTerm,
         string? SortColumn,
         SortOrder? SortOrder,
         int PageIndex,
         int PageSize) : IQuery<PagedResult<Response.GetClinicBranches>>;
-    
+
     public record GetClinicBranchesQuery : IQuery<Response.GetClinicBranchesResponse>;
 
     public record GetClinicByIdQuery(Guid Id) : IQuery<Response.ClinicBranchDto>;
-    
+
     public record GetSubClinicByIdQuery(Guid Id) : IQuery<Response.ClinicBranchDto>;
 }

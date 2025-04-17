@@ -8,6 +8,8 @@ public class Order : AggregateRoot<Guid>, IAuditableEntity
     public virtual User? Customer { get; set; }
     [Column(TypeName = "decimal(18,2)")] public decimal? TotalAmount { get; set; }
     [Column(TypeName = "decimal(18,2)")] public decimal? Discount { get; set; }
+
+    [Column(TypeName = "decimal(18,2)")] public required decimal DepositAmount { get; set; }
     [Column(TypeName = "decimal(18,2)")] public decimal? FinalAmount { get; set; }
     public DateOnly OrderDate { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
     public Guid? ServiceId { get; set; }
@@ -17,6 +19,7 @@ public class Order : AggregateRoot<Guid>, IAuditableEntity
 
     [MaxLength(50)] public string? Status { get; set; }
     public virtual ICollection<OrderDetail>? OrderDetails { get; set; } = [];
+    public virtual ICollection<CustomerSchedule>? CustomerSchedules { get; set; } = [];
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? ModifiedOnUtc { get; set; }
 }

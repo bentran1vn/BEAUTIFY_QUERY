@@ -27,12 +27,11 @@ public static class ServiceCollectionExtensions
                 .UseSqlServer(
                     configuration.GetConnectionString("ConnectionStrings"),
                     optionsBuilder
-                        => optionsBuilder.ExecutionStrategy(
-                                dependencies => new SqlServerRetryingExecutionStrategy(
-                                    dependencies,
-                                    options.CurrentValue.MaxRetryCount,
-                                    options.CurrentValue.MaxRetryDelay,
-                                    options.CurrentValue.ErrorNumbersToAdd))
+                        => optionsBuilder.ExecutionStrategy(dependencies => new SqlServerRetryingExecutionStrategy(
+                                dependencies,
+                                options.CurrentValue.MaxRetryCount,
+                                options.CurrentValue.MaxRetryDelay,
+                                options.CurrentValue.ErrorNumbersToAdd))
                             .MigrationsAssembly(typeof(ApplicationDbContext).Assembly.GetName().Name));
 
             #endregion ============== SQL-SERVER-STRATEGY-1 ==============

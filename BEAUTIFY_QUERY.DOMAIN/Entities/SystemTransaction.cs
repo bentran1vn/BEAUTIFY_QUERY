@@ -8,10 +8,10 @@ public class SystemTransaction : AggregateRoot<Guid>, IAuditableEntity
     public virtual Clinic? Clinic { get; set; }
     public Guid? SubscriptionPackageId { get; set; }
     public virtual SubscriptionPackage? SubscriptionPackage { get; set; }
-    
+
     public int? AdditionBranches { get; set; }
     public int? AdditionLivestreams { get; set; }
-    
+
     public Guid? OrderId { get; set; }
     public virtual Order? Order { get; set; }
     public DateTimeOffset TransactionDate { get; set; } = DateTimeOffset.UtcNow;

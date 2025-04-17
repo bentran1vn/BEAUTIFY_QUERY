@@ -1,5 +1,4 @@
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Dashboards;
-
 public class Responses
 {
     public class GetTotalInformationResponse
@@ -10,8 +9,8 @@ public class Responses
         public int? TotalStaff { get; set; }
         public int TotalService { get; set; }
         public int TotalDoctor { get; set; }
-    };
-    
+    }
+
     public class GetSystemTotalInformationResponse
     {
         public int? TotalClinics { get; set; }
@@ -19,11 +18,11 @@ public class Responses
         public int? TotalBranches { get; set; }
         public int? TotalBranchActive { get; set; }
         public int? TotalBranchInActive { get; set; }
-        public int TotalBrandPending{ get; set; }
+        public int TotalBrandPending { get; set; }
         public int TotalService { get; set; }
         public int TotalDoctor { get; set; }
-    };
-    
+    }
+
     public class GetDaytimeInformationResponse
     {
         public Information? DatetimeInformation { get; set; }
@@ -50,7 +49,7 @@ public class Responses
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
     }
-    
+
     public class SystemInformation
     {
         public int TotalCountBranding { get; set; }
@@ -67,14 +66,14 @@ public class Responses
         public decimal TotalSumGoldSubscriptionRevenue { get; set; }
         public decimal TotalSumClinicRevenue { get; set; }
     }
-    
+
     public class SystemDatetimeInformation
     {
         public SystemInformation Information { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
     }
-    
+
     public class GetSystemDaytimeInformationResponse
     {
         public SystemInformation? SystemInformation { get; set; }
