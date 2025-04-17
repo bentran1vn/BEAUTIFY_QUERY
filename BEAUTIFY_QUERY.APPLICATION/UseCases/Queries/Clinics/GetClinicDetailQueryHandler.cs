@@ -115,6 +115,8 @@ public class GetClinicDetailQueryHandler(
             clinic.TaxCode,
             clinic.BusinessLicenseUrl,
             clinic.OperatingLicenseUrl,
+            clinic.WorkingTimeStart,
+            clinic.WorkingTimeEnd,
             clinic.OperatingLicenseExpiryDate,
             clinic.ProfilePictureUrl,
             clinic.TotalBranches ?? 0,

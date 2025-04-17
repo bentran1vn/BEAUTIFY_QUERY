@@ -5,8 +5,16 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.INFRASTRUCTURE.Consumer.Abstractions.M
 using MediatR;
 
 namespace BEAUTIFY_QUERY.INFRASTRUCTURE.Consumer.MessageBus.Consumers.Events;
+
 public static class ClinicConsumer
 {
     public class ClinicBranchActivatedActionConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.ClinicBranchActivatedAction>(sender, repository);
+    
+    
+    public class ClinicDeletedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.ClinicDeleted>(sender, repository);
+    
+    public class ClinicUpdatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.ClinicUpdated>(sender, repository);
 }

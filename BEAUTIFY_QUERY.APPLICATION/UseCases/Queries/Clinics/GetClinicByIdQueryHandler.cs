@@ -39,6 +39,8 @@ internal sealed class GetClinicByIdQueryHandler(
             Logo = clinic.ProfilePictureUrl,
             Balance = clinic.Balance,
             PendingWithdrawals = pendingWithdrawals,
+            WorkingTimeEnd = clinic.WorkingTimeStart,
+            WorkingTimeStart = clinic.WorkingTimeEnd,
             TotalEarnings = totalEarnings,
             BankName = clinic.BankName ?? string.Empty,
             BankAccountNumber = clinic.BankAccountNumber ?? string.Empty,

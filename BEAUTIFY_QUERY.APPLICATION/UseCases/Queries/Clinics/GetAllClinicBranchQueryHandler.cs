@@ -39,6 +39,8 @@ public class GetAllClinicBranchQueryHandler(
                 x.Ward,
                 x.FullAddress,
                 x.TaxCode,
+                x.WorkingTimeStart,
+                x.WorkingTimeEnd,
                 x.BusinessLicenseUrl,
                 x.OperatingLicenseUrl,
                 x.OperatingLicenseExpiryDate,
