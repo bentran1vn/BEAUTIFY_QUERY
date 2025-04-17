@@ -6,6 +6,7 @@ public static class Response
         Guid OrderId,
         decimal Amount,
         string CustomerName,
+        string CustomerEmail,
         string CustomerPhoneNumber,
         string ServiceName,
         string DoctorName,
@@ -14,6 +15,7 @@ public static class Response
         TimeSpan? EndTime,
         string Status,
         string ProcedurePriceTypeName,
+        string ProcedureName,
         string StepIndex,
         bool IsFirstCheckIn = false);
 
@@ -23,6 +25,7 @@ public static class Response
         Guid UserId,
         decimal Amount,
         string CustomerName,
+        string CustomerEmail,
         string CustomerPhoneNumber,
         string ServiceName,
         string DoctorName,
@@ -31,6 +34,7 @@ public static class Response
         TimeSpan? EndTime,
         string Status,
         string ProcedurePriceTypeName,
+        string ProcedureName,
         string StepIndex,
         bool IsFirstCheckIn = false);
 

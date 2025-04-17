@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 
 namespace BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 public static class Query

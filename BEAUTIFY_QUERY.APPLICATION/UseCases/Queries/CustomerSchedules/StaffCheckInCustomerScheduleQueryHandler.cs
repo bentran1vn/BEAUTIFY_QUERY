@@ -1,8 +1,8 @@
-﻿﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
+﻿using System.Linq.Expressions;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.CustomerSchedules;
 internal sealed class StaffCheckInCustomerScheduleQueryHandler(
@@ -38,7 +38,7 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
         var query = customerScheduleRepositoryBase.FindAll(
                 x => users.Select(u => u.Id).Contains(x.CustomerId) &&
                      x.Doctor.ClinicId == currentUserService.ClinicId &&
-                    /* x.Date == DateOnly.FromDateTime(currentTime) &&*/ x.StartTime != null)
+                     /* x.Date == DateOnly.FromDateTime(currentTime) &&*/ x.StartTime != null)
             .Include(x => x.Service)
             .Include(x => x.Doctor)
             .ThenInclude(d => d.User)
@@ -108,6 +108,7 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             OrderId: schedule.OrderId.Value,
             Amount: schedule.Order?.FinalAmount ?? 0,
             CustomerName: $"{user.FirstName} {user.LastName}".Trim(),
+            CustomerEmail: user.Email,
             CustomerPhoneNumber: user.PhoneNumber,
             ServiceName: schedule.Service?.Name ?? string.Empty,
             DoctorName: schedule.Doctor?.User is not null
@@ -118,6 +119,7 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             EndTime: schedule.EndTime,
             Status: schedule.Status,
             ProcedurePriceTypeName: schedule.ProcedurePriceType?.Name ?? string.Empty,
+            ProcedureName: schedule.ProcedurePriceType?.Procedure.Name ?? string.Empty,
             StepIndex: schedule.ProcedurePriceType?.Procedure.StepIndex.ToString(),
             schedule.ProcedurePriceType.Procedure.StepIndex == 1
         );
