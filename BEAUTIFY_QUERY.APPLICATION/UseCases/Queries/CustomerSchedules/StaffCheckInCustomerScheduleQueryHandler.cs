@@ -106,6 +106,9 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
         return new Response.StaffCheckInCustomerScheduleResponse(
             Id: schedule.Id,
             OrderId: schedule.OrderId.Value,
+            TotalAmount: schedule.Order?.TotalAmount ?? 0,
+            DiscountAmount: schedule.Order?.Discount ?? 0,
+            DepositAmount: schedule.Order?.DepositAmount ?? 0,
             Amount: schedule.Order?.FinalAmount ?? 0,
             CustomerName: $"{user.FirstName} {user.LastName}".Trim(),
             CustomerEmail: user.Email,
