@@ -70,7 +70,10 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
                     isExist.Clinic.Email, isExist.Clinic.City,
                     isExist.Clinic.Address, isExist.Clinic.District,
                     isExist.Clinic.Ward, isExist.Clinic.FullAddress,
-                    isExist.Clinic.TaxCode, isExist.Clinic.BusinessLicenseUrl,
+                    isExist.Clinic.TaxCode,
+                    isExist.Clinic.WorkingTimeStart,
+                    isExist.Clinic.WorkingTimeEnd,
+                    isExist.Clinic.BusinessLicenseUrl,
                     isExist.Clinic.OperatingLicenseUrl, isExist.Clinic.OperatingLicenseExpiryDate,
                     isExist.Clinic.ProfilePictureUrl, isExist.Clinic.IsActivated
                 )).ToArray(),

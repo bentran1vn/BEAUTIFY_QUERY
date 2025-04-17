@@ -36,6 +36,8 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
             City = x.City,
             Address = x.Address,
             District = x.District,
+            WorkingTimeStart = x.WorkingTimeStart,
+            WorkingTimeEnd = x.WorkingTimeEnd,
             Ward = x.Ward,
             FullAddress = x.FullAddress,
             PhoneNumber = x.PhoneNumber,

@@ -47,6 +47,8 @@ internal sealed class GetSubClinicByIdQueryHandler(
             Logo = requestedClinic.ProfilePictureUrl,
             Balance = requestedClinic.Balance,
             PendingWithdrawals = pendingWithdrawals,
+            WorkingTimeEnd = requestedClinic.WorkingTimeStart,
+            WorkingTimeStart = requestedClinic.WorkingTimeEnd,
             TotalEarnings = totalEarnings,
             BankName = requestedClinic.BankName ?? string.Empty,
             BankAccountNumber = requestedClinic.BankAccountNumber ?? string.Empty,

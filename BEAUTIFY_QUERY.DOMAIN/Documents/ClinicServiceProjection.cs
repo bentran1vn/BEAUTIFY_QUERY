@@ -36,6 +36,8 @@ public class Clinic
     public string Ward { get; set; }
     public string FullAddress { get; set; }
     public string PhoneNumber { get; set; }
+    public required TimeSpan WorkingTimeStart { get; set; }
+    public required TimeSpan WorkingTimeEnd { get; set; }
     public string? ProfilePictureUrl { get; set; }
     public bool? IsParent { get; set; }
     public bool IsActivated { get; set; }

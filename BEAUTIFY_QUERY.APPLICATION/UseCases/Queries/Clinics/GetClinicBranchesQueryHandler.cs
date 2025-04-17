@@ -68,6 +68,8 @@ internal sealed class GetClinicBranchesQueryHandler(
                 Name = clinic.Name,
                 Logo = clinic.ProfilePictureUrl,
                 Balance = clinic.Balance,
+                WorkingTimeEnd = clinic.WorkingTimeStart,
+                WorkingTimeStart = clinic.WorkingTimeEnd,
                 PendingWithdrawals =
                     pendingWithdrawals.TryGetValue(clinic.Id, out var pendingAmount) ? pendingAmount : 0,
                 TotalEarnings = totalEarnings.TryGetValue(clinic.Id, out var earnings) ? earnings : 0,

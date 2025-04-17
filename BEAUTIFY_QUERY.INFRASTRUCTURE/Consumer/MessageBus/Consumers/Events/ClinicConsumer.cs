@@ -11,4 +11,10 @@ public static class ClinicConsumer
     public class ClinicBranchActivatedActionConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.ClinicBranchActivatedAction>(sender, repository);
     
+    
+    public class ClinicDeletedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.ClinicDeleted>(sender, repository);
+    
+    public class ClinicUpdatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.ClinicUpdated>(sender, repository);
 }

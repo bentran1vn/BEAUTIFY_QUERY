@@ -14,19 +14,20 @@ internal sealed class GetClinicsQueryHandler(
     public async Task<Result<PagedResult<Response.GetClinics>>> Handle(Query.GetClinicsQuery request,
         CancellationToken cancellationToken)
     {
-        var clinicsQuery = string.IsNullOrWhiteSpace(request.SearchTerm)
-            ? clinicRepository.FindAll(x => !x.IsDeleted && x.IsParent.Value)
+        var clinicsQuery = clinicRepository.FindAll(x => true);
+
+        clinicsQuery = string.IsNullOrWhiteSpace(request.SearchTerm)
+            ? clinicsQuery
             : clinicRepository.FindAll(
                 x => (x.Name.ToLower().Contains(request.SearchTerm.ToLower())
                       || x.Email.ToLower().Contains(request.SearchTerm.ToLower())
                       || x.Address.ToLower().Contains(request.SearchTerm.ToLower()))
-                     && !x.IsDeleted
             );
 
-        if (request.Role is null or Constant.Role.CUSTOMER)
+        if (request.Role is not Constant.Role.CLINIC_ADMIN)
         {
             clinicsQuery = clinicsQuery
-                .Where(x => x.IsActivated);
+                .Where(x => x.IsActivated && x.IsParent.Value && !x.IsDeleted);
         }
 
         clinicsQuery = request.SortOrder == SortOrder.Descending
