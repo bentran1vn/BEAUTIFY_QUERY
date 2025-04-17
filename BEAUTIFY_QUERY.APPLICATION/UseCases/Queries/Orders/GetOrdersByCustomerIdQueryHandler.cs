@@ -22,8 +22,7 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
 
     private IQueryable<Order> BuildQuery(Query.GetOrdersByCustomerId request)
     {
-        var query = orderRepositoryBase.FindAll(x => x.CustomerId == currentUserService.UserId)
-            ;
+        var query = orderRepositoryBase.FindAll(x => x.CustomerId == currentUserService.UserId);
 
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
@@ -71,6 +70,7 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
                 x.Service.Name,
                 x.TotalAmount,
                 x.Discount,
+                x.DepositAmount,
                 x.FinalAmount,
                 DateOnly.Parse(x.OrderDate.ToString("yyyy-MM-dd")),
                 x.Status,
