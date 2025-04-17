@@ -4,7 +4,7 @@ public static class Response
     public record StaffCheckInCustomerScheduleResponse(
         Guid Id,
         Guid OrderId,
-        decimal? TotalAmount,
+        decimal? ServicePrice,
         decimal? DiscountAmount,
         decimal DepositAmount,
         decimal? Amount,
@@ -26,7 +26,7 @@ public static class Response
         Guid Id,
         Guid OrderId,
         Guid UserId,
-        decimal? TotalAmount,
+        decimal? ServicePrice,
         decimal? DiscountAmount,
         decimal DepositAmount,
         decimal Amount,
