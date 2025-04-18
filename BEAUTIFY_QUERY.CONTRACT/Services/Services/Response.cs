@@ -52,6 +52,8 @@ public class Response
         string Email,
         string Address,
         string PhoneNumber,
+        TimeSpan WorkingTimeStart,
+        TimeSpan WorkingTimeEnd,
         string? ProfilePictureUrl,
         bool? IsParent,
         bool IsActivated,

@@ -48,7 +48,10 @@ public class
         var mapList = services.Items.Select(x => new Response.GetAllServiceResponse(
                 x.DocumentId, x.Name,
                 new Response.Clinic(x.Branding.Id, x.Branding.Name, x.Branding.Email,
-                    x.Branding.Address, x.Branding.PhoneNumber, x.Branding.ProfilePictureUrl,
+                    x.Branding.Address, x.Branding.PhoneNumber,
+                    x.Branding.WorkingTimeStart,
+                    x.Branding.WorkingTimeEnd,
+                    x.Branding.ProfilePictureUrl,
                     x.Branding.IsParent,
                     x.Branding.IsActivated,
                     x.Branding.ParentId),
@@ -59,7 +62,8 @@ public class
                 x.DiscountMaxPrice, x.DiscountMinPrice,
                 x.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
                 x.Clinic.Select(y => new Response.Clinic(y.Id, y.Name, y.Email,
-                    y.Address, y.PhoneNumber, y.ProfilePictureUrl, y.IsParent, y.IsActivated, y.ParentId)).ToList(),
+                    y.Address, y.PhoneNumber, y.WorkingTimeStart, y.WorkingTimeEnd,
+                    y.ProfilePictureUrl, y.IsParent, y.IsActivated, y.ParentId)).ToList(),
                 new Response.Category(x.Category.Id, x.Category.Name, x.Category.Description), x.DoctorServices
                     .Select(y =>
                         new Response.DoctorService(y.Id, y.ServiceId,
