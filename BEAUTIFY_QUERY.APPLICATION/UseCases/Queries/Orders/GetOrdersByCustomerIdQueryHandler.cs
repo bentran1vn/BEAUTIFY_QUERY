@@ -85,8 +85,8 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
             "total amount" => projection => projection.TotalAmount,
             "discount" => projection => projection.Discount,
             "final amount" => projection => projection.FinalAmount,
-            "date" => projection => projection.CreatedOnUtc,
-            _ => projection => projection.OrderDate
+            "orderDate" => projection => projection.CreatedOnUtc,
+            _ => projection => projection.CreatedOnUtc
         };
     }
 }
