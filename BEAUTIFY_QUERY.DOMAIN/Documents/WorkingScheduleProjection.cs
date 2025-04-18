@@ -6,7 +6,7 @@ namespace BEAUTIFY_QUERY.DOMAIN.Documents;
 public class WorkingScheduleProjection : Document
 {
     public Guid? DoctorId { get; set; }
-    public required Guid CustomerScheduleId { get; set; }
+    public Guid? CustomerScheduleId { get; set; }
     public string? DoctorName { get; set; }
     public Guid ClinicId { get; set; }
     public DateOnly Date { get; set; }
@@ -18,12 +18,14 @@ public class WorkingScheduleProjection : Document
     public string? Note { get; set; }
     public bool? IsNoted { get; set; }
 
-    public string StepIndex { get; set; }
-    public string CustomerName { get; set; }
+    public string? StepIndex { get; set; }
+    public string? CustomerName { get; set; }
     public Guid? CustomerId { get; set; }
 
     public Guid? ServiceId { get; set; }
-    public string ServiceName { get; set; }
+    public string? ServiceName { get; set; }
+    public Guid? ShiftGroupId { get; set; }
+    public int? ShiftCapacity { get; set; }
 
-    public string CurrentProcedureName { get; set; }
+    public string? CurrentProcedureName { get; set; }
 }

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
@@ -487,22 +488,50 @@ public class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider
         return _inner.Execute<TResult>(expression);
     }
 
-    public TResult ExecuteAsync<TResult>(Expression expression,
-        CancellationToken cancellationToken = new())
+    // Fixed: Simplified ExecuteAsync method to avoid reflection errors
+    public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
     {
+        // For common EF Core async operations (Count, First, etc.), we'll execute them synchronously
+        // This works because we're dealing with in-memory collections
+        var result = _inner.Execute<TResult>(expression);
+
+        // For Task<T> or ValueTask<T> results, we need to wrap them
+        if (!typeof(TResult).IsGenericType ||
+            (typeof(TResult).GetGenericTypeDefinition() != typeof(Task<>) &&
+             typeof(TResult).GetGenericTypeDefinition() != typeof(ValueTask<>))) return result;
+        // Get the T from Task<T> or ValueTask<T>
         var resultType = typeof(TResult).GetGenericArguments()[0];
-        var executeMethod = typeof(IQueryProvider)
-            .GetMethod(
-                nameof(IQueryProvider.Execute),
-                1,
-                new[] { typeof(Expression) })
-            ?.MakeGenericMethod(resultType);
 
-        var result = executeMethod?.Invoke(_inner, new[] { expression });
+        // For Task<T>
+        if (typeof(TResult).GetGenericTypeDefinition() == typeof(Task<>))
+        {
+            var methodInfo = typeof(Task).GetMethod(nameof(Task.FromResult));
+            var genericMethod = methodInfo.MakeGenericMethod(resultType);
 
-        return (TResult)typeof(Task).GetMethod(nameof(Task.FromResult))
-            ?.MakeGenericMethod(resultType)
-            .Invoke(null, new[] { result });
+            // Get the underlying result
+            var innerResult = _inner.Execute(expression);
+            if (innerResult is not IEnumerable enumerable || resultType == typeof(IEnumerable))
+                return (TResult)genericMethod.Invoke(null, new[] { innerResult });
+            // If the result is IEnumerable but the expected return type is something like int, 
+            // we need to handle specific operations like Count, Sum, etc.
+            if (resultType == typeof(int))
+            {
+                // Most likely Count or Sum
+                innerResult = enumerable.Cast<object>().Count();
+            }
+
+            return (TResult)genericMethod.Invoke(null, new[] { innerResult });
+        }
+
+        // For ValueTask<T>
+        var valueTaskConstructor = typeof(ValueTask<>).MakeGenericType(resultType)
+            .GetConstructor(new[] { resultType });
+        if (valueTaskConstructor != null)
+        {
+            return (TResult)valueTaskConstructor.Invoke(new[] { _inner.Execute(expression) });
+        }
+
+        return result;
     }
 
     public IAsyncEnumerable<TResult> ExecuteAsync<TResult>(Expression expression)
@@ -511,45 +540,44 @@ public class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider
     }
 }
 
+// Fixed: Removed circular provider reference
 public class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, IQueryable<T>
 {
+    private readonly IQueryProvider _provider;
+
     public TestAsyncEnumerable(IEnumerable<T> enumerable)
         : base(enumerable)
     {
+        _provider = new TestAsyncQueryProvider<T>(((IQueryable)this).Provider);
     }
 
     public TestAsyncEnumerable(Expression expression)
         : base(expression)
     {
+        _provider = new TestAsyncQueryProvider<T>(((IQueryable)this).Provider);
     }
 
-    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = new())
+    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
     {
         return new TestAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
     }
 
-    IQueryProvider IQueryable.Provider => new TestAsyncQueryProvider<T>(((IQueryable)this).Provider);
+    // Fixed: Don't create a new provider each time, which creates a circular reference
+    IQueryProvider IQueryable.Provider => _provider;
 }
 
-public class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
+public class TestAsyncEnumerator<T>(IEnumerator<T> inner) : IAsyncEnumerator<T>
 {
-    private readonly IEnumerator<T> _inner;
-
-    public TestAsyncEnumerator(IEnumerator<T> inner)
-    {
-        _inner = inner;
-    }
-
-    public T Current => _inner.Current;
+    public T Current => inner.Current;
 
     public ValueTask<bool> MoveNextAsync()
     {
-        return new ValueTask<bool>(_inner.MoveNext());
+        return new ValueTask<bool>(inner.MoveNext());
     }
 
     public ValueTask DisposeAsync()
     {
-        _inner.Dispose();
+        inner.Dispose();
         return ValueTask.CompletedTask;
     }
 }

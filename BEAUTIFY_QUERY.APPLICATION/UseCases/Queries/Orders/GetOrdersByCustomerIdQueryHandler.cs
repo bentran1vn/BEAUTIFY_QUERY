@@ -6,7 +6,7 @@ using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Orders;
-internal sealed class GetOrdersByCustomerIdQueryHandler(
+public sealed class GetOrdersByCustomerIdQueryHandler(
     IRepositoryBase<Order, Guid> orderRepositoryBase,
     ICurrentUserService currentUserService)
     : IQueryHandler<Query.GetOrdersByCustomerId, PagedResult<Response.Order>>
@@ -85,7 +85,7 @@ internal sealed class GetOrdersByCustomerIdQueryHandler(
             "total amount" => projection => projection.TotalAmount,
             "discount" => projection => projection.Discount,
             "final amount" => projection => projection.FinalAmount,
-            "orderDate" => projection => projection.CreatedOnUtc,
+            "orderdate" => projection => projection.CreatedOnUtc,
             _ => projection => projection.CreatedOnUtc
         };
     }

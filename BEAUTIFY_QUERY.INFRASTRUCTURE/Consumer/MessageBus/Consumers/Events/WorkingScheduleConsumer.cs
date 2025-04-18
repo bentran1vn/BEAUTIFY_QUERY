@@ -15,4 +15,10 @@ public static class WorkingScheduleConsumer
 
     public class WorkingScheduleUpdatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.WorkingScheduleUpdated>(sender, repository);
+
+    public class ClinicEmptyScheduleCreatedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.ClinicEmptyScheduleCreated>(sender, repository);
+
+    public class ClinicScheduleCapacityChangedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.ClinicScheduleCapacityChanged>(sender, repository);
 }
