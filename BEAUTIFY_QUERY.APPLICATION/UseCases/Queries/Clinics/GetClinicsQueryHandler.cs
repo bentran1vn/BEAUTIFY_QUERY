@@ -24,7 +24,7 @@ internal sealed class GetClinicsQueryHandler(
                       || x.Address.ToLower().Contains(request.SearchTerm.ToLower()))
             );
 
-        if (request.Role is not Constant.Role.CLINIC_ADMIN)
+        if (!(request.Role is Constant.Role.CLINIC_ADMIN || request.Role is Constant.Role.CLINIC_STAFF))
         {
             clinicsQuery = clinicsQuery
                 .Where(x => x.IsActivated && x.IsParent.Value && !x.IsDeleted);
