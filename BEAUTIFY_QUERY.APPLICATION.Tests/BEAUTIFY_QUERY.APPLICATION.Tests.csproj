@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <RootNamespace>BEAUTIFY_QUERY.APPLICATION.Tests</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
+        <PackageReference Include="xunit" Version="2.6.2"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="6.0.0">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.11.4"/>
+        <PackageReference Include="Moq" Version="4.20.69"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7"/>
+        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.11.3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\BEAUTIFY_QUERY.APPLICATION\BEAUTIFY_QUERY.APPLICATION.csproj"/>
+        <ProjectReference Include="..\BEAUTIFY_QUERY.CONTRACT\BEAUTIFY_QUERY.CONTRACT.csproj"/>
+        <ProjectReference Include="..\BEAUTIFY_QUERY.DOMAIN\BEAUTIFY_QUERY.DOMAIN.csproj"/>
+    </ItemGroup>
+
+</Project>
