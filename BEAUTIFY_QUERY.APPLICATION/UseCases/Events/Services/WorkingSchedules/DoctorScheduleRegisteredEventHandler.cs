@@ -19,6 +19,7 @@ internal sealed class DoctorScheduleRegisteredEventHandler(
         foreach (var x in listWorkingSchedule)
         {
             x.DoctorId = request.DoctorId;
+            x.DoctorName = request.DoctorName;
             workingScheduleMongoRepository.ReplaceOneAsync(x);
         }
 

@@ -27,4 +27,11 @@ public static class Query
         SortOrder SortOrder,
         int PageNumber,
         int PageSize) : IQuery<PagedResult<Response.GetWorkingScheduleResponse>>;
+
+    public record GetWorkingScheduleByClinicId(
+        string? searchTerm,
+        string? SortColumn,
+        SortOrder SortOrder,
+        int PageNumber,
+        int PageSize) : IQuery<PagedResult<Response.GetWorkingScheduleResponse>>;
 }

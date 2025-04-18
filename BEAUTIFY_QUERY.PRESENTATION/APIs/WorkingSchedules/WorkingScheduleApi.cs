@@ -25,6 +25,10 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
         gr1.MapGet("doctors/{id:guid}", GetWorkingScheduleById)
             .WithSummary("Get doctor's busy time slots for a specific day")
             .RequireAuthorization(Constant.Role.DOCTOR);
+
+        gr1.MapGet("clinics", GetWorkingSchedulesByClinicId)
+            .WithSummary("Get working schedules by clinic ID")
+            .RequireAuthorization(Constant.Role.CLINIC_STAFF);
     }
 
     #region GetDoctorBusyTimeInADay
@@ -41,6 +45,20 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
     }
 
     #endregion
+
+    private static async Task<IResult> GetWorkingSchedulesByClinicId(
+        ISender sender,
+        string? searchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        int pageIndex = 1,
+        int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.GetWorkingScheduleByClinicId(searchTerm,
+            sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageIndex, pageSize));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
 
     private static async Task<IResult> GetWorkingSchedulesEachDayInMonth(
         ISender sender,
