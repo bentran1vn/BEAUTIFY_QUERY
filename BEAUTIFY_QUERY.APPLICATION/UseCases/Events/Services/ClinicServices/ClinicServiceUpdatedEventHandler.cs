@@ -24,6 +24,8 @@ public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.Cli
 
         isServiceExisted.Name = serviceRequest.Name;
         isServiceExisted.Description = serviceRequest.Description;
+        isServiceExisted.DepositPercent = serviceRequest.DepositPercent;
+        isServiceExisted.IsRefundable = serviceRequest.IsRefundable;
         isServiceExisted.Category = new Category(
             serviceRequest.Category.Id, serviceRequest.Category.Name,
             serviceRequest.Category.Description

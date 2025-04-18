@@ -54,6 +54,8 @@ internal sealed class GetServiceByClinicIdQueryHandler(
                 x.DiscountPercent.ToString(),
                 x.DiscountMaxPrice,
                 x.DiscountMinPrice,
+                x.DepositPercent,
+                x.IsRefundable,
                 x.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
                 x.Clinic.Select(y => new Response.Clinic(
                     y.Id,

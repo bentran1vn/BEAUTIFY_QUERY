@@ -24,6 +24,8 @@ internal sealed class GetAllServiceInGetClinicByIdQueryHandler(
             Description = x.Description,
             MaxPrice = x.MaxPrice,
             MinPrice = x.MinPrice,
+            DepositPercent = x.DepositPercent,
+            IsRefundable = x.IsRefundable,
             DiscountPercent = (x.DiscountPercent * 100).ToString(),
             DiscountMaxPrice = x.DiscountMaxPrice,
             DiscountMinPrice = x.DiscountMinPrice,

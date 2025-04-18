@@ -7,6 +7,8 @@ public class Response
         Clinic Branding,
         decimal MaxPrice,
         decimal MinPrice,
+        double DepositPercent,
+        bool IsRefundable,
         string DiscountPercent,
         decimal DiscountMaxPrice,
         decimal DiscountMinPrice,
@@ -62,6 +64,8 @@ public class Response
         public string Description { get; set; }
         public decimal MaxPrice { get; set; }
         public decimal MinPrice { get; set; }
+        public required double DepositPercent { get; set; }
+        public required bool IsRefundable { get; set; }
         public string DiscountPercent { get; set; }
         public decimal DiscountMaxPrice { get; set; }
         public decimal DiscountMinPrice { get; set; }
@@ -103,6 +107,8 @@ public class Response
         string DiscountPercent,
         decimal DiscountMaxPrice,
         decimal DiscountMinPrice,
+        double DepositPercent,
+        bool IsRefundable,
         ICollection<Image> CoverImage,
         ICollection<Clinic>? Clinics,
         Category Category,
