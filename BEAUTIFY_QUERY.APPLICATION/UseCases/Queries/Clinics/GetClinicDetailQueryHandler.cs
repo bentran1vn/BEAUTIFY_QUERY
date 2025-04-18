@@ -58,6 +58,8 @@ public class GetClinicDetailQueryHandler(
             DiscountPercent = (x.DiscountPercent * 100).ToString(CultureInfo.InvariantCulture),
             DiscountMaxPrice = x.DiscountMaxPrice,
             DiscountMinPrice = x.DiscountMinPrice,
+            DepositPercent = x.DepositPercent,
+            IsRefundable = x.IsRefundable,
             CoverImage = x.CoverImage.Select(x => new CONTRACT.Services.Services.Response.Image(x.Id, x.Index, x.Url))
                 .ToList()
         }).ToList();
