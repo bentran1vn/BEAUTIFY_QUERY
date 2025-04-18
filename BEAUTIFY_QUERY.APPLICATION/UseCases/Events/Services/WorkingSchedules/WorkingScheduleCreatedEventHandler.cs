@@ -13,7 +13,7 @@ internal sealed class WorkingScheduleCreatedEventHandler(IMongoRepository<Workin
                 DoctorName = request.DoctorName,
                 DocumentId = x.Id,
                 ClinicId = x.ClinicId,
-                DoctorId = x.DoctorClinicId,
+                DoctorId = x.DoctorId,
                 StartTime = x.StartTime,
                 CustomerScheduleId = x.CustomerScheduleId.Value,
                 EndTime = x.EndTime,

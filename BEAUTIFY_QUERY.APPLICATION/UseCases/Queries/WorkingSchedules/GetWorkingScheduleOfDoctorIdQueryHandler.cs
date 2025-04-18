@@ -14,7 +14,7 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandler(
         var userId = currentUserService.UserId;
         var searchTerm = request.searchTerm?.Trim() ?? string.Empty;
         var query = workingScheduleRepository.FindAll(x =>
-            !x.IsDeleted && x.DoctorClinic.UserId.Equals(userId) && x.CustomerScheduleId != null);
+            !x.IsDeleted && x.DoctorId.Equals(userId) && x.CustomerScheduleId != null);
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             if (searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
@@ -62,10 +62,10 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandler(
         );
         var result = total.Items.Select(x => new Response.GetWorkingScheduleResponse
         {
-            DoctorName = x.DoctorClinic.User.FullName,
+            DoctorName = x.Doctor.FullName,
             WorkingScheduleId = x.Id,
-            ClinicId = x.DoctorClinic.ClinicId,
-            DoctorId = x.DoctorClinic.UserId,
+            ClinicId = x.ClinicId.Value,
+            DoctorId = x.DoctorId,
             StartTime = x.StartTime,
             EndTime = x.EndTime,
             Date = x.Date,

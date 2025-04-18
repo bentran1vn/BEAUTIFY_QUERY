@@ -1,8 +1,10 @@
 ﻿namespace BEAUTIFY_QUERY.DOMAIN.Entities;
 public class WorkingSchedule : AggregateRoot<Guid>, IAuditableEntity
 {
-    public Guid? DoctorClinicId { get; set; }
-    public virtual UserClinic? DoctorClinic { get; set; }
+    public Guid? ClinicId { get; set; }
+    public virtual Clinic? Clinic { get; set; }
+    public Guid? DoctorId { get; set; }
+    public virtual Staff? Doctor { get; set; }
     public Guid? CustomerScheduleId { get; set; }
     public virtual CustomerSchedule? CustomerSchedule { get; set; }
     public DateOnly Date { get; set; }

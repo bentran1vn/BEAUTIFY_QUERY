@@ -19,7 +19,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.12.0"/>
+        <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.12.1"/>
         <PackageReference Include="Moq" Version="4.20.69"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7"/>
         <PackageReference Include="BEAUTIFY_PACKAGES.SHARE" Version="1.11.3"/>
