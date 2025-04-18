@@ -34,7 +34,7 @@ internal sealed class GetOrdersByClinicIdHandler(
                     x.Discount,
                     x.DepositAmount,
                     x.FinalAmount,
-                    x.OrderDate,
+                    x.CreatedOnUtc,
                     x.Status,
                     x.Customer.PhoneNumber,
                     x.Customer.Email,

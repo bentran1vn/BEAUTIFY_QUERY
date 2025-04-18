@@ -44,7 +44,7 @@ internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orde
             order.Discount,
             order.DepositAmount,
             order.FinalAmount,
-            order.OrderDate,
+            order.CreatedOnUtc,
             order.Status,
             order.Customer.PhoneNumber,
             order.Customer.Email,
