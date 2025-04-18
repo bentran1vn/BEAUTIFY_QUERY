@@ -13,8 +13,8 @@ public static class Response
         public string Name { get; set; } = string.Empty;
         public string? Logo { get; set; }
         public decimal Balance { get; set; }
-        public required TimeSpan WorkingTimeStart { get; set; }
-        public required TimeSpan WorkingTimeEnd { get; set; }
+        public TimeSpan? WorkingTimeStart { get; set; }
+        public TimeSpan? WorkingTimeEnd { get; set; }
         public decimal PendingWithdrawals { get; set; }
         public decimal TotalEarnings { get; set; }
         //bank account
@@ -49,8 +49,8 @@ public static class Response
         string? Ward,
         string? FullAddress,
         string TaxCode,
-        TimeSpan WorkingTimeStart,
-        TimeSpan WorkingTimeEnd,
+        TimeSpan? WorkingTimeStart,
+        TimeSpan? WorkingTimeEnd,
         string BusinessLicenseUrl,
         string OperatingLicenseUrl,
         DateTimeOffset? OperatingLicenseExpiryDate,
@@ -72,8 +72,8 @@ public static class Response
         string TaxCode,
         string BusinessLicenseUrl,
         string OperatingLicenseUrl,
-        TimeSpan WorkingTimeStart,
-        TimeSpan WorkingTimeEnd,
+        TimeSpan? WorkingTimeStart,
+        TimeSpan? WorkingTimeEnd,
         DateTimeOffset? OperatingLicenseExpiryDate,
         string? ProfilePictureUrl,
         int TotalBranches,
