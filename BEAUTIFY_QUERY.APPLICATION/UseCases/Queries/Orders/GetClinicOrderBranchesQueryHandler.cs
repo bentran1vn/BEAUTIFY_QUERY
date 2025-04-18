@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
@@ -107,9 +106,9 @@ public sealed class GetClinicOrderBranchesQueryHandler(
             "servicename" => x => x.Service.Name,
             "totalamount" => x => x.TotalAmount,
             "finalamount" => x => x.FinalAmount,
-            "orderdate" => x => x.OrderDate,
+            "orderdate" => x => x.CreatedOnUtc,
             "status" => x => x.Status,
-            _ => x => x.OrderDate
+            _ => x => x.CreatedOnUtc
         };
     }
 }

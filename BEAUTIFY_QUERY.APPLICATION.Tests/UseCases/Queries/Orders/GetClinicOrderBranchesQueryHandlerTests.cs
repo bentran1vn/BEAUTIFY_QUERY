@@ -53,7 +53,7 @@ public class GetClinicOrderBranchesQueryHandlerTests
         };
         var childClinics = new List<Clinic>
         {
-            new Clinic
+            new()
             {
                 Id = childClinicId,
                 ParentId = parentClinicId,
@@ -77,7 +77,7 @@ public class GetClinicOrderBranchesQueryHandlerTests
         // Create orders with different service names
         var orders = new List<Order>
         {
-            new Order
+            new()
             {
                 Id = Guid.NewGuid(),
                 CustomerId = customer1Id,
@@ -96,13 +96,13 @@ public class GetClinicOrderBranchesQueryHandlerTests
                     Description = "Standard haircut service",
                     ClinicServices = new List<ClinicService>
                     {
-                        new ClinicService { ClinicId = childClinicId }
+                        new() { ClinicId = childClinicId }
                     }
                 },
                 DepositAmount = 25,
                 FinalAmount = 100
             },
-            new Order
+            new()
             {
                 Id = Guid.NewGuid(),
                 CustomerId = customer2Id,
@@ -121,7 +121,7 @@ public class GetClinicOrderBranchesQueryHandlerTests
                     Description = "Standard manicure service",
                     ClinicServices = new List<ClinicService>
                     {
-                        new ClinicService { ClinicId = childClinicId }
+                        new() { ClinicId = childClinicId }
                     }
                 },
                 DepositAmount = 10,
@@ -177,7 +177,7 @@ public class GetClinicOrderBranchesQueryHandlerTests
         };
         var childClinics = new List<Clinic>
         {
-            new Clinic
+            new()
             {
                 Id = childClinic1Id,
                 ParentId = parentClinicId,
@@ -188,7 +188,7 @@ public class GetClinicOrderBranchesQueryHandlerTests
                 BusinessLicenseUrl = "https://example.com/business-license1",
                 OperatingLicenseUrl = "https://example.com/operating-license1"
             },
-            new Clinic
+            new()
             {
                 Id = childClinic2Id,
                 ParentId = parentClinicId,
@@ -213,7 +213,7 @@ public class GetClinicOrderBranchesQueryHandlerTests
 
         var orders = new List<Order>
         {
-            new Order
+            new()
             {
                 Id = orderId,
                 CustomerId = customerId,
@@ -232,7 +232,7 @@ public class GetClinicOrderBranchesQueryHandlerTests
                     Description = "Standard haircut service",
                     ClinicServices = new List<ClinicService>
                     {
-                        new ClinicService { ClinicId = childClinic1Id }
+                        new() { ClinicId = childClinic1Id }
                     }
                 },
                 TotalAmount = 100,
@@ -330,7 +330,7 @@ public class GetClinicOrderBranchesQueryHandlerTests
         };
         var childClinics = new List<Clinic>
         {
-            new Clinic
+            new()
             {
                 Id = childClinicId,
                 ParentId = parentClinicId,
@@ -354,7 +354,7 @@ public class GetClinicOrderBranchesQueryHandlerTests
         // Create orders with "John" in the name for testing search functionality
         var orders = new List<Order>
         {
-            new Order
+            new()
             {
                 Id = Guid.NewGuid(),
                 CustomerId = customer1Id,
@@ -373,13 +373,13 @@ public class GetClinicOrderBranchesQueryHandlerTests
                     Description = "Standard haircut service",
                     ClinicServices = new List<ClinicService>
                     {
-                        new ClinicService { ClinicId = childClinicId }
+                        new() { ClinicId = childClinicId }
                     }
                 },
                 DepositAmount = 25,
                 FinalAmount = 100
             },
-            new Order
+            new()
             {
                 Id = Guid.NewGuid(),
                 CustomerId = customer2Id,
@@ -398,7 +398,7 @@ public class GetClinicOrderBranchesQueryHandlerTests
                     Description = "Standard manicure service",
                     ClinicServices = new List<ClinicService>
                     {
-                        new ClinicService { ClinicId = childClinicId }
+                        new() { ClinicId = childClinicId }
                     }
                 },
                 DepositAmount = 10,
@@ -488,14 +488,14 @@ public class TestAsyncQueryProvider<TEntity> : IAsyncQueryProvider
     }
 
     public TResult ExecuteAsync<TResult>(Expression expression,
-        CancellationToken cancellationToken = new CancellationToken())
+        CancellationToken cancellationToken = new())
     {
         var resultType = typeof(TResult).GetGenericArguments()[0];
         var executeMethod = typeof(IQueryProvider)
             .GetMethod(
-                name: nameof(IQueryProvider.Execute),
-                genericParameterCount: 1,
-                types: new[] { typeof(Expression) })
+                nameof(IQueryProvider.Execute),
+                1,
+                new[] { typeof(Expression) })
             ?.MakeGenericMethod(resultType);
 
         var result = executeMethod?.Invoke(_inner, new[] { expression });
@@ -523,7 +523,7 @@ public class TestAsyncEnumerable<T> : EnumerableQuery<T>, IAsyncEnumerable<T>, I
     {
     }
 
-    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken())
+    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = new())
     {
         return new TestAsyncEnumerator<T>(this.AsEnumerable().GetEnumerator());
     }
