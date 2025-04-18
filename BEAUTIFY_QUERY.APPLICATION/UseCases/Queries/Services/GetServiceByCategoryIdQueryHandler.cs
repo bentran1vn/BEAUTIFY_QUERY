@@ -56,6 +56,8 @@ internal sealed class GetServiceByCategoryIdQueryHandler(
             x.DiscountPercent.ToString(),
             x.DiscountMaxPrice,
             x.DiscountMinPrice,
+            x.DepositPercent,
+            x.IsRefundable,
             x.CoverImage?.Select(img => new Response.Image(img.Id, img.Index, img.Url)).ToList() ??
             new List<Response.Image>(),
             x.Clinic?.Select(clinic => new Response.Clinic(

@@ -46,6 +46,8 @@ public class GetClinicServicesByIdQueryHandler(
                 (isServiceExisted.DiscountPercent * 100).ToString(),
                 isServiceExisted.DiscountMaxPrice,
                 isServiceExisted.DiscountMinPrice,
+                isServiceExisted.DepositPercent,
+                isServiceExisted.IsRefundable,
                 isServiceExisted.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
                 isServiceExisted.Clinic.Select(y => new Response.Clinic(
                     y.Id,
@@ -141,6 +143,8 @@ public class GetClinicServicesByIdQueryHandler(
                 (isServiceExisted.DiscountPercent * 100).ToString(),
                 isServiceExisted.DiscountMaxPrice,
                 isServiceExisted.DiscountMinPrice,
+                isServiceExisted.DepositPercent,
+                isServiceExisted.IsRefundable,
                 isServiceExisted.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
                 isServiceExisted.Clinic.Select(y => new Response.Clinic(
                     y.Id,

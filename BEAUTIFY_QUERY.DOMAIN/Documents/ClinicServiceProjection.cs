@@ -12,6 +12,8 @@ public class ClinicServiceProjection : Document
     public Clinic Branding { get; set; }
     public ICollection<EntityEvent.DoctorServiceEntity> DoctorServices { get; set; } = [];
     public decimal DiscountPercent { get; set; } = 0;
+    public required double DepositPercent { get; set; }
+    public required bool IsRefundable { get; set; }
     public decimal MaxPrice { get; set; } = 0;
     public decimal MinPrice { get; set; } = 0;
     public decimal DiscountMaxPrice { get; set; } = 0;

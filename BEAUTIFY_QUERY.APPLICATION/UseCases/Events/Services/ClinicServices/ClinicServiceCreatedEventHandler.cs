@@ -21,6 +21,8 @@ public class ClinicServiceCreatedEventHandler : ICommandHandler<DomainEvents.Cli
             DocumentId = serviceRequest.Id,
             Name = serviceRequest.Name,
             Description = serviceRequest.Description,
+            DepositPercent = serviceRequest.DepositPercent,
+            IsRefundable = serviceRequest.IsRefundable,
             Branding = new Clinic
             {
                 Id = serviceRequest.Branding.Id,
