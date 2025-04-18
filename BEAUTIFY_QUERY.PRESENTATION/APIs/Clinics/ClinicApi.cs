@@ -13,8 +13,9 @@ public class ClinicApi : ApiEndpoint, ICarterModule
 
         gr1.MapGet(string.Empty, GetAllClinics);
         gr1.MapGet("{id}", GetClinicDetail);
-        gr1.MapGet("application", GetAllApplyRequest);
-        gr1.MapGet("application/{id}", GetDetailApplyRequest);
+        gr1.MapGet("application", GetAllApplyRequest).RequireAuthorization();
+        gr1.MapGet("application/{id}", GetDetailApplyRequest).RequireAuthorization();
+        gr1.MapGet("application/me", GetMyApplyRequest).RequireAuthorization();
         gr1.MapGet("{clinicId:guid}/employees", GetAllAccountOfEmployee);
         gr1.MapGet("{clinicId:guid}/employees/{employeeId:guid}", GetDetailAccountOfEmployee);
         gr1.MapGet("branches", GetClinicBranches)
@@ -91,6 +92,14 @@ public class ClinicApi : ApiEndpoint, ICarterModule
     private static async Task<IResult> GetDetailApplyRequest(ISender sender, Guid id)
     {
         var result = await sender.Send(new Query.GetDetailApplyRequestQuery(id));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+    
+    private static async Task<IResult> GetMyApplyRequest(ISender sender, HttpContext httpContext)
+    {
+        var clinicId = httpContext.User.FindFirst(c => c.Type == "ClinicId")?.Value!;
+        var roleName = httpContext.User.FindFirst(c => c.Type == "RoleName")?.Value!;
+        var result = await sender.Send(new Query.GetClinicMyQuery(new Guid(clinicId), roleName));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 

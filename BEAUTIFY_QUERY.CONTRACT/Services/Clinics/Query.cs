@@ -24,6 +24,10 @@ public static class Query
         SortOrder? SortOrder,
         int PageIndex,
         int PageSize) : IQuery<Response.GetClinicDetail>;
+    
+    public record GetClinicMyQuery(
+        Guid ClinicId,
+        string RoleName) : IQuery<Response.MyClinicApply>;
 
     public record GetAllApplyRequestQuery(int PageIndex, int PageSize) : IQuery<PagedResult<Response.GetApplyRequest>>;
 
