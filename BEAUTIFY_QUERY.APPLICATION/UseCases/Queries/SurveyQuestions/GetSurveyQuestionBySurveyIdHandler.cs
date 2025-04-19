@@ -1,6 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_QUERY.CONTRACT.Services.SurveyQuestions;
-using BEAUTIFY_QUERY.DOMAIN.Entities;
+﻿using BEAUTIFY_QUERY.CONTRACT.Services.SurveyQuestions;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.SurveyQuestions;
 internal sealed class GetSurveyQuestionBySurveyIdHandler(

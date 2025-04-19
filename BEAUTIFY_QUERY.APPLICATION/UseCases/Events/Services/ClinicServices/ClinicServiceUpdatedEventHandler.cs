@@ -1,7 +1,7 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Services.ClinicServices;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.EntityEvents;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
+using Category = BEAUTIFY_QUERY.DOMAIN.Documents.Category;
+using Clinic = BEAUTIFY_QUERY.DOMAIN.Documents.Clinic;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.ClinicServices;
 public class ClinicServiceUpdatedEventHandler : ICommandHandler<DomainEvents.ClinicServiceUpdated>

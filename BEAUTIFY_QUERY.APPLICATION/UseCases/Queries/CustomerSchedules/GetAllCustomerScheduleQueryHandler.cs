@@ -1,6 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
-using BEAUTIFY_QUERY.DOMAIN.Entities;
+﻿using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.CustomerSchedules;

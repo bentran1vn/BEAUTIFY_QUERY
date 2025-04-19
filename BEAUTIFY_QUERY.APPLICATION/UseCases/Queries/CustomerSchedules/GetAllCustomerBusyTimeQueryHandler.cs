@@ -1,7 +1,5 @@
 using System.Collections.Immutable;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.CustomerSchedules;
 internal sealed class GetAllCustomerBusyTimeQueryHandler(IMongoRepository<CustomerScheduleProjection> repository)

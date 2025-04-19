@@ -1,6 +1,6 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Services.Feedback;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
+using Feedback = BEAUTIFY_QUERY.DOMAIN.Documents.Feedback;
+using User = BEAUTIFY_QUERY.DOMAIN.Documents.User;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.Feedbacks;
 public class CreateFeedbackEventHandler(IMongoRepository<ClinicServiceProjection> clinicServiceRepository)

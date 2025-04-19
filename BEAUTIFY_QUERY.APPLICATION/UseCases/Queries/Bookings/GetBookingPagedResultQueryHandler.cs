@@ -1,8 +1,6 @@
 ﻿using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Booking;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
 using MongoDB.Driver.Linq;
 using User = BEAUTIFY_QUERY.DOMAIN.Entities.User;
 

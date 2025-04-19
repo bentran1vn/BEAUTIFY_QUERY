@@ -1,8 +1,7 @@
 ﻿using System.Linq.Expressions;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
-using BEAUTIFY_QUERY.DOMAIN.Entities;
 using Microsoft.EntityFrameworkCore;
+using User = BEAUTIFY_QUERY.DOMAIN.Entities.User;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.CustomerSchedules;
 internal sealed class StaffCheckInCustomerScheduleQueryHandler(

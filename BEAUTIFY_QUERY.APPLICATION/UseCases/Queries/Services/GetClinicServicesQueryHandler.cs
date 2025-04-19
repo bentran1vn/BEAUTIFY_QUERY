@@ -1,8 +1,6 @@
 using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Services;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
 using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Services;
@@ -58,7 +56,7 @@ public class
                 x.MaxPrice, x.MinPrice,
                 x.DepositPercent,
                 x.IsRefundable,
-    (x.DiscountPercent * 100).ToString(),
+                (x.DiscountPercent * 100).ToString(),
                 x.DiscountMaxPrice, x.DiscountMinPrice,
                 x.CoverImage.Select(x => new Response.Image(x.Id, x.Index, x.Url)).ToList(),
                 x.Clinic.Select(y => new Response.Clinic(y.Id, y.Name, y.Email,

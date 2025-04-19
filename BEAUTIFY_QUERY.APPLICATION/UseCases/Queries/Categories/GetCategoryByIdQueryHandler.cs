@@ -1,6 +1,5 @@
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.Categories;
-using BEAUTIFY_QUERY.DOMAIN.Entities;
+using Category = BEAUTIFY_QUERY.DOMAIN.Entities.Category;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Categories;
 public class GetCategoryByIdQueryHandler(

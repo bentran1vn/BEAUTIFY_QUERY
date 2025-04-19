@@ -29,6 +29,9 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
         gr1.MapGet("clinics", GetWorkingSchedulesByClinicId)
             .WithSummary("Get working schedules by clinic ID")
             .RequireAuthorization(Constant.Role.CLINIC_STAFF);
+        gr1.MapGet("{clinicId:guid}/unregistered", GetUnregisteredWorkingSchedule)
+            .WithSummary("Get unregistered working schedules")
+            .RequireAuthorization(Constant.Role.DOCTOR);
     }
 
     #region GetDoctorBusyTimeInADay
@@ -45,6 +48,20 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
     }
 
     #endregion
+
+    private static async Task<IResult> GetUnregisteredWorkingSchedule(ISender sender,
+        Guid clinicId,
+        string? searchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        int pageIndex = 1,
+        int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.GetUnregisteredWorkingSchedules(clinicId, searchTerm,
+            sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageIndex, pageSize));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
 
     private static async Task<IResult> GetWorkingSchedulesByClinicId(
         ISender sender,

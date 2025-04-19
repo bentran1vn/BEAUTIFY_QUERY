@@ -1,6 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_QUERY.CONTRACT.Services.Services;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
+﻿using BEAUTIFY_QUERY.CONTRACT.Services.Services;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Services;
 internal sealed class GetAllServiceInGetClinicByIdQueryHandler(

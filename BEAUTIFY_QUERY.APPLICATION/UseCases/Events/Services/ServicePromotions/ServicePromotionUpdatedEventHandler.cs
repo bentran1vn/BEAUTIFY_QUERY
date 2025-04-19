@@ -1,6 +1,5 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Services.ServicePromotion;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
+using Promotion = BEAUTIFY_QUERY.DOMAIN.Documents.Promotion;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.ServicePromotions;
 public class ServicePromotionUpdatedEventHandler : ICommandHandler<DomainEvents.ServicePromotionUpdated>

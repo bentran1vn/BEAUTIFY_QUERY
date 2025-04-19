@@ -1,11 +1,9 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Services.Clinic;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
 using Microsoft.EntityFrameworkCore;
+using Clinic = BEAUTIFY_QUERY.DOMAIN.Documents.Clinic;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.Clinics;
-
-public class ClinicUpdatedEventHandler: ICommandHandler<DomainEvents.ClinicUpdated>
+public class ClinicUpdatedEventHandler : ICommandHandler<DomainEvents.ClinicUpdated>
 {
     private readonly IMongoRepository<ClinicServiceProjection> _clinicServiceRepository;
 
@@ -17,12 +15,12 @@ public class ClinicUpdatedEventHandler: ICommandHandler<DomainEvents.ClinicUpdat
     public async Task<Result> Handle(DomainEvents.ClinicUpdated request, CancellationToken cancellationToken)
     {
         var serviceRequest = request.entity;
-        
+
         if (serviceRequest.IsParent)
         {
             // Extract ID to a variable to avoid dynamic operation in LINQ expression
             var clinicId = serviceRequest.Clinic.Id;
-            
+
             var isServiceExisted = await _clinicServiceRepository
                 .AsQueryable(x => x.Branding.Id.Equals(clinicId))
                 .ToListAsync(cancellationToken);
@@ -30,7 +28,7 @@ public class ClinicUpdatedEventHandler: ICommandHandler<DomainEvents.ClinicUpdat
             if (isServiceExisted != null && isServiceExisted.Any())
             {
                 var updateTasks = new List<Task>();
-                
+
                 foreach (var item in isServiceExisted)
                 {
                     item.Branding = new Clinic
@@ -51,10 +49,10 @@ public class ClinicUpdatedEventHandler: ICommandHandler<DomainEvents.ClinicUpdat
                         IsActivated = true,
                         ParentId = serviceRequest.Clinic.ParentId
                     };
-                    
+
                     updateTasks.Add(_clinicServiceRepository.ReplaceOneAsync(item));
                 }
-                
+
                 // Run all updates in parallel
                 await Task.WhenAll(updateTasks);
             }
@@ -63,7 +61,7 @@ public class ClinicUpdatedEventHandler: ICommandHandler<DomainEvents.ClinicUpdat
         {
             // Extract ID to a variable to avoid dynamic operation in LINQ expression
             var parentId = serviceRequest.Clinic.ParentId;
-            
+
             var isServiceExisted = await _clinicServiceRepository
                 .AsQueryable(x => x.Branding.Id.Equals(parentId))
                 .ToListAsync(cancellationToken);
@@ -71,7 +69,7 @@ public class ClinicUpdatedEventHandler: ICommandHandler<DomainEvents.ClinicUpdat
             if (isServiceExisted != null && isServiceExisted.Any())
             {
                 var updateTasks = new List<Task>();
-                
+
                 foreach (var item in isServiceExisted)
                 {
                     item.Clinic = item.Clinic.Select(x =>
@@ -100,15 +98,15 @@ public class ClinicUpdatedEventHandler: ICommandHandler<DomainEvents.ClinicUpdat
 
                         return x;
                     }).ToList();
-                    
+
                     updateTasks.Add(_clinicServiceRepository.ReplaceOneAsync(item));
                 }
-                
+
                 // Run all updates in parallel
                 await Task.WhenAll(updateTasks);
             }
         }
-        
+
         return Result.Success();
     }
 }

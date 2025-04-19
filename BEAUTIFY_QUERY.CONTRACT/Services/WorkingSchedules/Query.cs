@@ -33,5 +33,13 @@ public static class Query
         string? SortColumn,
         SortOrder SortOrder,
         int PageNumber,
-        int PageSize) : IQuery<PagedResult<Response.GetWorkingScheduleResponse>>;
+        int PageSize) : IQuery<PagedResult<Response.GetScheduleResponseForStaff>>;
+
+    public record GetUnregisteredWorkingSchedules(
+        Guid ClinicId,
+        string searchTerm,
+        string? SortColumn,
+        SortOrder SortOrder,
+        int PageNumber,
+        int PageSize) : IQuery<PagedResult<Response.GetEmptyScheduleResponse>>;
 }

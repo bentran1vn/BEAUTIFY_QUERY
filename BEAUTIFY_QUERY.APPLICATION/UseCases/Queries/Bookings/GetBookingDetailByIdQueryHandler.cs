@@ -1,7 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_QUERY.CONTRACT.Services.Booking;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
-using BEAUTIFY_QUERY.DOMAIN.Entities;
+﻿using BEAUTIFY_QUERY.CONTRACT.Services.Booking;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;

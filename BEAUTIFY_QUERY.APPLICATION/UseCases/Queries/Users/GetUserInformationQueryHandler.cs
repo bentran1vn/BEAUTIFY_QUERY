@@ -1,7 +1,6 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Users;
-using BEAUTIFY_QUERY.DOMAIN.Entities;
+using User = BEAUTIFY_QUERY.DOMAIN.Entities.User;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Users;
 internal sealed class GetUserInformationQueryHandler(

@@ -1,6 +1,6 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Services.Procedures;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
+using Procedure = BEAUTIFY_QUERY.DOMAIN.Documents.Procedure;
+using ProcedurePriceType = BEAUTIFY_QUERY.DOMAIN.Documents.ProcedurePriceType;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.ServiceProcedures;
 public class ProcedureUpdatedEventHandler(IMongoRepository<ClinicServiceProjection> clinicServiceRepository)

@@ -61,6 +61,20 @@ public static class Response
         }
     }
 
+    public record GetEmptyScheduleResponse(
+        Guid WorkingScheduleId,
+        DateOnly Date,
+        TimeSpan StartTime,
+        TimeSpan EndTime
+    );
+
+    public record GetScheduleResponseForStaff(
+        int Capacity,
+        DateOnly Date,
+        TimeSpan StartTime,
+        TimeSpan EndTime
+    );
+
     public class GetWorkingScheduleDetailResponse
     {
         public GetWorkingScheduleResponseDaily.Appointment Appointment { get; set; } = new();

@@ -1,6 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
-using BEAUTIFY_QUERY.DOMAIN.Entities;
+﻿using BEAUTIFY_QUERY.CONTRACT.Services.Subscriptions;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Subscriptions;
 public class GetSubscriptionByIdHandler(IRepositoryBase<SubscriptionPackage, Guid> mongoRepository)

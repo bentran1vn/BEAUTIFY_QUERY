@@ -1,6 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
-using BEAUTIFY_QUERY.CONTRACT.Services.OrderDetails;
-using BEAUTIFY_QUERY.DOMAIN.Entities;
+﻿using BEAUTIFY_QUERY.CONTRACT.Services.OrderDetails;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.OrderDetails;
 internal sealed class GetOrderDetailsByOrderIdQueryHandler(IRepositoryBase<Order, Guid> orderRepositoryBase)

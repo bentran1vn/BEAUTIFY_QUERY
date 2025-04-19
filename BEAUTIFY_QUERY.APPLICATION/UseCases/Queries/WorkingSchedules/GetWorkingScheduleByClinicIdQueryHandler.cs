@@ -1,45 +1,57 @@
 ﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
-using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Abstractions.Repositories;
 using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
-using BEAUTIFY_QUERY.DOMAIN.Documents;
+using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
-internal sealed class GetWorkingScheduleByClinicIdQueryHandler(
+public sealed class GetWorkingScheduleByClinicIdQueryHandler(
     IMongoRepository<WorkingScheduleProjection> workingScheduleRepository,
     ICurrentUserService currentUserService)
-    : IQueryHandler<Query.GetWorkingScheduleByClinicId, PagedResult<Response.GetWorkingScheduleResponse>>
+    : IQueryHandler<Query.GetWorkingScheduleByClinicId, PagedResult<Response.GetScheduleResponseForStaff>>
 {
-    public async Task<Result<PagedResult<Response.GetWorkingScheduleResponse>>> Handle(
+    public async Task<Result<PagedResult<Response.GetScheduleResponseForStaff>>> Handle(
         Query.GetWorkingScheduleByClinicId request, CancellationToken cancellationToken)
     {
         var searchTerm = request.searchTerm?.Trim() ?? string.Empty;
 
         // Filter by clinic ID and not deleted
-        var query =
+        var baseQuery =
             workingScheduleRepository.AsQueryable(x => !x.IsDeleted && x.ClinicId == currentUserService.ClinicId);
 
         // Apply search filter if provided
-        if (!string.IsNullOrEmpty(searchTerm)) query = ApplySearchFilter(query, searchTerm);
+        if (!string.IsNullOrEmpty(searchTerm)) baseQuery = ApplySearchFilter(baseQuery, searchTerm);
+
+        // Calculate capacities based on all matching records using efficient aggregation
+        var capacities = await CalculateCapacities(baseQuery);
 
         // Apply sorting
-        query = ApplySorting(query, request.SortOrder);
+        var sortedQuery = ApplySorting(baseQuery, request.SortOrder);
 
-        // Get paged result
-        var total = await PagedResult<WorkingScheduleProjection>.CreateAsyncMongoLinq(
-            query,
+        // Create a distinct query (grouped by date/time) for pagination
+        var distinctQuery = sortedQuery
+            .GroupBy(x => new { x.Date, x.StartTime, x.EndTime })
+            .Select(g => new WorkingScheduleProjection
+            {
+                Date = g.Key.Date,
+                StartTime = g.Key.StartTime,
+                EndTime = g.Key.EndTime
+            });
+
+        // Apply pagination to the distinct query
+        var pagedItems = await PagedResult<WorkingScheduleProjection>.CreateAsyncMongoLinq(
+            distinctQuery,
             request.PageNumber,
             request.PageSize
         );
 
-        // Map to response
-        var result = MapToResponse(total.Items);
+        // Map to response using pre-calculated capacities
+        var result = MapToResponseWithCapacities(pagedItems.Items, capacities);
 
-        return Result.Success(new PagedResult<Response.GetWorkingScheduleResponse>(
+        return Result.Success(new PagedResult<Response.GetScheduleResponseForStaff>(
             result,
-            total.PageIndex,
-            total.PageSize,
-            total.TotalCount));
+            pagedItems.PageIndex,
+            pagedItems.PageSize,
+            pagedItems.TotalCount));
     }
 
     private static IMongoQueryable<WorkingScheduleProjection> ApplySearchFilter(
@@ -88,8 +100,8 @@ internal sealed class GetWorkingScheduleByClinicIdQueryHandler(
 
     private static bool TryParseTimeRange(string part1, string part2, out TimeSpan timeFrom, out TimeSpan timeTo)
     {
-        timeFrom = default;
-        timeTo = default;
+        timeFrom = TimeSpan.Zero;
+        timeTo = TimeSpan.Zero;
         return TimeSpan.TryParse(part1, out timeFrom) && TimeSpan.TryParse(part2, out timeTo);
     }
 
@@ -101,25 +113,38 @@ internal sealed class GetWorkingScheduleByClinicIdQueryHandler(
             : query.OrderBy(x => x.Date).ThenBy(x => x.StartTime);
     }
 
-    private static List<Response.GetWorkingScheduleResponse> MapToResponse(List<WorkingScheduleProjection> items)
+    private async Task<Dictionary<(DateOnly Date, TimeSpan StartTime, TimeSpan EndTime), int>> CalculateCapacities(
+        IMongoQueryable<WorkingScheduleProjection> query)
     {
-        return items.Select(x => new Response.GetWorkingScheduleResponse
-        {
-            WorkingScheduleId = x.DocumentId,
-            DoctorName = x.DoctorName,
-            ClinicId = x.ClinicId,
-            DoctorId = x.DoctorId,
-            StartTime = x.StartTime,
-            EndTime = x.EndTime,
-            Date = x.Date,
-            Status = x.Status,
-            StepIndex = x.StepIndex,
-            CustomerName = x.CustomerName,
-            CustomerId = x.CustomerId,
-            ServiceId = x.ServiceId,
-            ServiceName = x.ServiceName,
-            CustomerScheduleId = x.CustomerScheduleId,
-            CurrentProcedureName = x.CurrentProcedureName
-        }).ToList();
+        // Use MongoDB aggregation to calculate capacities on the database side
+        var capacities = await query
+            .GroupBy(x => new { x.Date, x.StartTime, x.EndTime })
+            .Select(g => new
+            {
+                Key = g.Key,
+                Count = g.Count()
+            })
+            .ToListAsync();
+
+        // Convert to dictionary for faster lookups
+        return capacities.ToDictionary(
+            item => (item.Key.Date, item.Key.StartTime, item.Key.EndTime),
+            item => item.Count
+        );
+    }
+
+    private static List<Response.GetScheduleResponseForStaff> MapToResponseWithCapacities(
+        List<WorkingScheduleProjection> items,
+        Dictionary<(DateOnly Date, TimeSpan StartTime, TimeSpan EndTime), int> capacities)
+    {
+        return items
+            .Select(item => new Response.GetScheduleResponseForStaff(
+                // Look up the capacity for this time slot from the pre-calculated dictionary
+                capacities.TryGetValue((item.Date, item.StartTime, item.EndTime), out var capacity) ? capacity : 0,
+                item.Date,
+                item.StartTime,
+                item.EndTime
+            ))
+            .ToList();
     }
 }
