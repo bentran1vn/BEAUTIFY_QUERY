@@ -33,12 +33,13 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
 
         // Create distinct query for pagination
         var distinctQuery = sortedQuery
-            .GroupBy(x => new { x.Date, x.StartTime, x.EndTime })
+            .GroupBy(x => new { x.Date, x.StartTime, x.EndTime, x.ShiftGroupId })
             .Select(g => new WorkingScheduleProjection
             {
                 Date = g.Key.Date,
                 StartTime = g.Key.StartTime,
-                EndTime = g.Key.EndTime
+                EndTime = g.Key.EndTime,
+                ShiftGroupId = g.Key.ShiftGroupId,
             });
 
         // Apply pagination
