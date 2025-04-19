@@ -145,6 +145,7 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
             var capacity = capacities.TryGetValue(key, out var count) ? count : 0;
 
             result.Add(new Response.GetScheduleResponseForStaff(
+                item.ShiftGroupId.Value,
                 capacity,
                 item.Date,
                 item.StartTime,

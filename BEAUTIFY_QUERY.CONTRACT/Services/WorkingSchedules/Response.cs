@@ -69,6 +69,7 @@ public static class Response
     );
 
     public record GetScheduleResponseForStaff(
+        Guid ShiftGroupId,
         int Capacity,
         DateOnly Date,
         TimeSpan StartTime,
