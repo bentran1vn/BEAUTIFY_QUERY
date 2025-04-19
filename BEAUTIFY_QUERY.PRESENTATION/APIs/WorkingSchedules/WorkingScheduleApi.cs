@@ -34,6 +34,9 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
         gr1.MapGet("{clinicId:guid}/unregistered", GetUnregisteredWorkingSchedule)
             .WithSummary("Get unregistered working schedules")
             .RequireAuthorization(Constant.Role.DOCTOR);
+        gr1.MapGet("shift-groups/{shiftGroupId:guid}", GetSchedulesByShiftGroupId)
+            .WithSummary("Get working schedules by shift group ID")
+            .RequireAuthorization(Constant.Role.CLINIC_STAFF);
     }
 
     #region GetDoctorBusyTimeInADay
@@ -73,6 +76,26 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
         var result = await sender.Send(new Query.GetUnregisteredWorkingSchedules(clinicId, searchTerm,
             sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
             pageIndex, pageSize));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetSchedulesByShiftGroupId(
+        ISender sender,
+        [FromRoute] Guid shiftGroupId,
+        string? searchTerm = null,
+        string? sortColumn = null,
+        string? sortOrder = null,
+        int pageNumber = 1,
+        int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.GetSchedulesByShiftGroupId(
+            shiftGroupId,
+            searchTerm,
+            sortColumn,
+            SortOrderExtension.ConvertStringToSortOrder(sortOrder),
+            pageNumber,
+            pageSize));
+
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 

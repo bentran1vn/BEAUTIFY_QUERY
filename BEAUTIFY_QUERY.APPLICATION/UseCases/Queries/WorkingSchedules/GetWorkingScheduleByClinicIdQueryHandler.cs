@@ -110,9 +110,10 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
             : query.OrderBy(x => x.Date).ThenBy(x => x.StartTime);
     }
 
-    private async Task<Dictionary<(DateOnly, TimeSpan, TimeSpan), int>> CalculateCapacities(
-        IMongoQueryable<WorkingScheduleProjection> query,
-        CancellationToken cancellationToken)
+    private async Task<Dictionary<(DateOnly, TimeSpan, TimeSpan), (int Capacity, int DoctorCount, int CustomerCount)>>
+        CalculateCapacities(
+            IMongoQueryable<WorkingScheduleProjection> query,
+            CancellationToken cancellationToken)
     {
         var capacityResults = await query
             .GroupBy(x => new { x.Date, x.StartTime, x.EndTime })
@@ -121,14 +122,18 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
                 g.Key.Date,
                 g.Key.StartTime,
                 g.Key.EndTime,
-                Count = g.Count()
+                TotalCount = g.Count(),
+                DoctorCount = g.Count(x => x.DoctorId != null),
+                CustomerCount = g.Count(x => x.CustomerScheduleId != null)
             })
             .ToListAsync(cancellationToken);
 
-        var capacityDict = new Dictionary<(DateOnly, TimeSpan, TimeSpan), int>();
+        var capacityDict =
+            new Dictionary<(DateOnly, TimeSpan, TimeSpan), (int Capacity, int DoctorCount, int CustomerCount)>();
         foreach (var item in capacityResults)
         {
-            capacityDict[(item.Date, item.StartTime, item.EndTime)] = item.Count;
+            capacityDict[(item.Date, item.StartTime, item.EndTime)] =
+                (item.TotalCount, item.DoctorCount, item.CustomerCount);
         }
 
         return capacityDict;
@@ -136,18 +141,21 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
 
     private static List<Response.GetScheduleResponseForStaff> MapToResponseWithCapacities(
         List<WorkingScheduleProjection> items,
-        Dictionary<(DateOnly, TimeSpan, TimeSpan), int> capacities)
+        Dictionary<(DateOnly, TimeSpan, TimeSpan), (int Capacity, int DoctorCount, int CustomerCount)> capacities)
     {
         var result = new List<Response.GetScheduleResponseForStaff>();
 
         foreach (var item in items)
         {
             var key = (item.Date, item.StartTime, item.EndTime);
-            var capacity = capacities.TryGetValue(key, out var count) ? count : 0;
+            var (capacity, doctorCount, customerCount) =
+                capacities.TryGetValue(key, out var counts) ? counts : (0, 0, 0);
 
             result.Add(new Response.GetScheduleResponseForStaff(
                 item.ShiftGroupId.Value,
                 capacity,
+                doctorCount,
+                customerCount,
                 item.Date,
                 item.StartTime,
                 item.EndTime

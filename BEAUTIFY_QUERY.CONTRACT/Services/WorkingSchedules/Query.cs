@@ -48,4 +48,12 @@ public static class Query
         Guid ClinicId,
         DateOnly Date)
         : IQuery<IReadOnlyList<Response.GetEmptyScheduleResponse>>;
+
+    public record GetSchedulesByShiftGroupId(
+        Guid ShiftGroupId,
+        string? SearchTerm,
+        string? SortColumn,
+        SortOrder SortOrder,
+        int PageNumber,
+        int PageSize) : IQuery<PagedResult<Response.GetWorkingScheduleResponse>>;
 }
