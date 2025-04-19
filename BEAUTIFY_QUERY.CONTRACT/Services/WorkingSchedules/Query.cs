@@ -42,4 +42,10 @@ public static class Query
         SortOrder SortOrder,
         int PageNumber,
         int PageSize) : IQuery<PagedResult<Response.GetEmptyScheduleResponse>>;
+
+    public record GetDoctorAvailableTimeSlots(
+        Guid DoctorId,
+        Guid ClinicId,
+        DateOnly Date)
+        : IQuery<IReadOnlyList<Response.GetEmptyScheduleResponse>>;
 }

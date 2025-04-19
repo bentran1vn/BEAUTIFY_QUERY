@@ -1,4 +1,4 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +10,12 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var gr1 = app.NewVersionedApi("Working Schedules").MapGroup(BaseUrl).HasApiVersion(1);
-        gr1.MapGet(string.Empty, GetWorkingSchedules)
-            .WithSummary("Search theo Date : Date1 to Date2 or Time : Time1 to Time2|| search by DoctorName");
-        gr1.MapGet("doctors/busy-times", GetDoctorBusyTimeInADay)
-            .WithSummary("Get doctor's busy time slots for a specific day");
+        //  gr1.MapGet(string.Empty, GetWorkingSchedules)
+        //      .WithSummary("Search theo Date : Date1 to Date2 or Time : Time1 to Time2|| search by DoctorName");
+        //   gr1.MapGet("doctors/busy-times", GetDoctorBusyTimeInADay)
+        //  .WithSummary("Get doctor's busy time slots for a specific day");
+        gr1.MapGet("doctors/available-times", GetDoctorAvailableTimeSlots)
+            .WithSummary("Get doctor's available time slots for booking");
         gr1.MapGet("doctors/", GetDoctorScheduleByIdV2).RequireAuthorization();
         gr1.MapGet("doctors/monthly-count", GetWorkingSchedulesEachDayInMonth)
             .WithSummary("Get doctor's busy time slots for a specific month")
@@ -48,6 +50,17 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
     }
 
     #endregion
+
+    private static async Task<IResult> GetDoctorAvailableTimeSlots(
+        ISender sender,
+        [FromQuery] Guid doctorId,
+        [FromQuery] Guid clinicId,
+        [FromQuery] DateOnly date)
+    {
+        var query = new Query.GetDoctorAvailableTimeSlots(doctorId, clinicId, date);
+        var result = await sender.Send(query);
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
 
     private static async Task<IResult> GetUnregisteredWorkingSchedule(ISender sender,
         Guid clinicId,

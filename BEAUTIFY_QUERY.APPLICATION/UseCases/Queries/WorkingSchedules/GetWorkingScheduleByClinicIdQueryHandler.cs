@@ -82,8 +82,8 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
             }
 
             // Handle range search
-            var part1 = searchTerm.Substring(0, toIndex).Trim();
-            var part2 = searchTerm.Substring(toIndex + 2).Trim();
+            var part1 = searchTerm[..toIndex].Trim();
+            var part2 = searchTerm[(toIndex + 2)..].Trim();
 
             // Try to parse as date range
             if (DateOnly.TryParse(part1, out var dateFrom) && DateOnly.TryParse(part2, out var dateTo))
