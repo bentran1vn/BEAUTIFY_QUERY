@@ -13,7 +13,7 @@ internal sealed class GetClinicsQueryHandler(
     public async Task<Result<PagedResult<Response.GetClinics>>> Handle(Query.GetClinicsQuery request,
         CancellationToken cancellationToken)
     {
-        var clinicsQuery = clinicRepository.FindAll(x => true);
+        var clinicsQuery = clinicRepository.FindAll(x => x.Status == 0  && x.IsDeleted == false);
 
         clinicsQuery = string.IsNullOrWhiteSpace(request.SearchTerm)
             ? clinicsQuery
@@ -22,7 +22,7 @@ internal sealed class GetClinicsQueryHandler(
                                              || x.Address.ToLower().Contains(request.SearchTerm.ToLower()))
             );
 
-        if (!(request.Role is Constant.Role.CLINIC_ADMIN || request.Role is Constant.Role.CLINIC_STAFF))
+        if (!(request.Role is Constant.Role.SYSTEM_ADMIN || request.Role is Constant.Role.SYSTEM_STAFF))
         {
             clinicsQuery = clinicsQuery
                 .Where(x => x.IsActivated && x.IsParent.Value && !x.IsDeleted);
