@@ -15,7 +15,8 @@ internal sealed class WorkingScheduleCreatedEventHandler(IMongoRepository<Workin
                 StartTime = x.StartTime,
                 CustomerScheduleId = x.CustomerScheduleId.Value,
                 EndTime = x.EndTime,
-
+                ShiftCapacity = x.ShiftCapacity,
+                ShiftGroupId = x.ShiftGroupId,
                 Date = x.Date,
                 //IsNoted = x.Note,
                 Status = x.Status,
