@@ -23,7 +23,7 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
         // Get base query
         var baseQuery = workingScheduleRepository
             .AsQueryable()
-            .Where(x => !x.IsDeleted && x.ClinicId == currentUserService.ClinicId && x.DoctorId == null &&
+            .Where(x => !x.IsDeleted && x.ClinicId == currentUserService.ClinicId &&
                         x.CustomerScheduleId == null);
 
         // Apply search filter if provided
