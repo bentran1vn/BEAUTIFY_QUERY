@@ -89,6 +89,14 @@ public static class Response
         TimeSpan EndTime
     );
 
+    public record GetEmptyScheduleResponseWithId(
+        Guid WorkingScheduleId,
+        DateOnly Date,
+        TimeSpan StartTime,
+        TimeSpan EndTime
+    );
+
+
     public record GetScheduleResponseForStaff(
         Guid ShiftGroupId,
         int Capacity,

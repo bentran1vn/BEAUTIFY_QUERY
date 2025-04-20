@@ -3,11 +3,15 @@ using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
+/// <summary>
+/// /api/v{version:apiVersion}/working-schedules/{clinicId}/unregistered
+/// </summary>
+/// <param name="workingScheduleRepository"></param>
 internal sealed class GetUnregisteredWorkingSchedulesQueryHandler(
     IMongoRepository<WorkingScheduleProjection> workingScheduleRepository)
-    : IQueryHandler<Query.GetUnregisteredWorkingSchedules, PagedResult<Response.GetEmptyScheduleResponse>>
+    : IQueryHandler<Query.GetUnregisteredWorkingSchedules, PagedResult<Response.GetEmptyScheduleResponseWithId>>
 {
-    public async Task<Result<PagedResult<Response.GetEmptyScheduleResponse>>> Handle(
+    public async Task<Result<PagedResult<Response.GetEmptyScheduleResponseWithId>>> Handle(
         Query.GetUnregisteredWorkingSchedules request, CancellationToken cancellationToken)
     {
         var searchTerm = request.searchTerm?.Trim().ToLower();
@@ -77,7 +81,7 @@ internal sealed class GetUnregisteredWorkingSchedulesQueryHandler(
         // Map to response
         var result = MapToResponse(total.Items);
 
-        return Result.Success(new PagedResult<Response.GetEmptyScheduleResponse>(
+        return Result.Success(new PagedResult<Response.GetEmptyScheduleResponseWithId>(
             result,
             total.PageIndex,
             total.PageSize,
@@ -101,9 +105,10 @@ internal sealed class GetUnregisteredWorkingSchedulesQueryHandler(
             : query.OrderBy(x => x.Date).ThenBy(x => x.StartTime);
     }
 
-    private static List<Response.GetEmptyScheduleResponse> MapToResponse(List<WorkingScheduleProjection> items)
+    private static List<Response.GetEmptyScheduleResponseWithId> MapToResponse(List<WorkingScheduleProjection> items)
     {
-        return items.Select(x => new Response.GetEmptyScheduleResponse(x.Date, x.StartTime, x.EndTime)
+        return items.Select(x =>
+            new Response.GetEmptyScheduleResponseWithId(x.DocumentId, x.Date, x.StartTime, x.EndTime)
         ).ToList();
     }
 }

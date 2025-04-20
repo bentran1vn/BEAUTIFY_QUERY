@@ -41,7 +41,7 @@ public static class Query
         string? SortColumn,
         SortOrder SortOrder,
         int PageNumber,
-        int PageSize) : IQuery<PagedResult<Response.GetEmptyScheduleResponse>>;
+        int PageSize) : IQuery<PagedResult<Response.GetEmptyScheduleResponseWithId>>;
 
     public record GetDoctorAvailableTimeSlots(
         Guid ServiceIdOrCustomerScheduleId,
