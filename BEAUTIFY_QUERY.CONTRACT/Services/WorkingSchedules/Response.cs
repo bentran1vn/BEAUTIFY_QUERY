@@ -1,26 +1,48 @@
 ﻿namespace BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 public static class Response
 {
-    public class GetWorkingScheduleResponse
+    public class ShiftGroup
     {
-        public Guid WorkingScheduleId { get; set; }
+        public Guid Id { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public DateOnly Date { get; set; }
         public Guid? DoctorId { get; set; }
         public string? DoctorName { get; set; }
         public Guid ClinicId { get; set; }
-        public DateOnly Date { get; set; }
+        public List<GetWorkingScheduleResponse> WorkingSchedules { get; set; } = [];
+    }
+
+    public class GetWorkingScheduleResponse_Son
+    {
+        public Guid WorkingScheduleId { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
-
+        public Guid? DoctorId { get; set; }
+        public string? DoctorName { get; set; }
+        public DateOnly Date { get; set; }
         public string? Status { get; set; }
-
         public string StepIndex { get; set; }
         public string CustomerName { get; set; }
         public Guid? CustomerId { get; set; }
-
         public Guid? ServiceId { get; set; }
         public string ServiceName { get; set; }
         public Guid? CustomerScheduleId { get; set; }
+        public string CurrentProcedureName { get; set; }
+    }
 
+    public class GetWorkingScheduleResponse
+    {
+        public Guid WorkingScheduleId { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public string? Status { get; set; }
+        public string StepIndex { get; set; }
+        public string CustomerName { get; set; }
+        public Guid? CustomerId { get; set; }
+        public Guid? ServiceId { get; set; }
+        public string ServiceName { get; set; }
+        public Guid? CustomerScheduleId { get; set; }
         public string CurrentProcedureName { get; set; }
     }
 

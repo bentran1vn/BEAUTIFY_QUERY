@@ -3,6 +3,9 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+///api/v{version:apiVersion}/orders/clinic
+/// </summary>
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Orders;
 internal sealed class GetOrdersByClinicIdHandler(
     ICurrentUserService currentUserService,
@@ -21,6 +24,7 @@ internal sealed class GetOrdersByClinicIdHandler(
         {
             var pattern = $"%{searchTerm}%";
             query = query.Where(x =>
+                EF.Functions.Like(x.Id.ToString(), pattern) ||
                 EF.Functions.Like(x.Customer.FirstName, pattern) ||
                 EF.Functions.Like(x.Customer.LastName, pattern) ||
                 EF.Functions.Like(x.Service.Name, pattern) ||

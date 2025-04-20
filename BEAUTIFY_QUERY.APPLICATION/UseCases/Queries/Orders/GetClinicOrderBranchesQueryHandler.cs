@@ -4,6 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Orders;
+/// <summary>
+///    api/v{version:apiVersion}/orders/clinic/branches
+/// </summary>
+/// <param name="currentUserService"></param>
+/// <param name="orderRepository"></param>
+/// <param name="clinicRepository"></param>
 public sealed class GetClinicOrderBranchesQueryHandler(
     ICurrentUserService currentUserService,
     IRepositoryBase<Order, Guid> orderRepository,
@@ -60,7 +66,7 @@ public sealed class GetClinicOrderBranchesQueryHandler(
                 (x.Customer != null && x.Customer.PhoneNumber != null &&
                  x.Customer.PhoneNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
                 (x.FinalAmount.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
-                (x.Id.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)));
+                x.Id.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
         }
 
         // Apply sorting in memory

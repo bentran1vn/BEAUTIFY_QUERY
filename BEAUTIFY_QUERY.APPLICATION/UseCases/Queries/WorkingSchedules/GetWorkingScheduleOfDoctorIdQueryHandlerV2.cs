@@ -3,19 +3,23 @@ using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
+/// <summary>
+///   api/v{version:apiVersion}/working-schedules/doctor
+/// </summary>
 internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
     IMongoRepository<WorkingScheduleProjection> workingScheduleRepository,
     ICurrentUserService currentUserService)
     : IQueryHandler<Query.GetWorkingScheduleOfDoctorId,
-        PagedResult<Response.GetWorkingScheduleResponse>>
+        PagedResult<Response.ShiftGroup>>
 {
-    public async Task<Result<PagedResult<Response.GetWorkingScheduleResponse>>> Handle(
+    public async Task<Result<PagedResult<Response.ShiftGroup>>> Handle(
         Query.GetWorkingScheduleOfDoctorId request, CancellationToken cancellationToken)
     {
         var doctorId = currentUserService.UserId;
         var searchTerm = request.searchTerm?.Trim() ?? string.Empty;
 
-        var query = workingScheduleRepository.AsQueryable(x => !x.IsDeleted && x.DoctorId.Equals(doctorId));
+        var query = workingScheduleRepository.AsQueryable(x =>
+            !x.IsDeleted && x.DoctorId.Equals(doctorId) && x.CustomerScheduleId != null);
 
         if (!string.IsNullOrEmpty(searchTerm)) query = ApplySearchFilter(query, searchTerm);
 
@@ -27,7 +31,7 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
         );
 
         var result = MapToResponse(total.Items);
-        return Result.Success(new PagedResult<Response.GetWorkingScheduleResponse>(
+        return Result.Success(new PagedResult<Response.ShiftGroup>(
             result,
             total.PageIndex,
             total.PageSize,
@@ -75,25 +79,36 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
             : query.OrderBy(x => x.StartTime);
     }
 
-    private static List<Response.GetWorkingScheduleResponse> MapToResponse(List<WorkingScheduleProjection> items)
+    private static List<Response.ShiftGroup> MapToResponse(List<WorkingScheduleProjection> items)
     {
-        return items.Select(x => new Response.GetWorkingScheduleResponse
-        {
-            WorkingScheduleId = x.DocumentId,
-            DoctorName = x.DoctorName,
-            ClinicId = x.ClinicId,
-            DoctorId = x.DoctorId,
-            StartTime = x.StartTime,
-            EndTime = x.EndTime,
-            Date = x.Date,
-            Status = x.Status,
-            StepIndex = x.StepIndex,
-            CustomerName = x.CustomerName,
-            CustomerId = x.CustomerId,
-            ServiceId = x.ServiceId,
-            ServiceName = x.ServiceName,
-            CustomerScheduleId = x.CustomerScheduleId,
-            CurrentProcedureName = x.CurrentProcedureName
-        }).ToList();
+        return items
+            .GroupBy(x => x.ShiftGroupId)
+            .Select(g => new Response.ShiftGroup
+            {
+                Id = g.First().ShiftGroupId ?? Guid.Empty,
+                DoctorId = g.First().DoctorId,
+                ClinicId = g.First().ClinicId,
+                Date = g.First().Date,
+                StartTime = g.Min(x => x.StartTime),
+                EndTime = g.Max(x => x.EndTime),
+                DoctorName = g.First().DoctorName,
+                WorkingSchedules = g.Select(x => new Response.GetWorkingScheduleResponse
+                {
+                    WorkingScheduleId = x.DocumentId,
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                    Status = x.Status,
+                    StepIndex = x.StepIndex,
+                    CustomerName = x.CustomerName,
+                    CustomerId = x.CustomerId,
+                    ServiceId = x.ServiceId,
+                    ServiceName = x.ServiceName,
+                    CustomerScheduleId = x.CustomerScheduleId,
+                    CurrentProcedureName = x.CurrentProcedureName
+                }).ToList()
+            })
+            .ToList();
     }
+
+// In Handle method return statement
 }

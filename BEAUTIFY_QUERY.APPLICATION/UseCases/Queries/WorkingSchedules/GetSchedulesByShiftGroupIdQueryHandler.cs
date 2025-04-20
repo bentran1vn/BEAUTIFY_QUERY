@@ -7,9 +7,9 @@ namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
 public sealed class GetSchedulesByShiftGroupIdQueryHandler(
     IMongoRepository<WorkingScheduleProjection> workingScheduleRepository,
     ICurrentUserService currentUserService)
-    : IQueryHandler<Query.GetSchedulesByShiftGroupId, PagedResult<Response.GetWorkingScheduleResponse>>
+    : IQueryHandler<Query.GetSchedulesByShiftGroupId, PagedResult<Response.GetWorkingScheduleResponse_Son>>
 {
-    public async Task<Result<PagedResult<Response.GetWorkingScheduleResponse>>> Handle(
+    public async Task<Result<PagedResult<Response.GetWorkingScheduleResponse_Son>>> Handle(
         Query.GetSchedulesByShiftGroupId request, CancellationToken cancellationToken)
     {
         var searchTerm = request.SearchTerm?.Trim() ?? string.Empty;
@@ -45,7 +45,7 @@ public sealed class GetSchedulesByShiftGroupIdQueryHandler(
         // Map to response
         var result = pagedItems.Items.Select(MapToResponse).ToList();
 
-        return Result.Success(new PagedResult<Response.GetWorkingScheduleResponse>(
+        return Result.Success(new PagedResult<Response.GetWorkingScheduleResponse_Son>(
             result,
             pagedItems.PageIndex,
             pagedItems.PageSize,
@@ -53,9 +53,9 @@ public sealed class GetSchedulesByShiftGroupIdQueryHandler(
     }
 
 
-    private static Response.GetWorkingScheduleResponse MapToResponse(WorkingScheduleProjection item)
+    private static Response.GetWorkingScheduleResponse_Son MapToResponse(WorkingScheduleProjection item)
     {
-        return new Response.GetWorkingScheduleResponse
+        return new Response.GetWorkingScheduleResponse_Son
         {
             WorkingScheduleId = item.DocumentId,
             DoctorId = item.DoctorId,
