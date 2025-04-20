@@ -30,10 +30,13 @@ public static class Query
         string RoleName) : IQuery<Response.MyClinicApply>;
 
     public record GetAllApplyRequestQuery(int PageIndex, int PageSize) : IQuery<PagedResult<Response.GetApplyRequest>>;
+    
+    public record GetAllApplyBranchRequestQuery(Guid? ClinicId, int PageIndex, int PageSize) : IQuery<PagedResult<Response.BranchClinicApplyGetAll>>;
 
     public record GetDetailApplyRequestQuery(Guid ApplyRequestId) : IQuery<Response.GetApplyRequestById>;
-
-
+    
+    public record GetDetailBranchApplyRequestQuery(Guid ApplyRequestId) : IQuery<Response.BranchClinicApplyDetail>;
+    
     public record GetAllAccountOfEmployeeQuery(
         Guid ClinicId,
         Roles? Role,
