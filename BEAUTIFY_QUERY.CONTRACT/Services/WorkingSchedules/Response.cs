@@ -84,7 +84,6 @@ public static class Response
     }
 
     public record GetEmptyScheduleResponse(
-        Guid WorkingScheduleId,
         DateOnly Date,
         TimeSpan StartTime,
         TimeSpan EndTime

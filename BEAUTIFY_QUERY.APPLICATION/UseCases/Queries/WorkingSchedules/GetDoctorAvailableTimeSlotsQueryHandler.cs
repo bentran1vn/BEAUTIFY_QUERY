@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+/*using System.Collections.Immutable;
 using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
@@ -30,4 +30,100 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(IMongoRepository<W
 
         return Result.Success<IReadOnlyList<Response.GetEmptyScheduleResponse>>(availableTimeSlots);
     }
+}*/
+///<summary>
+/// /api/v1/working-schedules/doctors/available-times
+/// </summary>
+
+using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
+
+namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
+internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(IMongoRepository<WorkingScheduleProjection> repository)
+    : IQueryHandler<Query.GetDoctorAvailableTimeSlots, IReadOnlyList<Response.GetEmptyScheduleResponse>>
+{
+    public async Task<Result<IReadOnlyList<Response.GetEmptyScheduleResponse>>> Handle(
+        Query.GetDoctorAvailableTimeSlots request, CancellationToken cancellationToken)
+    {
+        // Get all working schedules for the doctor on the specified date
+        var allSchedules = repository.FilterBy(x =>
+            x.DoctorId == request.DoctorId &&
+            x.ClinicId == request.ClinicId &&
+            x.Date == request.Date &&
+            !x.IsDeleted);
+
+        // Group schedules by shift groups
+        var shiftGroups = allSchedules
+            .GroupBy(x => x.ShiftGroupId)
+            .Select(g => new ShiftGroupData(
+                g.Key,
+                g.Min(x => x.StartTime),
+                g.Max(x => x.EndTime),
+                g.Where(x => x.CustomerScheduleId != null).OrderBy(x => x.StartTime).ToList()
+            ))
+            .ToList();
+
+        var availableSlots = new List<Response.GetEmptyScheduleResponse>();
+
+        foreach (var group in shiftGroups)
+        {
+            var currentStart = group.GroupStart;
+            var bookedSlots = group.BookedAppointments;
+
+            foreach (var booked in bookedSlots)
+            {
+                if (booked.StartTime > currentStart)
+                {
+                    availableSlots.Add(CreateAvailableSlot(
+                        request.Date,
+                        currentStart,
+                        booked.StartTime
+                    ));
+                }
+
+                currentStart = booked.EndTime > currentStart ? booked.EndTime : currentStart;
+            }
+
+            if (currentStart < group.GroupEnd)
+            {
+                availableSlots.Add(CreateAvailableSlot(
+                    request.Date,
+                    currentStart,
+                    group.GroupEnd));
+            }
+        }
+
+        // Add completely free shifts not included in any group
+        var completelyFree = allSchedules
+            .Where(x => x.CustomerScheduleId == null && !x.ShiftGroupId.HasValue)
+            .Select(x => new Response.GetEmptyScheduleResponse(
+                x.Date,
+                x.StartTime,
+                x.EndTime
+            ));
+
+        availableSlots.AddRange(completelyFree);
+
+        return Result.Success<IReadOnlyList<Response.GetEmptyScheduleResponse>>(
+            availableSlots.OrderBy(x => x.StartTime).ToList());
+    }
+
+    private static Response.GetEmptyScheduleResponse CreateAvailableSlot(
+        DateOnly date,
+        TimeSpan start,
+        TimeSpan end)
+    {
+        // In a real implementation, you'd need to generate proper IDs or handle them differently
+        return new Response.GetEmptyScheduleResponse(
+            date,
+            start,
+            end
+        );
+    }
+
+    private record ShiftGroupData(
+        Guid? ShiftGroupId,
+        TimeSpan GroupStart,
+        TimeSpan GroupEnd,
+        List<WorkingScheduleProjection> BookedAppointments
+    );
 }

@@ -103,7 +103,7 @@ internal sealed class GetUnregisteredWorkingSchedulesQueryHandler(
 
     private static List<Response.GetEmptyScheduleResponse> MapToResponse(List<WorkingScheduleProjection> items)
     {
-        return items.Select(x => new Response.GetEmptyScheduleResponse(x.DocumentId, x.Date, x.StartTime, x.EndTime)
+        return items.Select(x => new Response.GetEmptyScheduleResponse(x.Date, x.StartTime, x.EndTime)
         ).ToList();
     }
 }
