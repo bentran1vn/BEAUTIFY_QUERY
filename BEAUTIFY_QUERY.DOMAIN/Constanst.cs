@@ -18,6 +18,25 @@ public static class ErrorMessages
         public const string ClinicBranchNotActive = "Clinic branch is not active.";
     }
 
+    public static class Service
+    {
+        public const string ServiceNotFound = "Không tìm thấy dịch vụ.";
+        public const string ServiceAlreadyExists = "Dịch vụ đã tồn tại.";
+        public const string ServiceNotActive = "Dịch vụ không hoạt động.";
+        public const string ServiceAlreadyDeleted = "Dịch vụ đã bị xóa.";
+        public const string ServiceNameAlreadyExists = "Tên dịch vụ đã tồn tại.";
+    }
+
+    public static class CustomerSchedule
+    {
+        public const string CustomerScheduleNotFound = "Không tìm thấy lịch hẹn của khách hàng.";
+        public const string NextCustomerScheduleNotFound = "Không tìm thấy lịch hẹn tiếp theo của khách hàng.";
+        public const string CustomerScheduleAlreadyExists = "Lịch hẹn của khách hàng đã tồn tại.";
+        public const string CustomerScheduleNotActive = "Lịch hẹn của khách hàng không hoạt động.";
+        public const string CustomerScheduleAlreadyCompleted = "Lịch hẹn của khách hàng đã hoàn thành.";
+        public const string CustomerScheduleAlreadyCancelled = "Lịch hẹn của khách hàng đã bị hủy.";
+    }
+
     public static class Wallet
     {
         public const string WalletNotFound = "Không tìm thấy ví.";

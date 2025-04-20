@@ -44,8 +44,10 @@ public static class Query
         int PageSize) : IQuery<PagedResult<Response.GetEmptyScheduleResponse>>;
 
     public record GetDoctorAvailableTimeSlots(
+        Guid ServiceIdOrCustomerScheduleId,
+        Guid? ClinicId,
+        bool IsCustomerSchedule,
         Guid DoctorId,
-        Guid ClinicId,
         DateOnly Date)
         : IQuery<IReadOnlyList<Response.GetEmptyScheduleResponse>>;
 
