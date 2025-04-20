@@ -4,6 +4,9 @@ using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
+/// <summary>
+/// api/v1/working-schedules/clinics
+/// </summary>
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
 public sealed class GetWorkingScheduleByClinicIdQueryHandler(
     IMongoRepository<WorkingScheduleProjection> workingScheduleRepository,
@@ -20,7 +23,8 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
         // Get base query
         var baseQuery = workingScheduleRepository
             .AsQueryable()
-            .Where(x => !x.IsDeleted && x.ClinicId == currentUserService.ClinicId);
+            .Where(x => !x.IsDeleted && x.ClinicId == currentUserService.ClinicId && x.DoctorId == null &&
+                        x.CustomerScheduleId == null);
 
         // Apply search filter if provided
         if (!string.IsNullOrEmpty(searchTerm))
