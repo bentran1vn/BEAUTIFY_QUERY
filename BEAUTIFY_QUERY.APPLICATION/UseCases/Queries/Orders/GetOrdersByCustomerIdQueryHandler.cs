@@ -78,12 +78,12 @@ public sealed class GetOrdersByCustomerIdQueryHandler(
 
     private static Expression<Func<Order, object>> GetSortProperty(Query.GetOrdersByCustomerId request)
     {
-        return request.SortColumn?.ToLower() switch
+        return request.SortColumn switch
         {
-            "total amount" => projection => projection.TotalAmount,
+            "totalAmount" => projection => projection.TotalAmount,
             "discount" => projection => projection.Discount,
-            "final amount" => projection => projection.FinalAmount,
-            "orderdate" => projection => projection.CreatedOnUtc,
+            "finalAmount" => projection => projection.FinalAmount,
+            "orderDate" => projection => projection.OrderDate,
             _ => projection => projection.CreatedOnUtc
         };
     }

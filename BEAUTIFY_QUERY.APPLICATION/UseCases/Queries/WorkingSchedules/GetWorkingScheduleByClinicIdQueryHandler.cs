@@ -1,4 +1,5 @@
-﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+﻿using System.Linq.Expressions;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -29,10 +30,10 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
         var capacityLookup = await CalculateCapacities(baseQuery, cancellationToken);
 
         // Apply sorting
-        var sortedQuery = ApplySorting(baseQuery, request.SortOrder);
+
 
         // Create distinct query for pagination
-        var distinctQuery = sortedQuery
+        var distinctQuery = baseQuery
             .GroupBy(x => new { x.Date, x.StartTime, x.EndTime, x.ShiftGroupId })
             .Select(g => new WorkingScheduleProjection
             {
@@ -41,7 +42,9 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
                 EndTime = g.Key.EndTime,
                 ShiftGroupId = g.Key.ShiftGroupId,
             });
-
+        distinctQuery = request.SortOrder == SortOrder.Descending
+            ? distinctQuery.OrderByDescending(GetSortProperty(request))
+            : distinctQuery.OrderBy(GetSortProperty(request));
         // Apply pagination
         var pagedItems = await PagedResult<WorkingScheduleProjection>.CreateAsyncMongoLinq(
             distinctQuery,
@@ -102,15 +105,21 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
         }
     }
 
-    private static IMongoQueryable<WorkingScheduleProjection> ApplySorting(
-        IMongoQueryable<WorkingScheduleProjection> query, SortOrder sortOrder)
+
+    private static Expression<Func<WorkingScheduleProjection, object>> GetSortProperty(
+        Query.GetWorkingScheduleByClinicId request)
     {
-        return sortOrder == SortOrder.Descending
-            ? query.OrderByDescending(x => x.Date).ThenByDescending(x => x.StartTime)
-            : query.OrderBy(x => x.Date).ThenBy(x => x.StartTime);
+        return request.SortColumn switch
+        {
+            "date" => x => x.Date,
+            "startTime" => x => x.StartTime,
+            "endTime" => x => x.EndTime,
+            _ => x => x.CreatedOnUtc
+        };
     }
 
-    private async Task<Dictionary<(DateOnly, TimeSpan, TimeSpan), (int Capacity, int DoctorCount, int CustomerCount)>>
+    private static async
+        Task<Dictionary<(DateOnly, TimeSpan, TimeSpan), (int Capacity, int DoctorCount, int CustomerCount)>>
         CalculateCapacities(
             IMongoQueryable<WorkingScheduleProjection> query,
             CancellationToken cancellationToken)

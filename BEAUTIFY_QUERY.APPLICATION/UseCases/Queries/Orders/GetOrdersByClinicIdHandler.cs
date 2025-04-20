@@ -1,4 +1,7 @@
-﻿using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
+﻿using System.Linq.Expressions;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
+using Microsoft.EntityFrameworkCore;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Orders;
 internal sealed class GetOrdersByClinicIdHandler(
@@ -15,10 +18,23 @@ internal sealed class GetOrdersByClinicIdHandler(
             x.Service.ClinicServices.FirstOrDefault().ClinicId == currentUserService.ClinicId);
 
         if (!string.IsNullOrEmpty(searchTerm))
-            query = query.Where(x => x.Customer.FullName.Contains(searchTerm) ||
-                                     x.Service.Name.Contains(searchTerm) ||
-                                     x.Customer.PhoneNumber.Contains(searchTerm) ||
-                                     x.FinalAmount.ToString().Contains(searchTerm));
+        {
+            var pattern = $"%{searchTerm}%";
+            query = query.Where(x =>
+                EF.Functions.Like(x.Customer.FirstName, pattern) ||
+                EF.Functions.Like(x.Customer.LastName, pattern) ||
+                EF.Functions.Like(x.Service.Name, pattern) ||
+                EF.Functions.Like(x.Customer.PhoneNumber, pattern) ||
+                EF.Functions.Like(x.FinalAmount.ToString(), pattern) ||
+                EF.Functions.Like(x.Discount.ToString(), pattern) ||
+                EF.Functions.Like(x.DepositAmount.ToString(), pattern) ||
+                EF.Functions.Like(x.LivestreamRoom.Name, pattern)
+            );
+        }
+
+        query = request.SortOrder == SortOrder.Descending
+            ? query.OrderByDescending(GetSortProperty(request))
+            : query.OrderBy(GetSortProperty(request));
 
         var orders = await PagedResult<Order>.CreateAsync(query, request.PageIndex, request.PageSize);
 
@@ -42,5 +58,20 @@ internal sealed class GetOrdersByClinicIdHandler(
 
         return Result.Success(
             new PagedResult<Response.Order>(mapped, orders.PageIndex, orders.PageSize, orders.TotalCount));
+    }
+
+    private static Expression<Func<Order, object>> GetSortProperty(Query.GetOrdersByClinicId request)
+    {
+        return request.SortColumn switch
+        {
+            "customerName" => x => x.Customer.FullName,
+            "serviceName" => x => x.Service.Name,
+            "totalAmount" => x => x.TotalAmount,
+            "discount" => x => x.Discount,
+            "depositAmount" => x => x.DepositAmount,
+            "finalAmount" => x => x.FinalAmount,
+            "oderDate" => x => x.OrderDate,
+            _ => x => x.CreatedOnUtc,
+        };
     }
 }
