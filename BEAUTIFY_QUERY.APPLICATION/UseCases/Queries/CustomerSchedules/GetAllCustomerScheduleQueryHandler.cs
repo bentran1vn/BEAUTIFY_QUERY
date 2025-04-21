@@ -1,6 +1,9 @@
 ﻿using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+/// customer-schedules/clinic
+/// </summary>
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.CustomerSchedules;
 internal sealed class GetAllCustomerScheduleQueryHandler(
     ICurrentUserService currentUserService,

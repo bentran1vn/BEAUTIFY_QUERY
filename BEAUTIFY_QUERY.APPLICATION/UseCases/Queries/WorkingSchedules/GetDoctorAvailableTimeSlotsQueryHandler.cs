@@ -59,7 +59,7 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
             if (customerSchedule == null)
                 return Result.Failure<IReadOnlyList<Response.GetEmptyScheduleResponse>>(new Error("404",
                     ErrorMessages.CustomerSchedule.CustomerScheduleNotFound));
-            var nextCustomerSchedule = await
+            /*var nextCustomerSchedule = await
                 customerScheduleRepository.FindOneAsync(x =>
                     x.DoctorId == customerSchedule.DoctorId &&
                     x.ServiceId == customerSchedule.ServiceId &&
@@ -72,7 +72,8 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
                     ErrorMessages.CustomerSchedule.NextCustomerScheduleNotFound));
             }
 
-            duration = nextCustomerSchedule.CurrentProcedure.Duration;
+            duration = nextCustomerSchedule.CurrentProcedure.Duration;*/
+            duration = customerSchedule.CurrentProcedure.Duration;
             clinicId = customerSchedule.ClinicId.Value;
         }
         else
