@@ -31,7 +31,7 @@ public static class Query
 
     public record GetAllApplyRequestQuery(int PageIndex, int PageSize) : IQuery<PagedResult<Response.GetApplyRequest>>;
     
-    public record GetAllApplyBranchRequestQuery(Guid? ClinicId, int PageIndex, int PageSize) : IQuery<PagedResult<Response.BranchClinicApplyGetAll>>;
+    public record GetAllApplyBranchRequestQuery(Guid? ClinicId, string? SearchTerm, int PageIndex, int PageSize) : IQuery<PagedResult<Response.BranchClinicApplyGetAll>>;
 
     public record GetDetailApplyRequestQuery(Guid ApplyRequestId) : IQuery<Response.GetApplyRequestById>;
     

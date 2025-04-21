@@ -107,10 +107,13 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
     
-    private static async Task<IResult> GetAllApplyClinicRequest(ISender sender , HttpContext httpContext, int pageIndex = 1, int pageSize = 10)
+    private static async Task<IResult> GetAllApplyClinicRequest(ISender sender ,
+        HttpContext httpContext, string? searchTerm = null,
+        int pageIndex = 1, int pageSize = 10)
     {
         var clinicId = httpContext.User.FindFirst(c => c.Type == "ClinicId")?.Value;
-        var result = await sender.Send(new Query.GetAllApplyBranchRequestQuery(clinicId == null? null : new Guid(clinicId), pageIndex, pageSize));
+        var result = await sender.Send(new Query.GetAllApplyBranchRequestQuery(clinicId == null? null : new Guid(clinicId),
+            searchTerm, pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
