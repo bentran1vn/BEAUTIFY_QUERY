@@ -14,6 +14,13 @@ public class Apis : ApiEndpoint, ICarterModule
 
         gr1.MapGet("information", GetUserInformation)
             .RequireAuthorization(Constant.Policy.POLICY_DOCTOR_AND_CUSTOMER);
+        gr1.MapGet("{userId:guid}/balance", GetCustomerCurrentBalance).RequireAuthorization(Constant.Role.CLINIC_STAFF);
+    }
+
+    private static async Task<IResult> GetCustomerCurrentBalance(ISender sender, Guid userId)
+    {
+        var result = await sender.Send(new Query.GetCustomerCurrentBalance(userId));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
     private static async Task<IResult> GetUserByPhoneOrEmail(ISender sender, string searchTerm)

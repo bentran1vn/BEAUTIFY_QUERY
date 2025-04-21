@@ -5,4 +5,6 @@ public class Query
 
 
     public record GetUserInformation : IQuery<Response.GetUserInformationResponse>;
+
+    public record GetCustomerCurrentBalance(Guid UserId) : IQuery<string>;
 }

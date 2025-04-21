@@ -47,7 +47,7 @@ public static class Query
         Guid ServiceIdOrCustomerScheduleId,
         Guid? ClinicId,
         bool IsCustomerSchedule,
-        Guid DoctorId,
+        Guid? DoctorId,
         DateOnly Date)
         : IQuery<IReadOnlyList<Response.GetEmptyScheduleResponse>>;
 
