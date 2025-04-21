@@ -2,15 +2,14 @@
 using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using MongoDB.Driver.Linq;
 
-namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
 /// <summary>
 ///   api/v{version:apiVersion}/working-schedules/doctor
 /// </summary>
+namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
 internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
     IMongoRepository<WorkingScheduleProjection> workingScheduleRepository,
     ICurrentUserService currentUserService)
-    : IQueryHandler<Query.GetWorkingScheduleOfDoctorId,
-        PagedResult<Response.ShiftGroup>>
+    : IQueryHandler<Query.GetWorkingScheduleOfDoctorId, PagedResult<Response.ShiftGroup>>
 {
     public async Task<Result<PagedResult<Response.ShiftGroup>>> Handle(
         Query.GetWorkingScheduleOfDoctorId request, CancellationToken cancellationToken)
@@ -18,70 +17,25 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
         var doctorId = currentUserService.UserId;
         var searchTerm = request.searchTerm?.Trim() ?? string.Empty;
 
+        // Query for non-deleted working schedules for the current doctor with customer schedules
         var query = workingScheduleRepository.AsQueryable(x =>
-            !x.IsDeleted && x.DoctorId.Equals(doctorId) && x.CustomerScheduleId != null);
+            !x.IsDeleted && x.DoctorId == doctorId && x.CustomerScheduleId != null);
 
-        if (!string.IsNullOrEmpty(searchTerm)) query = ApplySearchFilter(query, searchTerm);
+        // Apply search filter if provided
+        if (!string.IsNullOrEmpty(searchTerm))
+            query = ApplySearchFilter(query, searchTerm);
 
-        query = ApplySorting(query, request.SortOrder);
-        var total = await PagedResult<WorkingScheduleProjection>.CreateAsyncMongoLinq(
-            query,
-            request.PageNumber,
-            request.PageSize
-        );
-
-        var result = MapToResponse(total.Items);
-        return Result.Success(new PagedResult<Response.ShiftGroup>(
-            result,
-            total.PageIndex,
-            total.PageSize,
-            total.TotalCount));
-    }
-
-    private static IMongoQueryable<WorkingScheduleProjection> ApplySearchFilter(
-        IMongoQueryable<WorkingScheduleProjection> query, string searchTerm)
-    {
-        if (!searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
-            return query.Where(x =>
-                (x.CustomerName != null &&
-                 x.CustomerName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                x.Status.Equals(searchTerm, StringComparison.CurrentCultureIgnoreCase));
-        {
-            var parts = searchTerm.Split("to", StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length != 2)
-                return query.Where(x =>
-                    (x.CustomerName != null &&
-                     x.CustomerName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                    x.Status.Equals(searchTerm, StringComparison.CurrentCultureIgnoreCase));
-            var part1 = parts[0].Trim();
-            var part2 = parts[1].Trim();
-
-            if (DateOnly.TryParse(part1, out var dateFrom) &&
-                DateOnly.TryParse(part2, out var dateTo))
-                return query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
-
-            if (TimeSpan.TryParse(part1, out var timeFrom) &&
-                TimeSpan.TryParse(part2, out var timeTo))
-                return query.Where(x => x.StartTime >= timeFrom && x.EndTime <= timeTo);
-        }
-
-        return query.Where(x =>
-            (x.CustomerName != null &&
-             x.CustomerName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-            x.Status.Equals(searchTerm, StringComparison.CurrentCultureIgnoreCase));
-    }
-
-    private static IMongoQueryable<WorkingScheduleProjection> ApplySorting(
-        IMongoQueryable<WorkingScheduleProjection> query, SortOrder sortOrder)
-    {
-        return sortOrder == SortOrder.Descending
+        // Apply sorting
+        query = request.SortOrder == SortOrder.Descending
             ? query.OrderByDescending(x => x.StartTime)
             : query.OrderBy(x => x.StartTime);
-    }
 
-    private static List<Response.ShiftGroup> MapToResponse(List<WorkingScheduleProjection> items)
-    {
-        return items
+        // Get paged results
+        var total = await PagedResult<WorkingScheduleProjection>.CreateAsyncMongoLinq(
+            query, request.PageNumber, request.PageSize);
+
+        // Map to response
+        var result = total.Items
             .GroupBy(x => x.ShiftGroupId)
             .Select(g => new Response.ShiftGroup
             {
@@ -108,7 +62,43 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
                 }).ToList()
             })
             .ToList();
+
+        return Result.Success(new PagedResult<Response.ShiftGroup>(
+            result, total.PageIndex, total.PageSize, total.TotalCount));
     }
 
-// In Handle method return statement
+    private static IMongoQueryable<WorkingScheduleProjection> ApplySearchFilter(
+        IMongoQueryable<WorkingScheduleProjection> query, string searchTerm)
+    {
+        // Check if search term contains date or time range
+        if (!searchTerm.Contains("to", StringComparison.OrdinalIgnoreCase))
+            return query.Where(x =>
+                (x.CustomerName != null &&
+                 x.CustomerName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
+                x.Status.Equals(searchTerm, StringComparison.CurrentCultureIgnoreCase));
+        {
+            var parts = searchTerm.Split("to", StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length != 2)
+                return query.Where(x =>
+                    (x.CustomerName != null &&
+                     x.CustomerName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
+                    x.Status.Equals(searchTerm, StringComparison.CurrentCultureIgnoreCase));
+            var from = parts[0].Trim();
+            var to = parts[1].Trim();
+
+            // Try parsing as date range
+            if (DateOnly.TryParse(from, out var dateFrom) && DateOnly.TryParse(to, out var dateTo))
+                return query.Where(x => x.Date >= dateFrom && x.Date <= dateTo);
+
+            // Try parsing as time range
+            if (TimeSpan.TryParse(from, out var timeFrom) && TimeSpan.TryParse(to, out var timeTo))
+                return query.Where(x => x.StartTime >= timeFrom && x.EndTime <= timeTo);
+        }
+
+        // Default search by customer name or status
+        return query.Where(x =>
+            (x.CustomerName != null &&
+             x.CustomerName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
+            x.Status.Equals(searchTerm, StringComparison.CurrentCultureIgnoreCase));
+    }
 }

@@ -56,13 +56,13 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
 
     private static async Task<IResult> GetDoctorAvailableTimeSlots(
         ISender sender,
-        [FromQuery] Guid doctorId,
-        [FromQuery] Guid ServiceIdOrCustomerScheduleId,
+        [FromQuery] Guid? doctorId,
+        [FromQuery] Guid serviceIdOrCustomerScheduleId,
         [FromQuery] Guid? clinicId,
         [FromQuery] bool isCustomerSchedule,
         [FromQuery] DateOnly date)
     {
-        var query = new Query.GetDoctorAvailableTimeSlots(ServiceIdOrCustomerScheduleId, clinicId, isCustomerSchedule,
+        var query = new Query.GetDoctorAvailableTimeSlots(serviceIdOrCustomerScheduleId, clinicId, isCustomerSchedule,
             doctorId,
             date);
         var result = await sender.Send(query);

@@ -4,6 +4,11 @@ using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 using MongoDB.Driver.Linq;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
+/// <summary>
+///  /api/v{version:apiVersion}/working-schedules/shift-group/{shiftGroupId}
+/// </summary>
+/// <param name="workingScheduleRepository"></param>
+/// <param name="currentUserService"></param>
 public sealed class GetSchedulesByShiftGroupIdQueryHandler(
     IMongoRepository<WorkingScheduleProjection> workingScheduleRepository,
     ICurrentUserService currentUserService)
@@ -19,6 +24,7 @@ public sealed class GetSchedulesByShiftGroupIdQueryHandler(
             .AsQueryable()
             .Where(x => !x.IsDeleted &&
                         x.ClinicId == currentUserService.ClinicId &&
+                        x.CustomerScheduleId != null &&
                         x.ShiftGroupId == request.ShiftGroupId);
 
         // Apply search filter if provided

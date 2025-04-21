@@ -48,14 +48,14 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
     public async Task<Result<IReadOnlyList<Response.GetEmptyScheduleResponse>>> Handle(
         Query.GetDoctorAvailableTimeSlots request, CancellationToken cancellationToken)
     {
-        // Get all working schedules for the doctor on the specified date
-
+        // Get duration and clinic ID logic remains the same
         int duration;
         Guid clinicId;
         if (request.IsCustomerSchedule)
         {
+            // Existing customer schedule logic...
             var customerSchedule = await
-                customerScheduleRepository.FindOneAsync(x => x.DocumentId == request.ServiceIdOrCustomerScheduleId);
+                customerScheduleRepository.FindOneAsync(x => x.DocumentId == request.serviceIdOrCustomerScheduleId);
             if (customerSchedule == null)
                 return Result.Failure<IReadOnlyList<Response.GetEmptyScheduleResponse>>(new Error("404",
                     ErrorMessages.CustomerSchedule.CustomerScheduleNotFound));
@@ -78,19 +78,18 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
         else
         {
             var service = await
-                clinicServiceRepository.FindOneAsync(x => x.DocumentId == request.ServiceIdOrCustomerScheduleId);
+                clinicServiceRepository.FindOneAsync(x => x.DocumentId == request.serviceIdOrCustomerScheduleId);
             if (service == null)
                 return Result.Failure<IReadOnlyList<Response.GetEmptyScheduleResponse>>(new Error("404",
                     ErrorMessages.Service.ServiceNotActive));
 
-            // Get the maximum duration from all procedure price types
             duration = service.Procedures
-                .SelectMany(p => p.ProcedurePriceTypes
-                    .Select(ppt => ppt.Duration))
-                .Max();
+                .Where(x => x.StepIndex == 1)
+                .SelectMany(p => p.ProcedurePriceTypes)
+                .OrderByDescending(ppt => ppt.Duration)
+                .FirstOrDefault().Duration;
             clinicId = request.ClinicId.Value;
         }
-
 
         var allSchedules = repository.FilterBy(x =>
             x.DoctorId == request.DoctorId &&
@@ -116,9 +115,27 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
             var currentStart = group.GroupStart;
             var bookedSlots = group.BookedAppointments;
 
+            // If there are no booked appointments in this shift, check if the entire shift is long enough
+            if (!bookedSlots.Any())
+            {
+                var totalDuration = (group.GroupEnd - group.GroupStart).TotalMinutes;
+                if (totalDuration >= duration)
+                {
+                    availableSlots.Add(CreateAvailableSlot(
+                        request.Date,
+                        group.GroupStart,
+                        group.GroupEnd
+                    ));
+                }
+
+                continue;
+            }
+
             foreach (var booked in bookedSlots)
             {
-                if (booked.StartTime > currentStart)
+                // Check if there's enough time between current position and next booking
+                var availableDuration = (booked.StartTime - currentStart).TotalMinutes;
+                if (availableDuration >= duration)
                 {
                     availableSlots.Add(CreateAvailableSlot(
                         request.Date,
@@ -130,18 +147,22 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
                 currentStart = booked.EndTime > currentStart ? booked.EndTime : currentStart;
             }
 
-            if (currentStart < group.GroupEnd)
+            // Check if there's enough time after the last booking
+            var remainingDuration = (group.GroupEnd - currentStart).TotalMinutes;
+            if (remainingDuration >= duration)
             {
                 availableSlots.Add(CreateAvailableSlot(
                     request.Date,
                     currentStart,
-                    group.GroupEnd));
+                    group.GroupEnd
+                ));
             }
         }
 
-        // Add completely free shifts not included in any group
+        // Add completely free shifts not included in any group - only if they're long enough
         var completelyFree = allSchedules
             .Where(x => x.CustomerScheduleId == null && !x.ShiftGroupId.HasValue)
+            .Where(x => (x.EndTime - x.StartTime).TotalMinutes >= duration)
             .Select(x => new Response.GetEmptyScheduleResponse(
                 x.Date,
                 x.StartTime,
@@ -151,10 +172,7 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
         availableSlots.AddRange(completelyFree);
 
         return Result.Success<IReadOnlyList<Response.GetEmptyScheduleResponse>>(
-            availableSlots
-                .Where(slot => (slot.EndTime - slot.StartTime).TotalMinutes >= duration)
-                .OrderBy(x => x.StartTime)
-                .ToList());
+            availableSlots.OrderBy(x => x.StartTime).ToList());
     }
 
     private static Response.GetEmptyScheduleResponse CreateAvailableSlot(
