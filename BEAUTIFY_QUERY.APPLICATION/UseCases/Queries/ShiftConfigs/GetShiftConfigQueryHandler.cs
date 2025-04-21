@@ -1,15 +1,18 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.ShiftConfigs;
+using Clinic = BEAUTIFY_QUERY.DOMAIN.Documents.Clinic;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.ShiftConfigs;
 
 public class GetShiftConfigQueryHandler: IQueryHandler<Query.GetShiftConfigQuery, PagedResult<Response.ShiftResponse>>
 {
     private readonly IRepositoryBase<ShiftConfig, Guid> _shiftConfigRepository;
+    private readonly IRepositoryBase<Clinic, Guid> _clinicRepository;
 
-    public GetShiftConfigQueryHandler(IRepositoryBase<ShiftConfig, Guid> shiftConfigRepository)
+    public GetShiftConfigQueryHandler(IRepositoryBase<ShiftConfig, Guid> shiftConfigRepository, IRepositoryBase<Clinic, Guid> clinicRepository)
     {
         _shiftConfigRepository = shiftConfigRepository;
+        _clinicRepository = clinicRepository;
     }
 
     public async Task<Result<PagedResult<Response.ShiftResponse>>> Handle(Query.GetShiftConfigQuery request, CancellationToken cancellationToken)
@@ -23,7 +26,14 @@ public class GetShiftConfigQueryHandler: IQueryHandler<Query.GetShiftConfigQuery
         }
         else
         {
-            query = query.Where(x => x.Clinic.ParentId == request.ClinicId);
+            var clinicMain = await _clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken);
+            
+            if (clinicMain == null)
+            {
+                return Result.Failure<PagedResult<Response.ShiftResponse>>(new Error("404", "Clinic not found"));
+            }
+            
+            query = query.Where(x => x.ClinicId == clinicMain.ParentId);
         }
         
         var pageList = await PagedResult<ShiftConfig>.CreateAsync(query, request.PageNumber, request.PageSize);
