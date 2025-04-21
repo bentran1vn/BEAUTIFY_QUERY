@@ -55,7 +55,7 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
         {
             // Existing customer schedule logic...
             var customerSchedule = await
-                customerScheduleRepository.FindOneAsync(x => x.DocumentId == request.ServiceIdOrCustomerScheduleId);
+                customerScheduleRepository.FindOneAsync(x => x.DocumentId == request.serviceIdOrCustomerScheduleId);
             if (customerSchedule == null)
                 return Result.Failure<IReadOnlyList<Response.GetEmptyScheduleResponse>>(new Error("404",
                     ErrorMessages.CustomerSchedule.CustomerScheduleNotFound));
@@ -78,7 +78,7 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
         else
         {
             var service = await
-                clinicServiceRepository.FindOneAsync(x => x.DocumentId == request.ServiceIdOrCustomerScheduleId);
+                clinicServiceRepository.FindOneAsync(x => x.DocumentId == request.serviceIdOrCustomerScheduleId);
             if (service == null)
                 return Result.Failure<IReadOnlyList<Response.GetEmptyScheduleResponse>>(new Error("404",
                     ErrorMessages.Service.ServiceNotActive));
