@@ -13,7 +13,7 @@ internal sealed class GetClinicsQueryHandler(
     public async Task<Result<PagedResult<Response.GetClinics>>> Handle(Query.GetClinicsQuery request,
         CancellationToken cancellationToken)
     {
-        var clinicsQuery = clinicRepository.FindAll(x => x.Status == 0  && x.IsDeleted == false);
+        var clinicsQuery = clinicRepository.FindAll(x => x.Status == 1 && x.IsDeleted == false);
 
         clinicsQuery = string.IsNullOrWhiteSpace(request.SearchTerm)
             ? clinicsQuery
