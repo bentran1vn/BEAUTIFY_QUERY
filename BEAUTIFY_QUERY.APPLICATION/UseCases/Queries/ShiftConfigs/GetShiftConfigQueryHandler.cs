@@ -7,9 +7,9 @@ namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.ShiftConfigs;
 public class GetShiftConfigQueryHandler: IQueryHandler<Query.GetShiftConfigQuery, PagedResult<Response.ShiftResponse>>
 {
     private readonly IRepositoryBase<ShiftConfig, Guid> _shiftConfigRepository;
-    private readonly IRepositoryBase<Clinic, Guid> _clinicRepository;
+    private readonly IRepositoryBase<DOMAIN.Entities.Clinic, Guid> _clinicRepository;
 
-    public GetShiftConfigQueryHandler(IRepositoryBase<ShiftConfig, Guid> shiftConfigRepository, IRepositoryBase<Clinic, Guid> clinicRepository)
+    public GetShiftConfigQueryHandler(IRepositoryBase<ShiftConfig, Guid> shiftConfigRepository, IRepositoryBase<DOMAIN.Entities.Clinic, Guid> clinicRepository)
     {
         _shiftConfigRepository = shiftConfigRepository;
         _clinicRepository = clinicRepository;
