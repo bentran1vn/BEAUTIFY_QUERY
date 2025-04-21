@@ -20,6 +20,15 @@ public class GetAllApplyBranchRequestQueryHandler : IQueryHandler<Query.GetAllAp
         requestQuery = requestQuery
             .Include(x => x.Clinic)
                 .ThenInclude(x => x.Parent);
+
+        if (!string.IsNullOrEmpty(request.SearchTerm))
+        {
+            requestQuery = requestQuery
+                .Where(x => 
+                    x.Clinic!.Name.ToLower().Contains(request.SearchTerm.ToLower()) ||
+                    x.Clinic!.Email.ToLower().Contains(request.SearchTerm.ToLower())
+                );
+        }
         
         if(request.ClinicId != null)
         {
