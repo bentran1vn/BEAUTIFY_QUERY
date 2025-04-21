@@ -35,7 +35,7 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         gr1.MapGet("{clinicId:guid}/employees/{employeeId:guid}", GetDetailAccountOfEmployee);
         
         gr1.MapGet("branches", GetClinicBranches)
-            .RequireAuthorization(Constant.Role.CLINIC_ADMIN)
+            .RequireAuthorization(Constant.Policy.POLICY_CLINIC_ADMIN_AND_SYSTEM_STAFF)
             .WithName("Get Clinic Branches")
             .WithSummary("Get all branches for the current clinic admin");
         
@@ -66,9 +66,11 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
-    private static async Task<IResult> GetClinicBranches(ISender sender)
+    private static async Task<IResult> GetClinicBranches(ISender sender,
+        HttpContext httpContext, Guid? id)
     {
-        var result = await sender.Send(new Query.GetClinicBranchesQuery());
+        var role = httpContext.User.FindFirst(c => c.Type == "RoleName")?.Value!;
+        var result = await sender.Send(new Query.GetClinicBranchesQuery(id, role));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 

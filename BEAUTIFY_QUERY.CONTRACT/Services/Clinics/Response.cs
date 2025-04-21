@@ -15,6 +15,17 @@ public static class Response
         public decimal Balance { get; set; }
         public TimeSpan? WorkingTimeStart { get; set; }
         public TimeSpan? WorkingTimeEnd { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string? City { get; set; }
+        public string? District { get; set; }
+        public string? Ward { get; set; }
+        public string? Address { get; set; }
+        public string FullAddress => $"{Address}, {Ward}, {District}, {City}".Trim(',', ' ', '\n');
+        public string TaxCode { get; set; }
+        public string BusinessLicenseUrl { get; set; }
+        public string OperatingLicenseUrl { get; set; }
+        public DateTimeOffset? OperatingLicenseExpiryDate { get; set; }
         public decimal PendingWithdrawals { get; set; }
         public decimal TotalEarnings { get; set; }
         //bank account
