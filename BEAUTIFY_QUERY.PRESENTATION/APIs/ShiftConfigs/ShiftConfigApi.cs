@@ -13,7 +13,7 @@ public class ShiftConfigApi: ApiEndpoint, ICarterModule
             .MapGroup(BaseUrl).HasApiVersion(1);
 
         gr1.MapGet("", GetAllShiftConfig)
-            .RequireAuthorization(Constant.Role.CLINIC_ADMIN);
+            .RequireAuthorization(Constant.Policy.POLICY_CLINIC_ADMIN_AND_CLINIC_STAFF);
     }
     
     private static async Task<IResult> GetAllShiftConfig(ISender sender,
@@ -22,8 +22,9 @@ public class ShiftConfigApi: ApiEndpoint, ICarterModule
         int pageSize = 10)
     {
         var clinicId = httpContext.User.FindFirst(c => c.Type == "ClinicId")?.Value!;
+        var role = httpContext.User.FindFirst(c => c.Type == "RoleName")?.Value!;
         
-        var result = await sender.Send(new Query.GetShiftConfigQuery(new Guid(clinicId),
+        var result = await sender.Send(new Query.GetShiftConfigQuery(new Guid(clinicId), role,
             pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
