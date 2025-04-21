@@ -51,6 +51,7 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
         // Get duration and clinic ID logic remains the same
         int duration;
         Guid clinicId;
+        var doctorId = request.DoctorId;
         if (request.IsCustomerSchedule)
         {
             // Existing customer schedule logic...
@@ -75,6 +76,7 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
             duration = nextCustomerSchedule.CurrentProcedure.Duration;*/
             duration = customerSchedule.CurrentProcedure.Duration;
             clinicId = customerSchedule.ClinicId.Value;
+            doctorId = customerSchedule.DoctorId;
         }
         else
         {
@@ -93,7 +95,7 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
         }
 
         var allSchedules = repository.FilterBy(x =>
-            x.DoctorId == request.DoctorId &&
+            x.DoctorId == doctorId &&
             x.ClinicId == clinicId &&
             x.Date == request.Date &&
             !x.IsDeleted);
