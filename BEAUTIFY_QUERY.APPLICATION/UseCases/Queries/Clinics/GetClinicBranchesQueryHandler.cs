@@ -15,14 +15,29 @@ internal sealed class GetClinicBranchesQueryHandler(
         CancellationToken cancellationToken)
     {
         // Get the current user's clinic ID
+        Clinic? parentClinic = null;
 
 
-        // Find the parent clinic associated with the current user
-        var parentClinic = await clinicRepository
-            .FindAll(c => c.UserClinics != null &&
-                          c.UserClinics.Any(uc => uc.UserId == currentUserService.UserId.Value) &&
-                          c.IsParent == true)
-            .FirstOrDefaultAsync(cancellationToken);
+        if (request.Role.Equals(Constant.Role.CLINIC_ADMIN))
+        {
+            // Find the parent clinic associated with the current user
+            parentClinic = await clinicRepository
+                .FindAll(c => c.UserClinics != null &&
+                              c.UserClinics.Any(uc => uc.UserId == currentUserService.UserId.Value) &&
+                              c.IsParent == true)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+        else if (request.Role.Equals(Constant.Role.SYSTEM_STAFF) && request.Id != null)
+        {
+            parentClinic = await clinicRepository
+                .FindSingleAsync(
+                    x => x.Id.Equals(request.Id) &&
+                    x.IsParent == true &&
+                    x.IsDeleted == false &&
+                    x.IsActivated &&
+                    x.Status == 1
+            , cancellationToken);
+        }
 
         if (parentClinic == null)
             return Result.Failure<Response.GetClinicBranchesResponse>(
@@ -64,7 +79,17 @@ internal sealed class GetClinicBranchesQueryHandler(
                 Id = clinic.Id,
                 Name = clinic.Name,
                 Logo = clinic.ProfilePictureUrl,
+                Email = clinic.Email,
+                PhoneNumber = clinic.PhoneNumber,
+                City = clinic.City,
+                District = clinic.District,
+                Ward = clinic.Ward,
+                Address = clinic.Address,
                 Balance = clinic.Balance,
+                TaxCode = clinic.TaxCode,
+                BusinessLicenseUrl = clinic.BusinessLicenseUrl,
+                OperatingLicenseUrl = clinic.OperatingLicenseUrl,
+                OperatingLicenseExpiryDate = clinic.OperatingLicenseExpiryDate,
                 WorkingTimeEnd = clinic.WorkingTimeStart,
                 WorkingTimeStart = clinic.WorkingTimeEnd,
                 PendingWithdrawals =

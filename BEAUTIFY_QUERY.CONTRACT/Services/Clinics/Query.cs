@@ -55,7 +55,7 @@ public static class Query
         int PageIndex,
         int PageSize) : IQuery<PagedResult<Response.GetClinicBranches>>;
 
-    public record GetClinicBranchesQuery : IQuery<Response.GetClinicBranchesResponse>;
+    public record GetClinicBranchesQuery(Guid? Id, string Role) : IQuery<Response.GetClinicBranchesResponse>;
 
     public record GetClinicByIdQuery(Guid Id) : IQuery<Response.ClinicBranchDto>;
 
