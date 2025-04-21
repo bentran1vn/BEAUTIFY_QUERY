@@ -36,18 +36,65 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(IMongoRepository<W
 /// </summary>
 
 using BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
+using BEAUTIFY_QUERY.DOMAIN;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.WorkingSchedules;
-internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(IMongoRepository<WorkingScheduleProjection> repository)
+internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
+    IMongoRepository<WorkingScheduleProjection> repository,
+    IMongoRepository<ClinicServiceProjection> clinicServiceRepository,
+    IMongoRepository<CustomerScheduleProjection> customerScheduleRepository)
     : IQueryHandler<Query.GetDoctorAvailableTimeSlots, IReadOnlyList<Response.GetEmptyScheduleResponse>>
 {
     public async Task<Result<IReadOnlyList<Response.GetEmptyScheduleResponse>>> Handle(
         Query.GetDoctorAvailableTimeSlots request, CancellationToken cancellationToken)
     {
         // Get all working schedules for the doctor on the specified date
+
+        int duration;
+        Guid clinicId;
+        if (request.IsCustomerSchedule)
+        {
+            var customerSchedule = await
+                customerScheduleRepository.FindOneAsync(x => x.DocumentId == request.ServiceIdOrCustomerScheduleId);
+            if (customerSchedule == null)
+                return Result.Failure<IReadOnlyList<Response.GetEmptyScheduleResponse>>(new Error("404",
+                    ErrorMessages.CustomerSchedule.CustomerScheduleNotFound));
+            var nextCustomerSchedule = await
+                customerScheduleRepository.FindOneAsync(x =>
+                    x.DoctorId == customerSchedule.DoctorId &&
+                    x.ServiceId == customerSchedule.ServiceId &&
+                    x.OrderId == customerSchedule.OrderId &&
+                    x.CurrentProcedure.StepIndex == (int.Parse(customerSchedule.CurrentProcedure.StepIndex) + 1
+                    ).ToString());
+            if (nextCustomerSchedule == null)
+            {
+                return Result.Failure<IReadOnlyList<Response.GetEmptyScheduleResponse>>(new Error("404",
+                    ErrorMessages.CustomerSchedule.NextCustomerScheduleNotFound));
+            }
+
+            duration = nextCustomerSchedule.CurrentProcedure.Duration;
+            clinicId = customerSchedule.ClinicId.Value;
+        }
+        else
+        {
+            var service = await
+                clinicServiceRepository.FindOneAsync(x => x.DocumentId == request.ServiceIdOrCustomerScheduleId);
+            if (service == null)
+                return Result.Failure<IReadOnlyList<Response.GetEmptyScheduleResponse>>(new Error("404",
+                    ErrorMessages.Service.ServiceNotActive));
+
+            // Get the maximum duration from all procedure price types
+            duration = service.Procedures
+                .SelectMany(p => p.ProcedurePriceTypes
+                    .Select(ppt => ppt.Duration))
+                .Max();
+            clinicId = request.ClinicId.Value;
+        }
+
+
         var allSchedules = repository.FilterBy(x =>
             x.DoctorId == request.DoctorId &&
-            x.ClinicId == request.ClinicId &&
+            x.ClinicId == clinicId &&
             x.Date == request.Date &&
             !x.IsDeleted);
 
@@ -104,7 +151,10 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(IMongoRepository<W
         availableSlots.AddRange(completelyFree);
 
         return Result.Success<IReadOnlyList<Response.GetEmptyScheduleResponse>>(
-            availableSlots.OrderBy(x => x.StartTime).ToList());
+            availableSlots
+                .Where(slot => (slot.EndTime - slot.StartTime).TotalMinutes >= duration)
+                .OrderBy(x => x.StartTime)
+                .ToList());
     }
 
     private static Response.GetEmptyScheduleResponse CreateAvailableSlot(

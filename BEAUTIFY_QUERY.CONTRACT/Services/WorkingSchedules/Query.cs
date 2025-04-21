@@ -41,11 +41,13 @@ public static class Query
         string? SortColumn,
         SortOrder SortOrder,
         int PageNumber,
-        int PageSize) : IQuery<PagedResult<Response.GetEmptyScheduleResponse>>;
+        int PageSize) : IQuery<PagedResult<Response.GetEmptyScheduleResponseWithId>>;
 
     public record GetDoctorAvailableTimeSlots(
+        Guid ServiceIdOrCustomerScheduleId,
+        Guid? ClinicId,
+        bool IsCustomerSchedule,
         Guid DoctorId,
-        Guid ClinicId,
         DateOnly Date)
         : IQuery<IReadOnlyList<Response.GetEmptyScheduleResponse>>;
 

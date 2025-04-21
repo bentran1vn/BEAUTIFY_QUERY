@@ -15,7 +15,7 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
         //   gr1.MapGet("doctors/busy-times", GetDoctorBusyTimeInADay)
         //  .WithSummary("Get doctor's busy time slots for a specific day");
         gr1.MapGet("doctors/available-times", GetDoctorAvailableTimeSlots)
-            .WithSummary("Get doctor's available time slots for booking");
+            .WithSummary("Get doctor's available time slots for booking").RequireAuthorization();
         gr1.MapGet("doctors/", GetDoctorScheduleByIdV2).RequireAuthorization();
         gr1.MapGet("doctors/monthly-count", GetWorkingSchedulesEachDayInMonth)
             .WithSummary("Get doctor's busy time slots for a specific month")
@@ -57,10 +57,14 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
     private static async Task<IResult> GetDoctorAvailableTimeSlots(
         ISender sender,
         [FromQuery] Guid doctorId,
-        [FromQuery] Guid clinicId,
+        [FromQuery] Guid ServiceIdOrCustomerScheduleId,
+        [FromQuery] Guid? clinicId,
+        [FromQuery] bool isCustomerSchedule,
         [FromQuery] DateOnly date)
     {
-        var query = new Query.GetDoctorAvailableTimeSlots(doctorId, clinicId, date);
+        var query = new Query.GetDoctorAvailableTimeSlots(ServiceIdOrCustomerScheduleId, clinicId, isCustomerSchedule,
+            doctorId,
+            date);
         var result = await sender.Send(query);
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
