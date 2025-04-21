@@ -16,9 +16,9 @@ public class GetClinicServicesByIdQueryHandler(
 
         if (isServiceExisted == null)
             throw new Exception($"Service {request.ServiceId} not found");
-        var listDoctorID = isServiceExisted.DoctorServices.Select(x => x.Doctor.Id).ToList();
+        var listDoctorId = isServiceExisted.DoctorServices.Select(x => x.Doctor.Id).ToList();
         var doctorCertificates = await doctorCertificateRepository
-            .FindAll(x => listDoctorID.Contains(x.DoctorId))
+            .FindAll(x => listDoctorId.Contains(x.DoctorId))
             .ToListAsync(cancellationToken);
 
         Response.GetAllServiceByIdResponse result;

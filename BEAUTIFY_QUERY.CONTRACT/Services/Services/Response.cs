@@ -118,6 +118,10 @@ public class Response
         ICollection<Promotion>? Promotions,
         ICollection<DoctorService>? DoctorServices,
         ICollection<Feedback> Feedbacks);
+    
+    public record GetAllDoctorServiceByIdResponse(
+        Guid Id,
+        ICollection<DoctorService>? DoctorServices);
 
     public record Procedure(
         Guid Id,
