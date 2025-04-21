@@ -32,7 +32,7 @@ internal sealed class CustomerScheduleCreateEventHandler(
                 Id = service.CurrentProcedure.Id,
                 StepIndex = service.CurrentProcedure.StepIndex,
                 DateCompleted = service.Date,
-                Duration = 0
+                Duration = service.CurrentProcedure.Duration
             },
             Status = service.Status
         };
