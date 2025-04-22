@@ -26,7 +26,8 @@ internal sealed class GetBookingDetailByIdQueryHandler(
         var procedureHistory = allBookingsBelongingToCustomer
             .Select(x => new Response.ProcedureHistory
             {
-                Name = x.CurrentProcedure.Name,
+                ProcedureName = x.CurrentProcedure.ProcedureName,
+                ProcedurePriceType = x.CurrentProcedure.Name,
                 StepIndex = x.CurrentProcedure.StepIndex,
                 DateCompleted = x.Date,
                 TimeCompleted = x.EndTime,

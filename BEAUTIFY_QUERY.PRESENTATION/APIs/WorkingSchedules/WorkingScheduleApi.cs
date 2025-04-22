@@ -37,6 +37,9 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
         gr1.MapGet("shift-groups/{shiftGroupId:guid}", GetSchedulesByShiftGroupId)
             .WithSummary("Get working schedules by shift group ID")
             .RequireAuthorization(Constant.Role.CLINIC_STAFF);
+        gr1.MapGet("{clinicId:guid}/working-hours", GetClinicWorkingHours)
+            .WithSummary("Get clinic working hours")
+            .RequireAuthorization();
     }
 
     #region GetDoctorBusyTimeInADay
@@ -53,6 +56,14 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
     }
 
     #endregion
+
+    private static async Task<IResult> GetClinicWorkingHours(
+        ISender sender,
+        [FromRoute] Guid clinicId)
+    {
+        var result = await sender.Send(new Query.GetClinicWorkingHours(clinicId));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
 
     private static async Task<IResult> GetDoctorAvailableTimeSlots(
         ISender sender,

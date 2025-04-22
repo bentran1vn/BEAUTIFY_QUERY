@@ -33,8 +33,9 @@ public static class Response
 
     public record ProcedureHistory
     {
+        public required string ProcedureName { get; init; }
         public string StepIndex { get; init; }
-        public string Name { get; init; }
+        public string ProcedurePriceType { get; init; }
         public int Duration { get; init; }
         public DateOnly? DateCompleted { get; init; }
         public TimeSpan? TimeCompleted { get; init; }

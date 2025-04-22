@@ -12,16 +12,20 @@ internal sealed class GetOrderDetailsByOrderIdQueryHandler(IRepositoryBase<Order
             x => x.Customer);
         if (order == null)
             return Result.Failure<List<Response.OrderDetailResponse>>(new Error("404", "Order not found"));
-        var orderDetails = order.OrderDetails.Select(od => new Response.OrderDetailResponse
-        {
-            Id = od.Id,
-            ServiceName = od.Order.Service.Name,
-            ProcedurePriceType = od.ProcedurePriceType.Name,
-            Price = od.Price,
-            Duration = od.ProcedurePriceType.Duration,
-            CustomerEmail = order.Customer?.Email,
-            CustomerPhone = order.Customer?.PhoneNumber
-        }).ToList();
+        var orderDetails = order.OrderDetails
+            .OrderBy(x => x.ProcedurePriceType.Procedure.StepIndex)
+            .Select(od => new Response.OrderDetailResponse
+            {
+                Id = od.Id,
+                ProcedureName = od.ProcedurePriceType.Procedure.Name,
+                ProcedurePriceType = od.ProcedurePriceType.Name,
+                Price = od.Price,
+                Duration = od.ProcedurePriceType.Duration,
+                StepIndex = od.ProcedurePriceType.Procedure.StepIndex.ToString(),
+                CustomerEmail = order.Customer?.Email,
+                CustomerPhone = order.Customer?.PhoneNumber
+            })
+            .ToList();
         return Result.Success(orderDetails);
     }
 }
