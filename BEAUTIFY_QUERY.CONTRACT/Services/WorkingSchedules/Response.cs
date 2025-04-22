@@ -98,6 +98,7 @@ public static class Response
 
 
     public record GetScheduleResponseForStaff(
+        Guid Id,
         Guid ShiftGroupId,
         int Capacity,
         int NumberOfDoctors,
@@ -110,5 +111,11 @@ public static class Response
     public class GetWorkingScheduleDetailResponse
     {
         public GetWorkingScheduleResponseDaily.Appointment Appointment { get; set; } = new();
+    }
+
+    public class GetClinicWorkingHoursResponse
+    {
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
     }
 }
