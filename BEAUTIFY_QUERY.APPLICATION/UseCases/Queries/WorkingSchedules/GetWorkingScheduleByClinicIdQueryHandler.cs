@@ -41,6 +41,7 @@ public sealed class GetWorkingScheduleByClinicIdQueryHandler(
             .GroupBy(x => new { x.Date, x.StartTime, x.EndTime, x.ShiftGroupId })
             .Select(g => new WorkingScheduleProjection
             {
+                DocumentId = g.First().DocumentId,
                 Date = g.Key.Date,
                 StartTime = g.Key.StartTime,
                 EndTime = g.Key.EndTime,
