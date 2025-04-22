@@ -30,6 +30,7 @@ public static class Response
         string CustomerPhone,
         string CustomerEmail,
         bool IsFromLivestream,
+        bool IsFinished,
         string? LivestreamName,
         List<CustomerSchedule> CustomerSchedules
     );
