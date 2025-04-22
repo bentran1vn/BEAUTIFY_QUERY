@@ -1,4 +1,5 @@
-﻿using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
+using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Orders;
 internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orderRepositoryBase)
@@ -19,7 +20,7 @@ internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orde
             return Result.Failure<Response.OrderById>(new Error("404", "Order Not Found"));
 
         // 2. Map ALL customer schedules (no deduplication)
-        var customerSchedules = order.CustomerSchedules
+        var customerSchedules = order.CustomerSchedules?
             .Where(cs => cs.Doctor != null) // Filter out null doctors if needed
             .OrderBy(cs => cs.Date)
             .ThenBy(cs => cs.StartTime)
@@ -34,6 +35,8 @@ internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orde
                 cs.EndTime))
             .ToList();
 
+        bool isFinished = order.CustomerSchedules != null && order.CustomerSchedules.Count > 0 && order.CustomerSchedules.All(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED);
+
         return Result.Success(new Response.OrderById(
             order.Id,
             order.Customer.FullName,
@@ -44,11 +47,12 @@ internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orde
             order.FinalAmount,
             order.CreatedOnUtc,
             order.Status,
-            order.Customer.PhoneNumber,
+            order.Customer.PhoneNumber ?? "",
             order.Customer.Email,
             order.LivestreamRoomId != null,
+            isFinished,
             order.LivestreamRoomId != null ? order.LivestreamRoom.Name : null,
-            customerSchedules // Now includes ALL valid schedules
+            customerSchedules ?? [] // Now includes ALL valid schedules
         ));
     }
 }
