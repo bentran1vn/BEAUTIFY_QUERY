@@ -25,6 +25,8 @@ public static class Query
     
     public record GetDoctorClinicServicesByIdQuery(Guid ServiceId, int PageNumber,
         int PageSize): IQuery<PagedResult<Response.GetAllDoctorServiceByIdResponse>>;
+    
+    public record GetDoctorClinicServicesByIdQueryV2(Guid ServiceId): IQuery<Response.GetAllDoctorServiceByIdResponseV2>;
 
     public record GetAllServiceInGetClinicByIdQuery(
         int PageNumber,

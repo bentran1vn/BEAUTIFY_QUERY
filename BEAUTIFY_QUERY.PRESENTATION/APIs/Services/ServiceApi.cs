@@ -8,7 +8,8 @@ public class ServiceApi : ApiEndpoint, ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var gr1 = app.NewVersionedApi("Services")
-            .MapGroup(BaseUrl).HasApiVersion(1);
+            .MapGroup(BaseUrl)
+            .HasApiVersion(1);
 
         gr1.MapGet(string.Empty, GetAllServices);
         gr1.MapGet("{id}", GetServicesById);
@@ -16,7 +17,15 @@ public class ServiceApi : ApiEndpoint, ICarterModule
         //gr1.MapGet("clinic", GetServicesByClinicId);
         gr1.MapGet("clinics/{clinicId:guid}", GetServicesByClinicIdForCustomer);
         gr1.MapGet("categories/{categoryId:guid}", GetServicesByCategoryId);
+        
+        var gr2 = app.NewVersionedApi("Services")
+            .MapGroup(BaseUrl)
+            .HasApiVersion(2);
+        
+        gr2.MapGet("{id}/doctors", GetDoctorServicesByIdV2);
     }
+    
+
 
 
     private static async Task<IResult> GetServicesByCategoryId(ISender sender, Guid categoryId)
@@ -61,6 +70,13 @@ public class ServiceApi : ApiEndpoint, ICarterModule
         ISender sender, Guid id, int pageIndex = 1, int pageSize = 10)
     {
         var result = await sender.Send(new Query.GetDoctorClinicServicesByIdQuery(id, pageIndex, pageSize));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+    
+    private static async Task<IResult> GetDoctorServicesByIdV2(
+        ISender sender, Guid id, int pageIndex = 1, int pageSize = 10)
+    {
+        var result = await sender.Send(new Query.GetDoctorClinicServicesByIdQueryV2(id));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
