@@ -20,36 +20,49 @@ internal sealed class ClinicEmptyScheduleCreatedEventHandler(
                 var shiftGroupId = group.Key;
                 var schedulesForGroup = group.ToList();
 
-                // CRITICAL FIX: Check if records for this shift group already exist
-                var existingCount = workingScheduleMongoRepository
-                    .FilterBy(filter => filter.ShiftGroupId == shiftGroupId).Count();
+                // Get existing schedules for comparison
+                var existingSchedules = workingScheduleMongoRepository
+                    .FilterBy(filter => filter.ShiftGroupId == shiftGroupId).ToList();
 
-                if (existingCount > 0)
+                // If records already exist, we'll do a proper merge instead of skipping entirely
+                // This ensures data consistency between SQL and MongoDB
+                var schedulesToInsert = new List<WorkingScheduleProjection>();
+
+                foreach (var entity in schedulesForGroup)
                 {
-                    continue; // Skip this group if records already exist
+                    // Check if this specific schedule already exists
+                    var existingSchedule = existingSchedules.FirstOrDefault(e => e.DocumentId == entity.Id);
+
+                    if (existingSchedule != null)
+                    {
+                        // Skip this individual schedule as it already exists
+                        continue;
+                    }
+
+                    // Create a new projection with the event timestamp
+                    var workingSchedule = new WorkingScheduleProjection
+                    {
+                        DocumentId = entity.Id,
+                        ClinicId = entity.ClinicId,
+                        StartTime = entity.StartTime,
+                        EndTime = entity.EndTime,
+                        Date = entity.Date,
+                        Status = entity.Status,
+                        ShiftCapacity = entity.ShiftCapacity,
+                        ShiftGroupId = entity.ShiftGroupId,
+                        IsDeleted = entity.IsDeleted,
+                        // Use event timestamp
+                        // Use event timestamp
+                    };
+
+                    schedulesToInsert.Add(workingSchedule);
                 }
 
-                // Convert the DateTime to the desired time zone
-                var dateTimeInVN = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
-                    TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-
-                var workingSchedule = schedulesForGroup.Select(x => new WorkingScheduleProjection
-                    {
-                        DocumentId = x.Id,
-                        ClinicId = x.ClinicId,
-                        StartTime = x.StartTime,
-                        EndTime = x.EndTime,
-                        Date = x.Date,
-                        Status = x.Status,
-                        ShiftCapacity = x.ShiftCapacity,
-                        ShiftGroupId = x.ShiftGroupId,
-                        IsDeleted = x.IsDeleted,
-                        CreatedOnUtc = dateTimeInVN,
-                    })
-                    .ToList();
-
-                // Insert the new schedules into the MongoDB collection
-                await workingScheduleMongoRepository.InsertManyAsync(workingSchedule);
+                // Insert only new schedules that don't already exist
+                if (schedulesToInsert.Count > 0)
+                {
+                    await workingScheduleMongoRepository.InsertManyAsync(schedulesToInsert);
+                }
             }
 
             // Handle schedules without ShiftGroupId (if any)
@@ -57,14 +70,18 @@ internal sealed class ClinicEmptyScheduleCreatedEventHandler(
                 .Where(x => !x.ShiftGroupId.HasValue)
                 .ToList();
 
-
-            if (schedulesWithoutGroup.Count <= 0) return Result.Success();
+            if (schedulesWithoutGroup.Count > 0)
             {
-                // Convert the DateTime to the desired time zone
-                var dateTimeInVN = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
-                    TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+                // Get all existing schedule IDs to avoid duplicates
+                var existingIds = workingScheduleMongoRepository
+                    .FilterBy(x => x.ShiftGroupId == null)
+                    .Select(x => x.DocumentId)
+                    .ToHashSet();
 
-                var workingSchedule = schedulesWithoutGroup.Select(x => new WorkingScheduleProjection
+                // Filter out schedules that already exist
+                var newSchedules = schedulesWithoutGroup
+                    .Where(x => !existingIds.Contains(x.Id))
+                    .Select(x => new WorkingScheduleProjection
                     {
                         DocumentId = x.Id,
                         ClinicId = x.ClinicId,
@@ -75,12 +92,16 @@ internal sealed class ClinicEmptyScheduleCreatedEventHandler(
                         ShiftCapacity = x.ShiftCapacity,
                         ShiftGroupId = x.ShiftGroupId,
                         IsDeleted = x.IsDeleted,
-                        CreatedOnUtc = dateTimeInVN,
+                        // Use event timestamp
+                        // Use event timestamp
                     })
                     .ToList();
 
-                // Insert the new schedules into the MongoDB collection
-                await workingScheduleMongoRepository.InsertManyAsync(workingSchedule);
+                // Insert only new schedules
+                if (newSchedules.Count > 0)
+                {
+                    await workingScheduleMongoRepository.InsertManyAsync(newSchedules);
+                }
             }
 
             return Result.Success();

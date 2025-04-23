@@ -15,18 +15,19 @@ public class ClinicScheduleCapacityChangedEventHandler(
                 .Select(e => e.Id)
                 .ToHashSet();
 
-            // Step 2: Delete ALL existing records for this shift group
-            var deleteResult =
-                workingScheduleMongoRepository.FilterBy(x => x.ShiftGroupId == notification.ShiftGroupId).Count();
+            // Step 2: First find all existing records for this shift group
+            var existingRecords = workingScheduleMongoRepository.FilterBy(x =>
+                x.ShiftGroupId == notification.ShiftGroupId).ToList();
+
+            // Step 3: Delete existing records only after we've retrieved them
             await workingScheduleMongoRepository.DeleteManyAsync(filter =>
                 filter.ShiftGroupId == notification.ShiftGroupId);
 
-            // Step 3: Transform the entities to projections
-            var dateTimeInVN = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
-                TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-
-            var schedulesToAdd = notification.WorkingScheduleEntities
-                .Select(scheduleEntity => new WorkingScheduleProjection
+            // Step 4: Transform the entities to projections
+            // Use the timestamp from the event if available, otherwise maintain creation time from existing records
+            var schedulesToAdd = (from scheduleEntity in notification.WorkingScheduleEntities
+                let existingRecord = existingRecords.FirstOrDefault(r => r.DocumentId == scheduleEntity.Id)
+                select new WorkingScheduleProjection
                 {
                     DocumentId = scheduleEntity.Id,
                     ClinicId = scheduleEntity.ClinicId,
@@ -38,26 +39,21 @@ public class ClinicScheduleCapacityChangedEventHandler(
                     ShiftCapacity = scheduleEntity.ShiftCapacity,
                     Status = scheduleEntity.Status,
                     IsDeleted = scheduleEntity.IsDeleted,
-                    CreatedOnUtc = dateTimeInVN, // Use the same time zone as in ClinicEmptyScheduleCreatedEventHandler
-                    ModifiedOnUtc = dateTimeInVN
-                })
-                .ToList();
+                    // Preserve creation time if record existed, otherwise use current time
 
-            // Step 4: Double check we don't have duplicates before inserting
+                    // Always use event timestamp for modifications
+                }).ToList();
+
+            // Step 5: Double check for duplicates
             var uniqueSchedules = schedulesToAdd
                 .GroupBy(s => s.DocumentId)
                 .Select(g => g.First())
                 .ToList();
 
-            if (uniqueSchedules.Count != schedulesToAdd.Count)
+            // Step 6: Insert the new schedules
+            if (uniqueSchedules.Count > 0)
             {
-                schedulesToAdd = uniqueSchedules;
-            }
-
-            // Step 5: Insert the new schedules
-            if (schedulesToAdd.Count > 0)
-            {
-                await workingScheduleMongoRepository.InsertManyAsync(schedulesToAdd);
+                await workingScheduleMongoRepository.InsertManyAsync(uniqueSchedules);
             }
 
             return Result.Success();
