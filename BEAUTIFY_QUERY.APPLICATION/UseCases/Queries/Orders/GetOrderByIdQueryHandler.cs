@@ -10,22 +10,21 @@ internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orde
         CancellationToken cancellationToken)
     {
         // 1. Fetch order with necessary relationships
-        var query = orderRepositoryBase.FindAll(
-            x => x.Id == request.Id
+        var query = orderRepositoryBase.FindAll(x => x.Id == request.Id
         );
 
         query = query
             .Include(x => x.OrderFeedback)
-                .ThenInclude(x => x.OrderFeedbackMedias)
+            .ThenInclude(x => x.OrderFeedbackMedias)
             .Include(x => x.LivestreamRoom)
             .Include(x => x.CustomerSchedules)
-                .ThenInclude(x => x.Doctor)
-                    .ThenInclude(x => x.User)
+            .ThenInclude(x => x.Doctor)
+            .ThenInclude(x => x.User)
             .Include(x => x.CustomerSchedules)
             .ThenInclude(x => x.ProcedurePriceType)
-                .ThenInclude(x => x.Procedure)
+            .ThenInclude(x => x.Procedure)
             .Include(x => x.CustomerSchedules)
-                .ThenInclude(x => x.Feedback);
+            .ThenInclude(x => x.Feedback);
 
         var order = await query.FirstOrDefaultAsync(cancellationToken);
 
@@ -41,7 +40,7 @@ internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orde
                 cs.Id,
                 cs.DoctorId,
                 cs.Doctor!.User!.FullName, // Null checks handled by Where filter
-                cs.ProcedurePriceType.Procedure.Name,
+                cs.Procedure?.Name ?? cs.ProcedurePriceType?.Procedure?.Name ?? "Unknown Procedure",
                 cs.Doctor.User.ProfilePicture,
                 cs.Status,
                 cs.Date,
@@ -52,7 +51,8 @@ internal sealed class GetOrderByIdQueryHandler(IRepositoryBase<Order, Guid> orde
                 cs.Feedback?.CreatedOnUtc))
             .ToList();
 
-        bool isFinished = order.CustomerSchedules != null && order.CustomerSchedules.Count > 0 && order.CustomerSchedules.All(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED);
+        bool isFinished = order.CustomerSchedules != null && order.CustomerSchedules.Count > 0 &&
+                          order.CustomerSchedules.All(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED);
 
         return Result.Success(new Response.OrderById(
             order.Id,

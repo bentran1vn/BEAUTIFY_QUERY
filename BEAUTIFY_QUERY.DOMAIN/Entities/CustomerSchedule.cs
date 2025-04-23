@@ -18,7 +18,10 @@ public class CustomerSchedule : AggregateRoot<Guid>, IAuditableEntity
     [MaxLength(2000)] public string? DoctorNote { get; set; }
     public Guid? ProcedurePriceTypeId { get; set; }
     public virtual ProcedurePriceTypes? ProcedurePriceType { get; set; }
-    
+
+    public Guid? ProcedureId { get; set; }
+    public virtual Procedure? Procedure { get; set; }
+
     public Guid? OrderId { get; set; }
     public virtual Order? Order { get; set; }
     public DateTimeOffset CreatedOnUtc { get; set; }
