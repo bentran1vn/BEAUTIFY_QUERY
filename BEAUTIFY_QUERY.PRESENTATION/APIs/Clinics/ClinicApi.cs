@@ -12,42 +12,41 @@ public class ClinicApi : ApiEndpoint, ICarterModule
             .MapGroup(BaseUrl).HasApiVersion(1);
 
         gr1.MapGet(string.Empty, GetAllClinics);
-        
-        gr1.MapGet("{id}", GetClinicDetail); 
-        
-        gr1.MapGet("application", GetAllApplyRequest)
-            .RequireAuthorization();
-        
-        gr1.MapGet("application/clinic", GetAllApplyClinicRequest)
-            .RequireAuthorization();
-        
-        gr1.MapGet("application/{id}", GetDetailApplyRequest)
-            .RequireAuthorization();
-        
-        gr1.MapGet("application/{id}/clinic", GetDetailBranchApplyRequest)
-            .RequireAuthorization();
-        
-        gr1.MapGet("application/me", GetMyApplyRequest)
-            .RequireAuthorization();
-        
+
+        gr1.MapGet("{id}", GetClinicDetail);
+
         gr1.MapGet("{clinicId:guid}/employees", GetAllAccountOfEmployee);
-        
+
         gr1.MapGet("{clinicId:guid}/employees/{employeeId:guid}", GetDetailAccountOfEmployee);
-        
+
         gr1.MapGet("branches", GetClinicBranches)
             .RequireAuthorization(Constant.Policy.POLICY_CLINIC_ADMIN_AND_SYSTEM_STAFF)
             .WithName("Get Clinic Branches")
             .WithSummary("Get all branches for the current clinic admin");
-        
         gr1.MapGet("branches/{id:guid}", GetClinicBranchById)
             .RequireAuthorization(Constant.Role.CLINIC_ADMIN);
-        
+
         gr1.MapGet("sub-clinics/{id:guid}", GetSubClinicById)
             .RequireAuthorization(Constant.Role.CLINIC_STAFF)
             .WithName("Get Sub Clinic By Id")
             .WithSummary("Get a specific sub-clinic by ID")
             .WithDescription(
                 "Retrieves details of a specific sub-clinic that belongs to the current clinic admin's main clinic");
+
+        gr1.MapGet("application", GetAllApplyRequest)
+            .RequireAuthorization();
+
+        gr1.MapGet("application/clinic", GetAllApplyClinicRequest)
+            .RequireAuthorization();
+
+        gr1.MapGet("application/{id}", GetDetailApplyRequest)
+            .RequireAuthorization();
+
+        gr1.MapGet("application/{id}/clinic", GetDetailBranchApplyRequest)
+            .RequireAuthorization();
+
+        gr1.MapGet("application/me", GetMyApplyRequest)
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> GetSubClinicById(
@@ -108,13 +107,14 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         var result = await sender.Send(new Query.GetAllApplyRequestQuery(pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
-    
-    private static async Task<IResult> GetAllApplyClinicRequest(ISender sender ,
+
+    private static async Task<IResult> GetAllApplyClinicRequest(ISender sender,
         HttpContext httpContext, string? searchTerm = null,
         int pageIndex = 1, int pageSize = 10)
     {
         var clinicId = httpContext.User.FindFirst(c => c.Type == "ClinicId")?.Value;
-        var result = await sender.Send(new Query.GetAllApplyBranchRequestQuery(clinicId == null? null : new Guid(clinicId),
+        var result = await sender.Send(new Query.GetAllApplyBranchRequestQuery(
+            clinicId == null ? null : new Guid(clinicId),
             searchTerm, pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
@@ -124,13 +124,13 @@ public class ClinicApi : ApiEndpoint, ICarterModule
         var result = await sender.Send(new Query.GetDetailApplyRequestQuery(id));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
-    
+
     private static async Task<IResult> GetDetailBranchApplyRequest(ISender sender, Guid id)
     {
         var result = await sender.Send(new Query.GetDetailBranchApplyRequestQuery(id));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
-    
+
     private static async Task<IResult> GetMyApplyRequest(ISender sender, HttpContext httpContext)
     {
         var clinicId = httpContext.User.FindFirst(c => c.Type == "ClinicId")?.Value!;

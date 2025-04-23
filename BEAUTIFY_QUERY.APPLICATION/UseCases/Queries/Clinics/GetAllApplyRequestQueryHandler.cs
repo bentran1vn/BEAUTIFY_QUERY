@@ -16,7 +16,9 @@ public class
         CancellationToken cancellationToken)
     {
         var requestQuery = _clinicOnBoardingRequestRepository
-            .FindAll(x => x.IsDeleted == false && x.Status == 0 && x.IsMain, x => x.Clinic!);
+                .FindAll(x => !x.IsDeleted && x.Status == 0 && x.IsMain, x => x.Clinic!)
+                .OrderByDescending(x => x.ModifiedOnUtc).ThenByDescending(x => x.CreatedOnUtc)
+            ;
 
         var applyRequest = await PagedResult<ClinicOnBoardingRequest>
             .CreateAsync(requestQuery, request.PageIndex, request.PageSize);
