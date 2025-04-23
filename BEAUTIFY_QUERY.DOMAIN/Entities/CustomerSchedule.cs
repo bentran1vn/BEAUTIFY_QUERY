@@ -12,11 +12,15 @@ public class CustomerSchedule : AggregateRoot<Guid>, IAuditableEntity
     public TimeSpan? StartTime { get; set; }
     public TimeSpan? EndTime { get; set; }
     public DateOnly? Date { get; set; }
+    public Guid? FeedbackId { get; set; }
+    public virtual Feedback? Feedback { get; set; }
     [MaxLength(50)] public string? Status { get; set; }
     [MaxLength(2000)] public string? DoctorNote { get; set; }
     public Guid? ProcedurePriceTypeId { get; set; }
-    public virtual ProcedurePriceType? ProcedurePriceType { get; set; }
+    public virtual ProcedurePriceTypes? ProcedurePriceType { get; set; }
 
+    public Guid? ProcedureId { get; set; }
+    public virtual Procedure? Procedure { get; set; }
 
     public Guid? OrderId { get; set; }
     public virtual Order? Order { get; set; }

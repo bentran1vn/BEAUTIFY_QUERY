@@ -12,7 +12,7 @@ public class Procedure : AggregateRoot<Guid>, IAuditableEntity
     public virtual Service? Service { get; set; }
     public virtual ICollection<CustomerSchedule>? CustomerSchedules { get; set; } = [];
     public virtual ICollection<ProcedureMedia> ProcedureMedias { get; set; } = [];
-    public virtual ICollection<ProcedurePriceType> ProcedurePriceTypes { get; set; } = [];
+    public virtual ICollection<ProcedurePriceTypes> ProcedurePriceTypes { get; set; } = [];
 
     public DateTimeOffset CreatedOnUtc { get; set; }
     public DateTimeOffset? ModifiedOnUtc { get; set; }

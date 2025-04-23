@@ -12,6 +12,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public virtual DbSet<SurveyResponse> SurveyResponses { get; set; }
     public virtual DbSet<ClinicTransaction> ClinicTransactions { get; set; }
     public virtual DbSet<WalletTransaction> WalletTransaction { get; set; }
+    public virtual DbSet<Procedure> Procedures { get; set; }
+    public virtual DbSet<ProcedurePriceTypes> ProcedurePriceTypes { get; set; }
 
     private static void SetSoftDeleteFilter<T>(ModelBuilder modelBuilder) where T : Entity<T>
     {
@@ -23,6 +25,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Entity<Category>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Order>().HasQueryFilter(x => !x.IsDeleted);
         builder.ApplyConfigurationsFromAssembly(AssemblyReference.Assembly);
+        
         builder.Entity<CustomerSchedule>()
             .HasOne(cs => cs.Customer)
             .WithMany(u => u.CustomerSchedules)
@@ -55,5 +58,29 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         }
 
         builder.Entity<CustomerSchedule>().HasQueryFilter(x => !x.IsDeleted);
+        
+        builder.Entity<Order>()
+            .HasOne(lr => lr.OrderFeedback)
+            .WithOne() // Assuming one-to-one relationship, adjust if it's one-to-many
+            .HasForeignKey<Order>(lr => lr.OrderFeedbackId)
+            .OnDelete(DeleteBehavior.Restrict); // Adjust delete behavior as needed
+        
+        builder.Entity<CustomerSchedule>()
+            .HasOne(lr => lr.Feedback)
+            .WithOne() // Assuming one-to-one relationship, adjust if it's one-to-many
+            .HasForeignKey<CustomerSchedule>(lr => lr.FeedbackId)
+            .OnDelete(DeleteBehavior.Restrict); // Adjust delete behavior as needed
+        
+        // builder.Entity<Procedure>()
+        //     .HasMany(lr => lr.ProcedurePriceTypes)
+        //     .WithOne() // Assuming one-to-one relationship, adjust if it's one-to-many
+        //     .HasForeignKey(lr => lr.ProcedureId)
+        //     .OnDelete(DeleteBehavior.Restrict); // Adjust delete behavior as needed
+        
+        builder.Entity<ProcedurePriceTypes>()
+            .HasOne(p => p.Procedure)
+            .WithMany(p => p.ProcedurePriceTypes)
+            .HasForeignKey(p => p.ProcedureId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

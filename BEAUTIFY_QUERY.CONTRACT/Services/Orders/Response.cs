@@ -32,6 +32,9 @@ public static class Response
         bool IsFromLivestream,
         bool IsFinished,
         string? LivestreamName,
+        string? FeedbackContent,
+        int? FeedbackRating,
+        List<string>? FeedbackImages,
         List<CustomerSchedule> CustomerSchedules
     );
 
@@ -39,9 +42,13 @@ public static class Response
         Guid Id,
         Guid DoctorId,
         string DoctorName,
+        string ProcedureName,
         string ProfileUrl,
         string Status,
         DateOnly? Date,
         TimeSpan? StartTime,
-        TimeSpan? EndTime);
+        TimeSpan? EndTime,
+        string? FeedbackContent,
+        int? DoctorFeedbackRating,
+        DateTimeOffset? FeedbackCreatedOnUtc);
 }
