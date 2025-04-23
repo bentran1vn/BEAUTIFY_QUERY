@@ -58,9 +58,9 @@ public class ServiceApi : ApiEndpoint, ICarterModule
     }
     
     private static async Task<IResult> GetDoctorServicesById(
-        ISender sender, Guid id)
+        ISender sender, Guid id, int pageIndex = 1, int pageSize = 10)
     {
-        var result = await sender.Send(new Query.GetDoctorClinicServicesByIdQuery(id));
+        var result = await sender.Send(new Query.GetDoctorClinicServicesByIdQuery(id, pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 

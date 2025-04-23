@@ -32,6 +32,11 @@ public class Response
         string ProfilePictureUrl,
         ICollection<CertificateEntity> DoctorCertificates
     );
+    
+    public record DoctorService1(
+        Guid Id,
+        UserEntity Doctor,
+        Clinic Clinic);
 
     //Final Test
     public record CertificateEntity
@@ -121,7 +126,8 @@ public class Response
     
     public record GetAllDoctorServiceByIdResponse(
         Guid Id,
-        ICollection<DoctorService>? DoctorServices);
+        UserEntity Doctor,
+        Clinic Clinic);
 
     public record Procedure(
         Guid Id,
