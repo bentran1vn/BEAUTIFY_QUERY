@@ -7,13 +7,13 @@ namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Services;
 
 public class GetDoctorClinicServicesByIdQuery(
     IRepositoryBase<DoctorService, Guid> doctorServiceRepository,
-    IRepositoryBase<Clinic, Guid> clinicRepository)
+    IRepositoryBase<Service, Guid> serviceRepository)
     : IQueryHandler<Query.GetDoctorClinicServicesByIdQuery, PagedResult<Response.GetAllDoctorServiceByIdResponse>>
 {
     
     public async Task<Result<PagedResult<Response.GetAllDoctorServiceByIdResponse>>> Handle(Query.GetDoctorClinicServicesByIdQuery request, CancellationToken cancellationToken)
     {
-        var isServiceExisted = await clinicRepository.FindByIdAsync(request.ServiceId, cancellationToken);
+        var isServiceExisted = await serviceRepository.FindByIdAsync(request.ServiceId, cancellationToken);
         
         if (isServiceExisted == null)
             throw new Exception($"Service {request.ServiceId} not found");
