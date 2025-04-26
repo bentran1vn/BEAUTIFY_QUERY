@@ -109,6 +109,7 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             schedule.Order?.FinalAmount ?? 0,
             $"{user.FirstName} {user.LastName}".Trim(),
             user.Email,
+            schedule.DoctorNote,
             user.PhoneNumber,
             schedule.Service?.Name ?? string.Empty,
             schedule.Doctor?.User is not null

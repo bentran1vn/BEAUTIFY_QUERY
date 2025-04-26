@@ -71,6 +71,7 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
             x.Order.FinalAmount,
             x.Customer.FullName,
             x.Customer.Email,
+            x.DoctorNote,
             x.Customer.PhoneNumber,
             x.Service.Name,
             x.Doctor.User.FullName,
