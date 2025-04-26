@@ -52,6 +52,7 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
                     StartTime = x.StartTime,
                     EndTime = x.EndTime,
                     Status = x.Status,
+                    Note = x.Note,
                     StepIndex = x.StepIndex,
                     CustomerName = x.CustomerName,
                     CustomerId = x.CustomerId,

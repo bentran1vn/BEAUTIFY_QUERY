@@ -39,6 +39,7 @@ public static class Response
         public string? Status { get; set; }
         public string StepIndex { get; set; }
         public string CustomerName { get; set; }
+        public string Note { get; set; }
         public Guid? CustomerId { get; set; }
         public Guid? ServiceId { get; set; }
         public string ServiceName { get; set; }
