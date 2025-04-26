@@ -99,6 +99,7 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                 schedule.CustomerEmail,
                 schedule.CustomerPhoneNumber,
                 schedule.ServiceName,
+                schedule.Note,
                 schedule.DoctorName,
                 schedule.BookingDate,
                 schedule.StartTime,

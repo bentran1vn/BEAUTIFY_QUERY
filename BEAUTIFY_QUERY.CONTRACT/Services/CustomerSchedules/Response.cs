@@ -35,6 +35,7 @@ public static class Response
         string CustomerEmail,
         string CustomerPhoneNumber,
         string ServiceName,
+        string? DoctorNote,
         string DoctorName,
         DateOnly? BookingDate,
         TimeSpan? StartTime,
