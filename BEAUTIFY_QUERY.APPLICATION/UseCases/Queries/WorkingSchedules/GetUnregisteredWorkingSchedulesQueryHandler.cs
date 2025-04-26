@@ -18,7 +18,8 @@ internal sealed class GetUnregisteredWorkingSchedulesQueryHandler(
         // Filter working schedules that belong to the current doctor and have no customer schedule
         var query = workingScheduleRepository.AsQueryable(x =>
             x.ClinicId == request.ClinicId &&
-            x.DoctorId == null);
+            x.DoctorId == null &&
+            x.Date >= DateOnly.FromDateTime(DateTime.UtcNow));
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
