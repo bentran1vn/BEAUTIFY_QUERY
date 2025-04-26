@@ -129,6 +129,11 @@ public class Response
         UserEntity Doctor,
         Clinic Clinic);
 
+    public record GetAllDoctorServiceByIdResponseV2(
+        Guid Id,
+        ICollection<DoctorService>? DoctorServices
+    );
+
     public record Procedure(
         Guid Id,
         string Name,
