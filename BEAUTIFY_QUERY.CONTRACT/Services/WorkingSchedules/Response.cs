@@ -21,14 +21,6 @@ public static class Response
         public Guid? DoctorId { get; set; }
         public string? DoctorName { get; set; }
         public DateOnly Date { get; set; }
-        public string? Status { get; set; }
-        public string StepIndex { get; set; }
-        public string CustomerName { get; set; }
-        public Guid? CustomerId { get; set; }
-        public Guid? ServiceId { get; set; }
-        public string ServiceName { get; set; }
-        public Guid? CustomerScheduleId { get; set; }
-        public string CurrentProcedureName { get; set; }
     }
 
     public class GetWorkingScheduleResponse
