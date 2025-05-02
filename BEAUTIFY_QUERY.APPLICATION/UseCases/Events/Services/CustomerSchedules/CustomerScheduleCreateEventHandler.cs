@@ -29,6 +29,7 @@ internal sealed class CustomerScheduleCreateEventHandler(
             CurrentProcedure = new EntityEvent.ProcedurePriceTypeEntity
             {
                 Name = service.CurrentProcedure.Name,
+                ProcedureName = service.CurrentProcedure.ProcedureName,
                 Id = service.CurrentProcedure.Id,
                 StepIndex = service.CurrentProcedure.StepIndex,
                 DateCompleted = service.Date,
