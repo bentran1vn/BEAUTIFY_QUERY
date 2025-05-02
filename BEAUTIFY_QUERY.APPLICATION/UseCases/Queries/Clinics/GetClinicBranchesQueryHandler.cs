@@ -4,6 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
+/// <summary>
+/// "/api/v{version:apiVersion}/clinics/branches"
+/// </summary>
+/// <param name="clinicRepository"></param>
+/// <param name="walletTransactionRepository"></param>
+/// <param name="currentUserService"></param>
 internal sealed class GetClinicBranchesQueryHandler(
     IRepositoryBase<Clinic, Guid> clinicRepository,
     IRepositoryBase<WalletTransaction, Guid> walletTransactionRepository,
@@ -32,11 +38,11 @@ internal sealed class GetClinicBranchesQueryHandler(
             parentClinic = await clinicRepository
                 .FindSingleAsync(
                     x => x.Id.Equals(request.Id) &&
-                    x.IsParent == true &&
-                    x.IsDeleted == false &&
-                    x.IsActivated &&
-                    x.Status == 1
-            , cancellationToken);
+                         x.IsParent == true &&
+                         x.IsDeleted == false &&
+                         x.IsActivated &&
+                         x.Status == 1
+                    , cancellationToken);
         }
 
         if (parentClinic == null)
@@ -57,8 +63,10 @@ internal sealed class GetClinicBranchesQueryHandler(
         // Get pending withdrawals for all clinics
         var pendingWithdrawals = await walletTransactionRepository
             .FindAll(wt => clinicIds.Contains(wt.ClinicId.Value) &&
-                           wt.TransactionType == Constant.WalletConstants.TransactionType.WITHDRAWAL &&
-                           wt.Status == Constant.WalletConstants.TransactionStatus.PENDING)
+                           wt.TransactionType == Constant.WalletConstants.TransactionType.WITHDRAWAL && (
+                               wt.Status == Constant.WalletConstants.TransactionStatus.WAITING_APPROVAL || wt.Status ==
+                               Constant.WalletConstants.TransactionStatus.WAITING_FOR_PAYMENT
+                           ))
             .GroupBy(wt => wt.ClinicId)
             .Select(g => new { ClinicId = g.Key, PendingAmount = g.Sum(wt => wt.Amount) })
             .ToDictionaryAsync(x => x.ClinicId, x => x.PendingAmount, cancellationToken);
