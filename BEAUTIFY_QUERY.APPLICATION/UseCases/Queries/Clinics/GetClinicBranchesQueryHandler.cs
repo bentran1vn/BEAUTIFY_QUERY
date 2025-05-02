@@ -22,18 +22,30 @@ internal sealed class GetClinicBranchesQueryHandler(
     {
         // Get the current user's clinic ID
 
-        var parentClinic = request.Role switch
+        Clinic? parentClinic = null;
+
+
+        if (request.Role.Equals(Constant.Role.CLINIC_ADMIN))
         {
-            Constant.Role.CLINIC_ADMIN => await clinicRepository
+            // Find the parent clinic associated with the current user
+            parentClinic = await clinicRepository
                 .FindAll(c => c.UserClinics != null &&
                               c.UserClinics.Any(uc => uc.UserId == currentUserService.UserId.Value) &&
                               c.IsParent == true)
-                .FirstOrDefaultAsync(cancellationToken),
-            Constant.Role.SYSTEM_STAFF when request.Id != null => await clinicRepository.FindSingleAsync(
-                x => x.Id.Equals(request.Id) && x.IsParent == true && x.IsDeleted == false && x.IsActivated &&
-                     x.Status == 1, cancellationToken),
-            _ => null
-        };
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+        else if (request.Role.Equals(Constant.Role.SYSTEM_STAFF) && request.Id != null)
+        {
+            parentClinic = await clinicRepository
+                .FindSingleAsync(
+                    x => x.Id.Equals(request.Id) &&
+                         x.IsParent == true &&
+                         x.IsDeleted == false &&
+                         x.IsActivated &&
+                         x.Status == 1
+                    , cancellationToken);
+        }
+
 
         if (parentClinic == null)
             return Result.Failure<Response.GetClinicBranchesResponse>(
