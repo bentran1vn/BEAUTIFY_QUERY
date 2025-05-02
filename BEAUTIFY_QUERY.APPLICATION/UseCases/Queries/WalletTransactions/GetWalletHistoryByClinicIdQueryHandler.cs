@@ -193,7 +193,8 @@ internal sealed class GetWalletHistoryByClinicIdQueryHandler(
             transaction.IsMakeBySystem,
             "",
             transaction.Description,
-            transaction.TransactionDate,
-            transaction.CreatedOnUtc);
+            "",
+            "", `2222221 transaction.TransactionDate,
+        transaction.CreatedOnUtc);
     }
 }

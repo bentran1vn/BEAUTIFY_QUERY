@@ -182,6 +182,8 @@ internal sealed class GetAllClinicWalletTransactionsQueryHandler(
             transaction.IsMakeBySystem,
             transaction.NewestQrUrl,
             transaction.Description,
+            transaction.Clinic.BankAccountNumber,
+            transaction.Clinic.BankName,
             transaction.TransactionDate,
             transaction.CreatedOnUtc);
     }
