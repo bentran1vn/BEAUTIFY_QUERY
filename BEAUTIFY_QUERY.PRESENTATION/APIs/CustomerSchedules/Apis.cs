@@ -79,9 +79,9 @@ public class Apis : ApiEndpoint, ICarterModule
     }
 
     private static async Task<IResult> GetCustomerScheduleById(ISender sender,
-        Guid customerScheduleId)
+        Guid customerScheduleId, bool isNextSchedule = false)
     {
-        var result = await sender.Send(new Query.GetCustomerScheduleById(customerScheduleId));
+        var result = await sender.Send(new Query.GetCustomerScheduleById(customerScheduleId, isNextSchedule));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }
