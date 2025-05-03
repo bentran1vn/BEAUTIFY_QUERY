@@ -58,10 +58,11 @@ public class Apis : ApiEndpoint, ICarterModule
         [FromRoute] string customerName,
         [FromQuery] string customerPhone,
         [FromQuery] int pageIndex = 1,
-        [FromQuery] int pageSize = 10)
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? SearchTerm = null)
     {
         var result = await sender.Send(
-            new Query.StaffCheckInCustomerScheduleQuery(customerName, customerPhone, pageIndex, pageSize));
+            new Query.StaffCheckInCustomerScheduleQuery(customerName, customerPhone, pageIndex, pageSize, SearchTerm));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 

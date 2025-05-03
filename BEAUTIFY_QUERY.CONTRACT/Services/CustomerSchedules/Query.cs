@@ -4,10 +4,11 @@ namespace BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 public static class Query
 {
     public record StaffCheckInCustomerScheduleQuery(
-        string CustomerName,
+        string? CustomerName,
         string? CustomerPhone,
         int PageIndex = 1,
-        int PageSize = 10)
+        int PageSize = 10,
+        string? SearchTerm = null)
         : IQuery<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>;
 
     public record GetAllCustomerSchedule(
