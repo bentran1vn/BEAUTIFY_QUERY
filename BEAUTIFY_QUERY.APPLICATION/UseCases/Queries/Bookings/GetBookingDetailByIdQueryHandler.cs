@@ -51,7 +51,14 @@ internal sealed class GetBookingDetailByIdQueryHandler(
             {
                 Id = booking.DoctorId,
                 Name = booking.DoctorName,
-                ImageUrl = doctorImageUrl?.User.ProfilePicture ?? string.Empty
+                ImageUrl = doctorImageUrl?.User.ProfilePicture ?? string.Empty,
+                Certificates = doctorImageUrl?.User.DoctorCertificates.Where(x => x.ServiceId == booking.ServiceId)
+                    .Select(x => new Response.CertificateResponse
+                    {
+                        Id = x.Id,
+                        Name = x.CertificateName,
+                        ImageUrl = x.CertificateUrl
+                    }).ToList()
             },
             Clinic = new Response.ClinicResponse
             {
