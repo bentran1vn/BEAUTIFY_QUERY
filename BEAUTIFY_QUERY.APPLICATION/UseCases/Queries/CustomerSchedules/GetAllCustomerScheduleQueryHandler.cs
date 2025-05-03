@@ -54,9 +54,7 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
             : query.OrderBy(x => x.Date).ThenBy(x => x.StartTime);
 
         var customerSchedules = await PagedResult<CustomerSchedule>.CreateAsync(
-            query.OrderBy(x => x.Date)
-                .ThenBy(x => x.StartTime)
-                .ThenBy(x => x.Status),
+            query,
             request.PageIndex,
             request.PageSize
         );
