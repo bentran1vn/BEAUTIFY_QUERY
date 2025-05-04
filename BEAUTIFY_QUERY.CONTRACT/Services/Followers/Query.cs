@@ -9,4 +9,6 @@ public class Query
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
     }
+
+    public record GetFollowerClinicQuery(Guid ClinicId, Guid? UserId) : IQuery<Response.GetFollowerClinic>;
 }

@@ -12,4 +12,6 @@ public class Response
         public string? Email { get; set; }
         public DateTimeOffset FollowDate { get; set; }
     }
+
+    public record GetFollowerClinic(int TotalFollowers, bool IsFollowed);
 }

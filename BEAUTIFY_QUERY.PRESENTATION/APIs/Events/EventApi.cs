@@ -24,6 +24,8 @@ public class EventApi: ApiEndpoint, ICarterModule
         
         gr2.MapGet("", GetFollowers)
             .RequireAuthorization(Constant.Role.CLINIC_ADMIN);
+
+        gr2.MapGet("{id}", GetFollowersClinicId);
     }
     
     private static async Task<IResult> GetEvents(ISender sender, HttpContext httpContext,
@@ -74,6 +76,13 @@ public class EventApi: ApiEndpoint, ICarterModule
             PageNumber = pageIndex,
             PageSize = pageSize
         });
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+    
+    private static async Task<IResult> GetFollowersClinicId(ISender sender, HttpContext httpContext, Guid id)
+    {
+        var userId = httpContext.User.FindFirst(c => c.Type == "UserId")?.Value;
+        var result = await sender.Send(new CONTRACT.Services.Followers.Query.GetFollowerClinicQuery(id, userId != null ? new Guid(userId) : null));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 }
