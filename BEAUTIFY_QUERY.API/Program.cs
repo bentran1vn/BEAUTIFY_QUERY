@@ -27,6 +27,7 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
     .WriteTo.File("Logs/logs.txt", rollingInterval: RollingInterval.Day)
     .WriteTo.Console());
 // Add Carter module
+
 builder.Services.AddCarter();
 
 builder.Services
