@@ -40,6 +40,7 @@ public class User : AggregateRoot<Guid>, IAuditableEntity
 
 
     public virtual ICollection<UserConversation>? UserConversations { get; set; }
+    public virtual ICollection<Follower>? Followers { get; set; }
     public virtual ICollection<CustomerSchedule>? CustomerSchedules { get; set; }
     public virtual ICollection<Order>? Orders { get; set; }
     public DateTimeOffset CreatedOnUtc { get; set; }
