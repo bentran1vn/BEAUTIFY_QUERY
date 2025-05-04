@@ -111,6 +111,14 @@ public static class Response
         public Guid? Id { get; set; }
         public string Name { get; set; }
         public string ImageUrl { get; set; }
+        public ICollection<CertificateResponse>? Certificates { get; set; }
+    }
+
+    public class CertificateResponse
+    {
+        public Guid? Id { get; set; }
+        public string Name { get; set; }
+        public string ImageUrl { get; set; }
     }
 
     public class ClinicResponse

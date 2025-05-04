@@ -11,6 +11,8 @@ public static class Response
         bool IsMakeBySystem,
         string? NewestQrUrl,
         string? Description,
+        string? BankAccount,
+        string? BankName,
         DateTime TransactionDate,
         DateTimeOffset CreatedOnUtc);
 

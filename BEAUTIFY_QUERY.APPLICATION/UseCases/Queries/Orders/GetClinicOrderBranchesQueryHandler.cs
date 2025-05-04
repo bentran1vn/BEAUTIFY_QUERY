@@ -6,6 +6,7 @@ using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Orders;
 /// <summary>
 ///    api/v{version:apiVersion}/orders/clinic/branches
+/// clinic/branches
 /// </summary>
 /// <param name="currentUserService"></param>
 /// <param name="orderRepository"></param>

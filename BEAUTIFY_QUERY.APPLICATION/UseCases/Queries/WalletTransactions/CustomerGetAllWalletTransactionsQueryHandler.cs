@@ -19,6 +19,8 @@ internal sealed class CustomerGetAllWalletTransactionsQueryHandler(
             transaction.IsMakeBySystem,
             "",
             transaction.Description ?? string.Empty,
+            "",
+            "",
             transaction.TransactionDate,
             transaction.CreatedOnUtc);
 

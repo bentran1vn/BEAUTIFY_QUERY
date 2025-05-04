@@ -13,15 +13,63 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
     public async Task<Result<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>> Handle(
         Query.StaffCheckInCustomerScheduleQuery request, CancellationToken cancellationToken)
     {
-        // Validate input parameters
+        // If search term is provided, search by schedule ID and ignore other filters
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+        {
+            // Try to parse the search term as a GUID to check if it's a valid schedule ID
+            if (Guid.TryParse(request.SearchTerm, out Guid scheduleId))
+            {
+                // Search directly for the schedule with this ID
+                var schedule = await customerScheduleRepositoryBase.FindAll(x => x.Id == scheduleId &&
+                        x.Doctor.ClinicId == currentUserService.ClinicId &&
+                        x.StartTime != null)
+                    .Include(x => x.Service)
+                    .Include(x => x.Doctor)
+                    .ThenInclude(d => d.User)
+                    .Include(x => x.ProcedurePriceType)
+                    .Include(x => x.Order)
+                    .OrderBy(x => x.StartTime)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (schedule == null)
+                    return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(
+                        new Error("404", "No customer schedule found with the provided ID"));
+
+                // Get the user information
+                var user = await userRepositoryBase.FindByIdAsync(schedule.CustomerId);
+
+                if (user == null)
+                    return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(
+                        new Error("404", "Customer information not found"));
+
+                // Create a single-item paged result - using different variable names to avoid conflicts
+                var singleUserDict = new Dictionary<Guid, User> { { user.Id, user } };
+                var singleResponse = MapToResponse(schedule, singleUserDict);
+
+                var singleResult = new PagedResult<Response.StaffCheckInCustomerScheduleResponse>(
+                    new List<Response.StaffCheckInCustomerScheduleResponse> { singleResponse },
+                    1,
+                    1,
+                    1
+                );
+
+                return Result.Success(singleResult);
+            }
+            else
+            {
+                return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(
+                    new Error("400", "Invalid schedule ID format"));
+            }
+        }
+
+        // Original logic for filtering by customer name and phone if search term is not provided
         if (string.IsNullOrWhiteSpace(request.CustomerName))
             return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(
                 new Error("400", "Customer name is required"));
 
-        // Create a dynamic user filter based on available information
+        // The rest of your original code remains unchanged
         var userFilter = CreateUserFilter(request);
 
-        // Fetch users with a single database query
         var users = await userRepositoryBase.FindAll(userFilter)
             .ToListAsync(cancellationToken);
 
@@ -32,8 +80,6 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
         var VietNameTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
         var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, VietNameTimeZone);
 
-
-        // Create query for customer schedules with includes
         var query = customerScheduleRepositoryBase.FindAll(x => users.Select(u => u.Id).Contains(x.CustomerId) &&
                                                                 x.Doctor.ClinicId == currentUserService.ClinicId &&
                                                                 /* x.Date == DateOnly.FromDateTime(currentTime) &&*/
@@ -45,7 +91,6 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             .Include(x => x.Order)
             .OrderBy(x => x.StartTime);
 
-        // Apply pagination
         var pagedCustomerSchedules = await PagedResult<CustomerSchedule>.CreateAsync(
             query,
             request.PageIndex,
@@ -56,15 +101,12 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             return Result.Failure<PagedResult<Response.StaffCheckInCustomerScheduleResponse>>(
                 new Error("404", "No customer schedules found"));
 
-        // Create a dictionary for quick user lookup
         var userDict = users.ToDictionary(u => u.Id);
 
-        // Map to response with null-safe navigation and optimized projection
         var responses = pagedCustomerSchedules.Items
             .Select(schedule => MapToResponse(schedule, userDict))
             .ToList();
 
-        // Create paged result with mapped items
         var result = new PagedResult<Response.StaffCheckInCustomerScheduleResponse>(
             responses,
             pagedCustomerSchedules.PageIndex,
@@ -109,6 +151,7 @@ internal sealed class StaffCheckInCustomerScheduleQueryHandler(
             schedule.Order?.FinalAmount ?? 0,
             $"{user.FirstName} {user.LastName}".Trim(),
             user.Email,
+            schedule.DoctorNote,
             user.PhoneNumber,
             schedule.Service?.Name ?? string.Empty,
             schedule.Doctor?.User is not null

@@ -1,4 +1,5 @@
-﻿using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
+﻿using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+using BEAUTIFY_QUERY.CONTRACT.Services.CustomerSchedules;
 using Microsoft.EntityFrameworkCore;
 
 /// <summary>
@@ -42,18 +43,18 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                 // Use EF.Functions.Like for case-insensitive search instead of Contains with StringComparison
                 query = query.Where(x =>
                     (x.Customer != null &&
-                     ((x.Customer.FirstName != null &&
-                       EF.Functions.Like(x.Customer.FirstName, $"%{searchTerm}%")) ||
-                      (x.Customer.LastName != null &&
-                       EF.Functions.Like(x.Customer.LastName, $"%{searchTerm}%")))) ||
+                     (EF.Functions.Like(x.Customer.FirstName, $"%{searchTerm}%") ||
+                      EF.Functions.Like(x.Customer.LastName, $"%{searchTerm}%"))) ||
                     EF.Functions.Like(x.Status, $"%{searchTerm}%"));
             }
         }
 
+        query = request.SortOrder == SortOrder.Descending
+            ? query.OrderByDescending(x => x.Date).ThenByDescending(x => x.StartTime)
+            : query.OrderBy(x => x.Date).ThenBy(x => x.StartTime);
+
         var customerSchedules = await PagedResult<CustomerSchedule>.CreateAsync(
-            query.OrderBy(x => x.Date)
-                .ThenBy(x => x.StartTime)
-                .ThenBy(x => x.Status),
+            query,
             request.PageIndex,
             request.PageSize
         );
@@ -71,6 +72,7 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
             x.Order.FinalAmount,
             x.Customer.FullName,
             x.Customer.Email,
+            x.DoctorNote,
             x.Customer.PhoneNumber,
             x.Service.Name,
             x.Doctor.User.FullName,
@@ -98,6 +100,7 @@ internal sealed class GetAllCustomerScheduleQueryHandler(
                 schedule.CustomerEmail,
                 schedule.CustomerPhoneNumber,
                 schedule.ServiceName,
+                schedule.Note,
                 schedule.DoctorName,
                 schedule.BookingDate,
                 schedule.StartTime,

@@ -4,6 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Clinics;
+/// <summary>
+/// "/api/v{version:apiVersion}/clinics/branches"
+/// </summary>
+/// <param name="clinicRepository"></param>
+/// <param name="walletTransactionRepository"></param>
+/// <param name="currentUserService"></param>
 internal sealed class GetClinicBranchesQueryHandler(
     IRepositoryBase<Clinic, Guid> clinicRepository,
     IRepositoryBase<WalletTransaction, Guid> walletTransactionRepository,
@@ -15,29 +21,19 @@ internal sealed class GetClinicBranchesQueryHandler(
         CancellationToken cancellationToken)
     {
         // Get the current user's clinic ID
-        Clinic? parentClinic = null;
 
-
-        if (request.Role.Equals(Constant.Role.CLINIC_ADMIN))
+        var parentClinic = request.Role switch
         {
-            // Find the parent clinic associated with the current user
-            parentClinic = await clinicRepository
+            Constant.Role.CLINIC_ADMIN => await clinicRepository
                 .FindAll(c => c.UserClinics != null &&
                               c.UserClinics.Any(uc => uc.UserId == currentUserService.UserId.Value) &&
                               c.IsParent == true)
-                .FirstOrDefaultAsync(cancellationToken);
-        }
-        else if (request.Role.Equals(Constant.Role.SYSTEM_STAFF) && request.Id != null)
-        {
-            parentClinic = await clinicRepository
-                .FindSingleAsync(
-                    x => x.Id.Equals(request.Id) &&
-                    x.IsParent == true &&
-                    x.IsDeleted == false &&
-                    x.IsActivated &&
-                    x.Status == 1
-            , cancellationToken);
-        }
+                .FirstOrDefaultAsync(cancellationToken),
+            Constant.Role.SYSTEM_STAFF when request.Id != null => await clinicRepository.FindSingleAsync(
+                x => x.Id.Equals(request.Id) && x.IsParent == true && x.IsDeleted == false && x.IsActivated &&
+                     x.Status == 1, cancellationToken),
+            _ => null
+        };
 
         if (parentClinic == null)
             return Result.Failure<Response.GetClinicBranchesResponse>(
@@ -57,8 +53,10 @@ internal sealed class GetClinicBranchesQueryHandler(
         // Get pending withdrawals for all clinics
         var pendingWithdrawals = await walletTransactionRepository
             .FindAll(wt => clinicIds.Contains(wt.ClinicId.Value) &&
-                           wt.TransactionType == Constant.WalletConstants.TransactionType.WITHDRAWAL &&
-                           wt.Status == Constant.WalletConstants.TransactionStatus.PENDING)
+                           wt.TransactionType == Constant.WalletConstants.TransactionType.WITHDRAWAL && (
+                               wt.Status == Constant.WalletConstants.TransactionStatus.WAITING_APPROVAL || wt.Status ==
+                               Constant.WalletConstants.TransactionStatus.WAITING_FOR_PAYMENT
+                           ))
             .GroupBy(wt => wt.ClinicId)
             .Select(g => new { ClinicId = g.Key, PendingAmount = g.Sum(wt => wt.Amount) })
             .ToDictionaryAsync(x => x.ClinicId, x => x.PendingAmount, cancellationToken);
@@ -66,11 +64,13 @@ internal sealed class GetClinicBranchesQueryHandler(
         // Get total earnings for all clinics
         var totalEarnings = await walletTransactionRepository
             .FindAll(wt => clinicIds.Contains(wt.ClinicId.Value) &&
-                           wt.Status == Constant.WalletConstants.TransactionStatus.COMPLETED)
-            .GroupBy(wt => wt.ClinicId)
+                           (wt.Status == Constant.WalletConstants.TransactionStatus.COMPLETED ||
+                            wt.Status == Constant.WalletConstants.TransactionStatus.WAITING_FOR_PAYMENT ||
+                            wt.Status == Constant.WalletConstants.TransactionStatus.WAITING_APPROVAL))
+            .Where(wt => wt.ClinicId.HasValue) // Ensure ClinicId is not null
+            .GroupBy(wt => wt.ClinicId.Value) // Use .Value since we've filtered nulls
             .Select(g => new { ClinicId = g.Key, TotalAmount = g.Sum(wt => wt.Amount) })
             .ToDictionaryAsync(x => x.ClinicId, x => x.TotalAmount, cancellationToken);
-
         // Create response
         var response = new Response.GetClinicBranchesResponse
         {
