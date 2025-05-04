@@ -15,8 +15,8 @@ internal sealed class GetDoctorCertificateByIdQueryHandler(
             {
                 Id = x.Id,
                 CertificateName = x.CertificateName,
-                ServiceName = x.Service.Name,
-                ServiceId = x.ServiceId,
+                CategoryName = x.Category.Name,
+                CategoryId = x.CategoryId,
                 CertificateUrl = x.CertificateUrl,
                 DoctorName = x.Doctor.FullName,
                 ExpiryDate = x.ExpiryDate,

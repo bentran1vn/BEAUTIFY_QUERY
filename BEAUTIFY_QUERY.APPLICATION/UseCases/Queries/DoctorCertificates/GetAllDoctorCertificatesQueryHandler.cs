@@ -77,8 +77,8 @@ public class GetAllDoctorCertificatesQueryHandler(
         {
             Id = certificate.Id,
             CertificateName = certificate.CertificateName,
-            ServiceName = certificate.Service?.Name,
-            ServiceId = certificate.ServiceId,
+            CategoryName = certificate.Category.Name,
+            CategoryId = certificate.Category.Id,
             CertificateUrl = certificate.CertificateUrl,
             ExpiryDate = certificate.ExpiryDate,
             Note = certificate.Note,

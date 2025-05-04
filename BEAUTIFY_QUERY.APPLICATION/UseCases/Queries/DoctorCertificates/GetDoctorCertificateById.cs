@@ -28,8 +28,8 @@ internal sealed class GetDoctorCertificatesByDoctorIdHandler(
                 CertificateName = x.CertificateName,
                 CertificateUrl = x.CertificateUrl,
                 Note = x.Note,
-                ServiceId = x.ServiceId,
-                ServiceName = x.Service.Name,
+                CategoryId = x.CategoryId,
+                CategoryName = x.Category.Name,
                 DoctorName = x.Doctor.FullName,
                 ExpiryDate = x.ExpiryDate
             })

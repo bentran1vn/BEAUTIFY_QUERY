@@ -63,6 +63,8 @@ public class GetDetailAccountOfEmployeeQueryHandler(
                         .Select(x => new Response.DoctorCertificates
                         {
                             Id = x.Id,
+                            CategoryName = x.Category.Name,
+                            CategoryId = x.CategoryId,
                             CertificateName = x.CertificateName,
                             CertificateUrl = x.CertificateUrl,
                             ExpiryDate = x.ExpiryDate,
@@ -116,6 +118,8 @@ public class GetDetailAccountOfEmployeeQueryHandler(
                 {
                     Id = x.Id,
                     CertificateName = x.CertificateName,
+                    CategoryName = x.Category.Name,
+                    CategoryId = x.CategoryId,
                     CertificateUrl = x.CertificateUrl,
                     ExpiryDate = x.ExpiryDate,
                     Note = x.Note

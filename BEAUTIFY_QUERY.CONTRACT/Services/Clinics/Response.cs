@@ -230,6 +230,9 @@ public static class Response
         public Guid Id { get; set; }
         public string CertificateUrl { get; set; }
         public string CertificateName { get; set; }
+
+        public Guid? CategoryId { get; set; }
+        public string? CategoryName { get; set; }
         public DateTimeOffset? ExpiryDate { get; set; }
         public string? Note { get; set; }
     }
