@@ -86,7 +86,18 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
                 FullAddress = g.Select(x => x.User.FullAddress).FirstOrDefault(),
                 Address = g.Select(x => x.User.Address).FirstOrDefault(),
                 ProfilePictureUrl = g.Select(x => x.User.ProfilePicture).FirstOrDefault(),
-                Role = g.Select(x => x.User.Role.Name).FirstOrDefault()
+                Role = g.Select(x => x.User.Role.Name).FirstOrDefault(),
+                DoctorCertificates = g.Select(x => x.User.DoctorCertificates)
+                    .SelectMany(x => x)
+                    .Select(x => new Response.DoctorCertificates
+                    {
+                        Id = x.Id,
+                        CertificateUrl = x.CertificateUrl,
+                        ExpiryDate = x.ExpiryDate,
+                        CategoryId = x.CategoryId,
+                        CategoryName = x.Category.Name,
+                        Note = x.Note
+                    }).ToList()
             });
 
         var result =
