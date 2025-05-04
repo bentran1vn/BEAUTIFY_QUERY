@@ -4,9 +4,8 @@ public class Query
 {
     public class GetEvent
     {
-        public TimeOnly? StartDate { get; set; }
-        public TimeOnly? EndDate { get; set; }
-        public DateOnly? Date { get; set; }
+        public DateTimeOffset? StartDate { get; set; }
+        public DateTimeOffset? EndDate { get; set; }
         public string? SearchTerm { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
@@ -14,12 +13,11 @@ public class Query
     
     public class GetEventQuery: GetEvent, IQuery<PagedResult<Response.EventResponse>>
     {
-        public GetEventQuery(TimeOnly? startDate, TimeOnly? endDate,
-            DateOnly? date, string? searchTerm, int pageNumber, int pageSize)
+        public GetEventQuery(DateTimeOffset? startDate, DateTimeOffset? endDate, 
+            string? searchTerm, int pageNumber, int pageSize)
         {
             StartDate = startDate;
             EndDate = endDate;
-            Date = date;
             SearchTerm = searchTerm;
             PageNumber = pageNumber;
             PageSize = pageSize;
@@ -30,13 +28,11 @@ public class Query
     {
         public Guid ClinicId { get; set; }
 
-        public GetClinicEventQuery(TimeOnly? startDate, TimeOnly? endDate,
-            DateOnly? date, string? searchTerm, int pageNumber, int pageSize,
+        public GetClinicEventQuery(DateTimeOffset? startDate, DateTimeOffset? endDate, string? searchTerm, int pageNumber, int pageSize,
             Guid clinicId)
         {
             StartDate = startDate;
             EndDate = endDate;
-            Date = date;
             SearchTerm = searchTerm;
             PageNumber = pageNumber;
             PageSize = pageSize;

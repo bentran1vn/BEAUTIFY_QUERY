@@ -27,9 +27,8 @@ public class EventApi: ApiEndpoint, ICarterModule
     }
     
     private static async Task<IResult> GetEvents(ISender sender, HttpContext httpContext,
-        TimeOnly? startDate,
-        TimeOnly? endDate,
-        DateOnly? date,
+        DateTimeOffset? startDate,
+        DateTimeOffset? endDate,
         string? searchTerm = null,
         int pageIndex = 1,
         int pageSize = 10)
@@ -42,7 +41,6 @@ public class EventApi: ApiEndpoint, ICarterModule
             var result = await sender.Send(new Query.GetClinicEventQuery(
                 startDate,
                 endDate,
-                date,
                 searchTerm,
                 pageIndex,
                 pageSize,
@@ -55,7 +53,6 @@ public class EventApi: ApiEndpoint, ICarterModule
             var result = await sender.Send(new Query.GetEventQuery(
                 startDate,
                 endDate,
-                date,
                 searchTerm,
                 pageIndex,
                 pageSize
