@@ -52,7 +52,7 @@ internal sealed class GetBookingDetailByIdQueryHandler(
                 Id = booking.DoctorId,
                 Name = booking.DoctorName,
                 ImageUrl = doctorImageUrl?.User.ProfilePicture ?? string.Empty,
-                Certificates = doctorImageUrl?.User.DoctorCertificates.Where(x => x.ServiceId == booking.ServiceId)
+                Certificates = doctorImageUrl?.User.DoctorCertificates.Where(x => !x.IsDeleted)
                     .Select(x => new Response.CertificateResponse
                     {
                         Id = x.Id,
