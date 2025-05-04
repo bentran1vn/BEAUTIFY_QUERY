@@ -4,14 +4,16 @@ using BEAUTIFY_QUERY.CONTRACT.Services.DoctorCertificates;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.DoctorCertificates;
 public class GetAllDoctorCertificatesQueryHandler(
-    IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository)
+    IRepositoryBase<DoctorCertificate, Guid> doctorCertificateRepository,
+    ICurrentUserService currentUserService)
     : IQueryHandler<Query.GetAllDoctorCertificates, PagedResult<Response.GetDoctorCertificateByResponse>>
 {
     public async Task<Result<PagedResult<Response.GetDoctorCertificateByResponse>>> Handle(
         Query.GetAllDoctorCertificates request, CancellationToken cancellationToken)
     {
         var searchTerm = request.searchTerm?.Trim() ?? string.Empty;
-        var query = doctorCertificateRepository.FindAll();
+        var query = doctorCertificateRepository.FindAll(x => x.Doctor.UserClinics
+            .Any(y => y.ClinicId == currentUserService.ClinicId && !y.IsDeleted));
 
         // Apply search filter
         if (!string.IsNullOrEmpty(searchTerm)) query = ApplySearchFilter(query, searchTerm);
@@ -64,7 +66,7 @@ public class GetAllDoctorCertificatesQueryHandler(
     {
         return request.SortColumn switch
         {
-            "doctor_name" => x => x.Doctor.FirstName,
+            "doctorName" => x => x.Doctor.FirstName,
             _ => x => x.CreatedOnUtc
         };
     }
@@ -75,10 +77,12 @@ public class GetAllDoctorCertificatesQueryHandler(
         {
             Id = certificate.Id,
             CertificateName = certificate.CertificateName,
+            ServiceName = certificate.Service?.Name,
+            ServiceId = certificate.ServiceId,
             CertificateUrl = certificate.CertificateUrl,
             ExpiryDate = certificate.ExpiryDate,
             Note = certificate.Note,
-            DoctorName = $"{certificate.Doctor.FirstName} {certificate.Doctor.LastName}"
+            DoctorName = certificate.Doctor.FullName,
         };
     }
 }

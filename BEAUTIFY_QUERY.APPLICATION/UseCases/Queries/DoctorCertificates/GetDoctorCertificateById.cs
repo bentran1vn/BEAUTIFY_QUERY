@@ -27,7 +27,10 @@ internal sealed class GetDoctorCertificatesByDoctorIdHandler(
                 Id = x.Id,
                 CertificateName = x.CertificateName,
                 CertificateUrl = x.CertificateUrl,
-                DoctorName = $"{x.Doctor.FirstName} {x.Doctor.LastName}",
+                Note = x.Note,
+                ServiceId = x.ServiceId,
+                ServiceName = x.Service.Name,
+                DoctorName = x.Doctor.FullName,
                 ExpiryDate = x.ExpiryDate
             })
             .ToListAsync(cancellationToken);

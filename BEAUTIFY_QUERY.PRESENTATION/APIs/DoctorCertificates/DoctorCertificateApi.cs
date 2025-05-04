@@ -12,13 +12,13 @@ public class DoctorCertificateApi : ApiEndpoint, ICarterModule
             .HasApiVersion(1);
 
         // Get all certificates for a specific doctor
-        gr1.MapGet("doctors/{doctorId:guid}/certificates", GetCertificatesByDoctorId);
+        gr1.MapGet("doctors/{doctorId:guid}/certificates", GetCertificatesByDoctorId).RequireAuthorization();
 
         // Get a specific certificate by its ID
-        gr1.MapGet("{id:guid}", GetCertificateById);
+        gr1.MapGet("{id:guid}", GetCertificateById).RequireAuthorization();
 
         // Get all certificates (with filtering, sorting, and pagination)
-        gr1.MapGet(string.Empty, GetAllCertificates);
+        gr1.MapGet(string.Empty, GetAllCertificates).RequireAuthorization();
     }
 
     private static async Task<IResult> GetCertificatesByDoctorId(
