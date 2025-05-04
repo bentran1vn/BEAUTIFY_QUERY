@@ -14,81 +14,106 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
         Query.GetAllAccountOfEmployeeQuery request,
         CancellationToken cancellationToken)
     {
-        var isExist = await clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken, x => x.Children);
-        if (isExist == null)
+        // Check if clinic exists
+        var clinic = await clinicRepository.FindByIdAsync(request.ClinicId, cancellationToken, x => x.Children);
+        if (clinic == null)
             return Result.Failure<PagedResult<Response.GetAccountOfEmployee>>(new Error("404", "Clinic Not Found"));
 
-        var query = userClinicRepository.FindAll(x => x.IsDeleted == false);
+        // Get applicable clinic IDs
+        var clinicIds = clinic.IsParent.Value
+            ? clinic.Children.Select(x => x.Id).Append(request.ClinicId).ToList()
+            : [request.ClinicId];
 
-        query = query
-            .Include(x => x.Clinic)
-            .Include(x => x.User);
+        // Fix: Use SQL-compatible comparison for role names
+        var roles = await roleRepository
+            .FindAll(x => x.IsDeleted == false && (
+                x.Name.ToUpper() == "DOCTOR" ||
+                x.Name.ToUpper() == "CLINIC STAFF"
+            ))
+            .ToListAsync(cancellationToken);
 
-        if (isExist.IsParent == true)
-        {
-            var childrenIds = isExist.Children.Select(x => x.Id).ToList();
-            childrenIds.Add(request.ClinicId);
-            query = query.Where(x => childrenIds.Contains(x.ClinicId));
-        }
-        else
-        {
-            query = query.Where(x => x.ClinicId == request.ClinicId);
-        }
+        var roleIds = roles.Select(r => r.Id).ToList();
 
-        var roles = await roleRepository.FindAll(x => x.IsDeleted == false).ToListAsync(cancellationToken);
-
+        // Apply role filter if specified
         if (request.Role != null)
         {
             var roleName = request.Role.ToString() == "DOCTOR" ? "DOCTOR" : "CLINIC STAFF";
-            var role = roles.FirstOrDefault(x => x.Name.Equals(roleName, StringComparison.CurrentCultureIgnoreCase));
-            query = query.Where(x => x.User.RoleId == role.Id);
-        }
-        else
-        {
-            var rolesRequire = roles.Where(x =>
-                x.Name.Equals("DOCTOR", StringComparison.CurrentCultureIgnoreCase) ||
-                x.Name.Equals("CLINIC STAFF", StringComparison.CurrentCultureIgnoreCase)).ToList();
-            query = query.Where(x => rolesRequire.Select(r => r.Id).ToList().Contains((Guid)x.User.RoleId));
+            roleIds = roles
+                .Where(x => x.Name.Equals(roleName, StringComparison.OrdinalIgnoreCase))
+                .Select(r => r.Id)
+                .ToList();
         }
 
-        if (request.SearchTerm != null)
+        // Build base query with initial filters for improved performance
+        var query = userClinicRepository.FindAll(x =>
+            x.IsDeleted == false &&
+            clinicIds.Contains(x.ClinicId) &&
+            roleIds.Contains((Guid)x.User.RoleId));
+
+        // Apply search filter if provided
+        if (!string.IsNullOrEmpty(request.SearchTerm))
+        {
             query = query.Where(x =>
                 x.User.FirstName.Contains(request.SearchTerm) ||
                 x.User.LastName.Contains(request.SearchTerm) ||
                 x.User.Email.Contains(request.SearchTerm) ||
                 x.Clinic.Address.Contains(request.SearchTerm));
+        }
 
-        var groupByQuery = query
+        // Get unique user IDs for pagination
+        var totalCount = await query
+            .Select(x => x.UserId)
+            .Distinct()
+            .CountAsync(cancellationToken);
+
+        // Apply pagination early at user level
+        var userIds = await query
+            .Select(x => x.UserId)
+            .Distinct()
+            .Skip((request.PageIndex - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ToListAsync(cancellationToken);
+
+        // Only get data for users in the current page
+        var employeeData = await query
+            .Where(x => userIds.Contains(x.UserId))
+            .Include(x => x.Clinic)
+            .Include(x => x.User)
+            .ThenInclude(u => u.DoctorCertificates)
+            .ThenInclude(c => c.Category)
+            .ToListAsync(cancellationToken);
+
+        // Build response using memory operations on the already filtered dataset
+        var result = employeeData
             .GroupBy(x => x.UserId)
             .Select(g => new Response.GetAccountOfEmployee
             {
-                Branchs = g.Select(isExist => new Response.GetClinicBranches(
-                    isExist.Clinic.Id, isExist.Clinic.Name,
-                    isExist.Clinic.Email, isExist.Clinic.City,
-                    isExist.Clinic.Address, isExist.Clinic.District,
-                    isExist.Clinic.Ward, isExist.Clinic.FullAddress,
-                    isExist.Clinic.TaxCode,
-                    isExist.Clinic.WorkingTimeStart,
-                    isExist.Clinic.WorkingTimeEnd,
-                    isExist.Clinic.BusinessLicenseUrl,
-                    isExist.Clinic.OperatingLicenseUrl, isExist.Clinic.OperatingLicenseExpiryDate,
-                    isExist.Clinic.ProfilePictureUrl, isExist.Clinic.IsActivated
+                Branchs = g.Select(item => new Response.GetClinicBranches(
+                    item.Clinic.Id, item.Clinic.Name,
+                    item.Clinic.Email, item.Clinic.City,
+                    item.Clinic.Address, item.Clinic.District,
+                    item.Clinic.Ward, item.Clinic.FullAddress,
+                    item.Clinic.TaxCode,
+                    item.Clinic.WorkingTimeStart,
+                    item.Clinic.WorkingTimeEnd,
+                    item.Clinic.BusinessLicenseUrl,
+                    item.Clinic.OperatingLicenseUrl, item.Clinic.OperatingLicenseExpiryDate,
+                    item.Clinic.ProfilePictureUrl, item.Clinic.IsActivated
                 )).ToArray(),
                 EmployeeId = g.Key,
-                FirstName = g.Select(x => x.User.FirstName).FirstOrDefault(),
-                LastName = g.Select(x => x.User.LastName).FirstOrDefault(),
-                Email = g.Select(x => x.User.Email).FirstOrDefault(),
-                FullName = g.Select(x => x.User.FirstName + " " + x.User.LastName).FirstOrDefault(),
-                PhoneNumber = g.Select(x => x.User.PhoneNumber).FirstOrDefault(),
-                City = g.Select(x => x.User.City).FirstOrDefault(),
-                District = g.Select(x => x.User.District).FirstOrDefault(),
-                Ward = g.Select(x => x.User.Ward).FirstOrDefault(),
-                FullAddress = g.Select(x => x.User.FullAddress).FirstOrDefault(),
-                Address = g.Select(x => x.User.Address).FirstOrDefault(),
-                ProfilePictureUrl = g.Select(x => x.User.ProfilePicture).FirstOrDefault(),
-                Role = g.Select(x => x.User.Role.Name).FirstOrDefault(),
-                DoctorCertificates = g.Select(x => x.User.DoctorCertificates)
-                    .SelectMany(x => x)
+                FirstName = g.First().User.FirstName,
+                LastName = g.First().User.LastName,
+                Email = g.First().User.Email,
+                FullName = g.First().User.FullName,
+                PhoneNumber = g.First().User.PhoneNumber,
+                City = g.First().User.City,
+                District = g.First().User.District,
+                Ward = g.First().User.Ward,
+                FullAddress = g.First().User.FullAddress,
+                Address = g.First().User.Address,
+                ProfilePictureUrl = g.First().User.ProfilePicture,
+                Role = g.First().User.Role.Name,
+                DoctorCertificates = g.First().User.DoctorCertificates
                     .Select(x => new Response.DoctorCertificates
                     {
                         Id = x.Id,
@@ -98,12 +123,16 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
                         CategoryName = x.Category.Name,
                         Note = x.Note
                     }).ToList()
-            });
+            })
+            .ToList();
 
-        var result =
-            await PagedResult<Response.GetAccountOfEmployee>.CreateAsync(groupByQuery, request.PageIndex,
-                request.PageSize);
+        // Create paged result manually since we've already applied pagination
+        var pagedResult = new PagedResult<Response.GetAccountOfEmployee>(
+            result,
+            totalCount,
+            request.PageIndex,
+            request.PageSize);
 
-        return Result.Success(result);
+        return Result.Success(pagedResult);
     }
 }
