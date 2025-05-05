@@ -24,9 +24,6 @@ public class ServiceApi : ApiEndpoint, ICarterModule
         
         gr2.MapGet("{id}/doctors", GetDoctorServicesByIdV2);
     }
-    
-
-
 
     private static async Task<IResult> GetServicesByCategoryId(ISender sender, Guid categoryId)
     {

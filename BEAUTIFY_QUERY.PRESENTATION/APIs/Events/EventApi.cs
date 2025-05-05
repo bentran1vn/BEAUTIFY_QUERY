@@ -12,8 +12,10 @@ public class EventApi: ApiEndpoint, ICarterModule
     {
         var gr1 = app.NewVersionedApi("Events")
             .MapGroup(BaseUrl).HasApiVersion(1);
+
+        gr1.MapGet("", GetEvents);
         
-        gr1.MapGet("", GetEvents)
+        gr1.MapGet("{id}", GetEventById)
             .RequireAuthorization();
         
         // gr1.MapGet("{id}", () => {})
@@ -26,6 +28,18 @@ public class EventApi: ApiEndpoint, ICarterModule
             .RequireAuthorization(Constant.Role.CLINIC_ADMIN);
 
         gr2.MapGet("{id}", GetFollowersClinicId);
+    }
+    
+    private static async Task<IResult> GetEventById(ISender sender, HttpContext httpContext, Guid id)
+    {
+        var clinicId = httpContext.User.FindFirst(c => c.Type == "ClinicId")?.Value!;
+        var roleName = httpContext.User.FindFirst(c => c.Type == "RoleName")?.Value!;
+        var result = await sender.Send(new Query.GetEventByIdQuery
+        {
+            Id = id,
+            ClinicId = roleName == Constant.Role.CLINIC_ADMIN ? new Guid(clinicId) : null,
+        });
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
     
     private static async Task<IResult> GetEvents(ISender sender, HttpContext httpContext,

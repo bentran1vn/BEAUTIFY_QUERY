@@ -39,4 +39,10 @@ public class Query
             ClinicId = clinicId;
         }
     }
+    
+    public class GetEventByIdQuery: IQuery<Response.EventDetailResponse>
+    {
+        public Guid Id { get; set; }
+        public Guid? ClinicId { get; set; }
+    }
 }
