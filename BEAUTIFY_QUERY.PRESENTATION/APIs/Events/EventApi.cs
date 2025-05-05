@@ -12,9 +12,8 @@ public class EventApi: ApiEndpoint, ICarterModule
     {
         var gr1 = app.NewVersionedApi("Events")
             .MapGroup(BaseUrl).HasApiVersion(1);
-        
-        gr1.MapGet("", GetEvents)
-            .RequireAuthorization();
+
+        gr1.MapGet("", GetEvents);
         
         gr1.MapGet("{id}", GetEventById)
             .RequireAuthorization();
