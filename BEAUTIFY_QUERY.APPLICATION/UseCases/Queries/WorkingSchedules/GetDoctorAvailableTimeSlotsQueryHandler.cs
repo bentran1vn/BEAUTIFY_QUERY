@@ -60,20 +60,7 @@ internal sealed class GetDoctorAvailableTimeSlotsQueryHandler(
             if (customerSchedule == null)
                 return Result.Failure<IReadOnlyList<Response.GetEmptyScheduleResponse>>(new Error("404",
                     ErrorMessages.CustomerSchedule.CustomerScheduleNotFound));
-            /*var nextCustomerSchedule = await
-                customerScheduleRepository.FindOneAsync(x =>
-                    x.DoctorId == customerSchedule.DoctorId &&
-                    x.ServiceId == customerSchedule.ServiceId &&
-                    x.OrderId == customerSchedule.OrderId &&
-                    x.CurrentProcedure.StepIndex == (int.Parse(customerSchedule.CurrentProcedure.StepIndex) + 1
-                    ).ToString());
-            if (nextCustomerSchedule == null)
-            {
-                return Result.Failure<IReadOnlyList<Response.GetEmptyScheduleResponse>>(new Error("404",
-                    ErrorMessages.CustomerSchedule.NextCustomerScheduleNotFound));
-            }
 
-            duration = nextCustomerSchedule.CurrentProcedure.Duration;*/
             duration = customerSchedule.CurrentProcedure.Duration;
             clinicId = customerSchedule.ClinicId.Value;
             doctorId = customerSchedule.DoctorId;
