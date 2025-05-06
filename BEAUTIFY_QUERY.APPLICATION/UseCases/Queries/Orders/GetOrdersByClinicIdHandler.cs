@@ -39,9 +39,16 @@ internal sealed class GetOrdersByClinicIdHandler(
         query = request.SortOrder == SortOrder.Descending
             ? query.OrderByDescending(GetSortProperty(request))
             : query.OrderBy(GetSortProperty(request));
+        
+        query = request.LiveStreamId != null
+            ? query.Where(x => x.LivestreamRoomId == request.LiveStreamId)
+            : query;
+        
+        query = request.IsLiveStream != null
+            ? request.IsLiveStream == true ? query.Where(x => x.LivestreamRoomId != null) : query.Where(x => x.LivestreamRoomId == null)
+            : query;
 
         var orders = await PagedResult<Order>.CreateAsync(query, request.PageIndex, request.PageSize);
-
 
         var mapped = orders.Items.Select(x =>
                 new Response.Order(
@@ -57,7 +64,7 @@ internal sealed class GetOrdersByClinicIdHandler(
                     x.Customer.PhoneNumber,
                     x.Customer.Email,
                     x.LivestreamRoomId != null,
-                    x.LivestreamRoomId != null ? x.LivestreamRoom.Name : null))
+                    x.LivestreamRoomId != null ? x.LivestreamRoom?.Name : null))
             .ToList();
 
         return Result.Success(

@@ -17,7 +17,9 @@ public static class Query
         string? SortColumn,
         SortOrder? SortOrder,
         int PageIndex,
-        int PageSize) : IQuery<PagedResult<Response.Order>>;
+        int PageSize,
+        Guid? LiveStreamId,
+        bool? IsLiveStream) : IQuery<PagedResult<Response.Order>>;
 
 
     public record GetOrderById(Guid Id) : IQuery<Response.OrderById>;

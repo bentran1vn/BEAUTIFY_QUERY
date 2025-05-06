@@ -20,22 +20,24 @@ public class Apis : ApiEndpoint, ICarterModule
             .WithDescription("Retrieves orders from all branches of the parent clinic. Requires Clinic_Admin role.");
     }
 
-    private static async Task<IResult> GetOrderByClinicId(ISender sender, string? searchTerm = null,
-        string? sortColumn = null,
-        string? sortOrder = null,
-        int pageIndex = 1,
-        int pageSize = 10)
+    private static async Task<IResult> GetOrderByClinicId(
+        ISender sender, string? searchTerm = null,
+        string? sortColumn = null, string? sortOrder = null,
+        Guid? liveStreamId = null, bool? isLiveStream = null,
+        int pageIndex = 1, int pageSize = 10)
     {
         var result = await sender.Send(new Query.GetOrdersByClinicId(searchTerm,
             sortColumn, SortOrderExtension.ConvertStringToSortOrder(sortOrder),
-            pageIndex, pageSize));
+            pageIndex, pageSize, liveStreamId, isLiveStream));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
-    private static async Task<IResult> GetOrder(ISender sender, string? searchTerm = null, string? sortColumn = null,
+    private static async Task<IResult> GetOrder(ISender sender,
+        string? searchTerm = null, string? sortColumn = null,
         string? sortOrder = null, int pageIndex = 1, int pageSize = 10)
     {
-        var result = await sender.Send(new Query.GetOrdersByCustomerId(searchTerm, sortColumn,
+        var result = await sender.Send(
+            new Query.GetOrdersByCustomerId(searchTerm, sortColumn,
             SortOrderExtension.ConvertStringToSortOrder(sortOrder), pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
