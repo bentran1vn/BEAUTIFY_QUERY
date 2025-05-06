@@ -8,9 +8,9 @@ internal sealed class DoctorScheduleStatusChangedEventHandler(
     public async Task<Result> Handle(DomainEvents.DoctorScheduleStatusChanged request,
         CancellationToken cancellationToken)
     {
-        foreach (var x in request.WorkingScheduleId)
+        foreach (var Id in request.WorkingScheduleId)
         {
-            var workingSchedule = await mongoRepository.FindOneAsync(x => x.DocumentId.Equals(x));
+            var workingSchedule = await mongoRepository.FindOneAsync(x => x.DocumentId.Equals(Id));
             if (workingSchedule != null)
             {
                 workingSchedule.Status = request.Status;
