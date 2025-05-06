@@ -9,7 +9,6 @@ public class
     Responses.GetDaytimeInformationResponse>
 {
     private readonly IRepositoryBase<Clinic, Guid> _clinicRepository;
-    private readonly IRepositoryBase<ClinicService, Guid> _clinicServiceRepository;
     private readonly IRepositoryBase<ClinicTransaction, Guid> _clinicTransactionRepository;
     private readonly IRepositoryBase<CustomerSchedule, Guid> _customerScheduleRepository;
     private readonly IRepositoryBase<Order, Guid> _orderRepository;
@@ -17,13 +16,11 @@ public class
     public GetDaytimeInformationQueryHandler(
         IRepositoryBase<Order, Guid> orderRepository,
         IRepositoryBase<CustomerSchedule, Guid> customerScheduleRepository,
-        IRepositoryBase<ClinicService, Guid> clinicServiceRepository,
         IRepositoryBase<Clinic, Guid> clinicRepository,
         IRepositoryBase<ClinicTransaction, Guid> clinicTransactionRepository)
     {
         _orderRepository = orderRepository;
         _customerScheduleRepository = customerScheduleRepository;
-        _clinicServiceRepository = clinicServiceRepository;
         _clinicRepository = clinicRepository;
         _clinicTransactionRepository = clinicTransactionRepository;
     }
@@ -54,11 +51,7 @@ public class
                 customerScheduleQuery.Where(x => x.Date >= request.StartDate && x.Date <= request.EndDate);
         }
 
-        // Apply role-based filters
-        const string ROLE_CLINIC_ADMIN = "Clinic Admin";
-        const string ROLE_CLINIC_STAFF = "Clinic Staff";
-
-        if (request.RoleName == ROLE_CLINIC_ADMIN)
+        if (request.RoleName == Constant.Role.CLINIC_ADMIN)
         {
             var clinicIds = await _clinicRepository
                 .FindAll(x => x.ParentId.Equals(request.ClinicId))
@@ -74,7 +67,7 @@ public class
 
             orderQuery = orderQuery.Where(x => orders.Contains(x.Id));
         }
-        else if (request.RoleName == ROLE_CLINIC_STAFF)
+        else if (request.RoleName == Constant.Role.CLINIC_STAFF)
         {
             var orders = await _clinicTransactionRepository
                 .FindAll(x => x.ClinicId.Equals(request.ClinicId))
@@ -92,6 +85,7 @@ public class
             result.DatetimeInformation = await GetInformationForQueries(
                 orderQuery, customerScheduleQuery, cancellationToken);
         }
+        // Handle date range request with weekly/monthly display
         else if (request.StartDate != null && request.EndDate != null)
         {
             var listInfor = new List<Responses.DatetimeInformation>();
@@ -109,9 +103,9 @@ public class
                     // Calculate week end (Sunday)
                     var weekEnd = weekStart.AddDays(6);
 
-                    // Only include complete weeks that fall within the range
+                    // Adjust weekEnd if it exceeds the requested endDate
                     if (weekEnd > endDate)
-                        break;
+                        weekEnd = endDate;
 
                     // Filter queries for this specific week
                     var ordersInWeek = orderQuery.Where(x => x.OrderDate >= weekStart && x.OrderDate <= weekEnd);
@@ -125,6 +119,11 @@ public class
                     };
 
                     listInfor.Add(weekInfo);
+                    
+                    // Break after processing the last week that includes endDate
+                    if (weekEnd >= endDate)
+                        break;
+                        
                     weekStart = weekStart.AddDays(7);
                 }
             }
@@ -138,9 +137,9 @@ public class
                     // Calculate the end of the month
                     var monthEnd = monthStart.AddMonths(1).AddDays(-1);
 
-                    // Only include complete months that fall within the range
+                    // Adjust monthEnd if it exceeds the requested endDate
                     if (monthEnd > endDate)
-                        break;
+                        monthEnd = endDate;
 
                     // Filter queries for this specific month
                     var ordersInMonth = orderQuery.Where(x => x.OrderDate >= monthStart && x.OrderDate <= monthEnd);
@@ -154,6 +153,11 @@ public class
                     };
 
                     listInfor.Add(monthInfo);
+                    
+                    // Break after processing the last month that includes endDate
+                    if (monthEnd >= endDate)
+                        break;
+                        
                     monthStart = monthStart.AddMonths(1);
                 }
             }
