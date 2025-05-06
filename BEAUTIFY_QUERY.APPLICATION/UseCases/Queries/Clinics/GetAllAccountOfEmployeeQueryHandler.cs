@@ -129,9 +129,8 @@ internal sealed class GetAllAccountOfEmployeeQueryHandler(
         // Create paged result manually since we've already applied pagination
         var pagedResult = new PagedResult<Response.GetAccountOfEmployee>(
             result,
-            totalCount,
             request.PageIndex,
-            request.PageSize);
+            request.PageSize, totalCount);
 
         return Result.Success(pagedResult);
     }
