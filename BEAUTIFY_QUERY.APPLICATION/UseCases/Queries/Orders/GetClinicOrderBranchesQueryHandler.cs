@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 using Microsoft.EntityFrameworkCore;
@@ -20,91 +21,106 @@ public sealed class GetClinicOrderBranchesQueryHandler(
     public async Task<Result<PagedResult<Response.Order>>> Handle(Query.GetClinicOrderBranchesQuery request,
         CancellationToken cancellationToken)
     {
-        // Get the current clinic (which should be a parent clinic)
-        var currentClinic = await clinicRepository.FindByIdAsync(currentUserService.ClinicId.Value, cancellationToken);
-        if (currentClinic == null)
-            return Result.Failure<PagedResult<Response.Order>>(new Error("404", "Clinic not found"));
+        var currentClinic = await ValidateClinicAccessAsync(cancellationToken);
+        if (currentClinic.IsFailure)
+            return Result.Failure<PagedResult<Response.Order>>(currentClinic.Error);
 
-        // Check if the clinic is a parent clinic
-        if (currentClinic.IsParent != true)
-            return Result.Failure<PagedResult<Response.Order>>(new Error("403",
-                "Only parent clinics can access this endpoint"));
-
-        // Get all child clinic IDs
-        var childClinicIds = await clinicRepository
-            .FindAll(c => c.ParentId == currentUserService.ClinicId)
-            .Select(c => c.Id)
-            .ToListAsync(cancellationToken);
+        // Get child clinic IDs
+        var childClinicIds = await GetChildClinicIdsAsync(cancellationToken);
 
         if (childClinicIds.Count == 0)
             return Result.Success(new PagedResult<Response.Order>([], request.PageIndex, request.PageSize, 0));
 
-        // Get orders from all child clinics
-        var searchTerm = request.SearchTerm?.Trim();
+        // Build and execute query
+        var query = BuildOrdersQuery(childClinicIds, request.SearchTerm);
+        query = ApplySorting(query, request);
+
+        // Execute query with paging
+        var result = await PagedResult<Order>.CreateAsync(query,
+            request.PageIndex,
+            request.PageSize);
+
+        // Map to response
+        var mapped = result.Items.Select(MapOrderToResponse).ToList();
+
+        return Result.Success(
+            new PagedResult<Response.Order>(mapped, result.PageIndex, result.PageSize, result.TotalCount));
+    }
+
+    private async Task<Result<Clinic>> ValidateClinicAccessAsync(CancellationToken cancellationToken)
+    {
+        var currentClinic = await clinicRepository.FindByIdAsync(currentUserService.ClinicId.Value, cancellationToken);
+        if (currentClinic == null)
+            return Result.Failure<Clinic>(new Error("404", "Clinic not found"));
+
+        return currentClinic.IsParent != true
+            ? Result.Failure<Clinic>(new Error("403", "Only parent clinics can access this endpoint"))
+            : Result.Success(currentClinic);
+    }
+
+    private async Task<List<Guid>> GetChildClinicIdsAsync(CancellationToken cancellationToken)
+    {
+        return await clinicRepository
+            .FindAll(c => c.ParentId == currentUserService.ClinicId)
+            .Select(c => c.Id)
+            .ToListAsync(cancellationToken);
+    }
+
+    private IQueryable<Order> BuildOrdersQuery(List<Guid> childClinicIds, string? searchTerm)
+    {
+        // Base query for orders from child clinics
         var query = orderRepository.FindAll(x =>
             x.Service != null &&
             x.Service.ClinicServices != null &&
-            x.Service.ClinicServices.Any() &&
+            x.Service.ClinicServices.Count != 0 &&
             childClinicIds.Contains(x.Service.ClinicServices.First().ClinicId));
 
-        // Execute the initial query to get the base data
-        var baseQuery = await query
-            .Include(x => x.Customer)
-            .Include(x => x.Service)
-            .Include(x => x.LivestreamRoom)
-            .ToListAsync(cancellationToken);
-
-        // Then filter in memory
-        var filteredList = baseQuery.AsEnumerable();
-
+        // Apply search filter if provided
+        searchTerm = searchTerm?.Trim();
         if (!string.IsNullOrEmpty(searchTerm))
         {
-            filteredList = filteredList.Where(x =>
-                (x.Customer != null && x.Customer.FullName != null &&
-                 x.Customer.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
-                (x.Service != null && x.Service.Name != null &&
-                 x.Service.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
-                (x.Customer != null && x.Customer.PhoneNumber != null &&
-                 x.Customer.PhoneNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
-                (x.FinalAmount.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+            query = query.Where(x =>
+                (x.Customer.FullName ?? string.Empty).Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                (x.Service.Name ?? string.Empty).Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                (x.Customer.PhoneNumber ?? string.Empty).Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                x.FinalAmount.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                 x.Id.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
         }
 
-        // Apply sorting in memory
-        filteredList = request.SortOrder == SortOrder.Descending
-            ? filteredList.OrderByDescending(GetSortPropertyInMemory(request))
-            : filteredList.OrderBy(GetSortPropertyInMemory(request));
-
-        // Manual paging
-        var totalCount = filteredList.Count();
-        var pagedItems = filteredList
-            .Skip(request.PageIndex * request.PageSize)
-            .Take(request.PageSize)
-            .ToList();
-
-        // Map to response
-        var mapped = pagedItems.Select(x =>
-                new Response.Order(
-                    x.Id,
-                    x.Customer.FullName,
-                    x.Service.Name,
-                    x.TotalAmount,
-                    x.Discount,
-                    x.DepositAmount,
-                    x.FinalAmount,
-                    x.CreatedOnUtc,
-                    x.Status,
-                    x.Customer.PhoneNumber,
-                    x.Customer.Email,
-                    x.LivestreamRoomId != null,
-                    x.LivestreamRoomId != null ? x.LivestreamRoom.Name : null))
-            .ToList();
-
-        return Result.Success(
-            new PagedResult<Response.Order>(mapped, request.PageIndex, request.PageSize, totalCount));
+        // Include related entities
+        return query
+            .Include(x => x.Customer)
+            .Include(x => x.Service)
+            .Include(x => x.LivestreamRoom);
     }
 
-    private static Func<Order, object> GetSortPropertyInMemory(Query.GetClinicOrderBranchesQuery request)
+    private IQueryable<Order> ApplySorting(IQueryable<Order> query, Query.GetClinicOrderBranchesQuery request)
+    {
+        var sortProperty = GetSortProperty(request);
+        return request.SortOrder == SortOrder.Descending
+            ? query.OrderByDescending(sortProperty)
+            : query.OrderBy(sortProperty);
+    }
+
+    private static Response.Order MapOrderToResponse(Order x)
+    {
+        return new Response.Order(
+            x.Id,
+            x.Customer.FullName,
+            x.Service.Name,
+            x.TotalAmount,
+            x.Discount,
+            x.DepositAmount,
+            x.FinalAmount,
+            x.CreatedOnUtc,
+            x.Status,
+            x.Customer.PhoneNumber,
+            x.Customer.Email,
+            x.LivestreamRoomId.HasValue,
+            x.LivestreamRoomId.HasValue ? x.LivestreamRoom.Name : null);
+    }
+
+    private static Expression<Func<Order, object>> GetSortProperty(Query.GetClinicOrderBranchesQuery request)
     {
         return request.SortColumn?.ToLower() switch
         {
