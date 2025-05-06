@@ -17,6 +17,7 @@ public class ServiceApi : ApiEndpoint, ICarterModule
         //gr1.MapGet("clinic", GetServicesByClinicId);
         gr1.MapGet("clinics/{clinicId:guid}", GetServicesByClinicIdForCustomer);
         gr1.MapGet("categories/{categoryId:guid}", GetServicesByCategoryId);
+        gr1.MapGet("{id}/liveStream/{liveStreamId:guid}", GetDiscountServicesByLiveStreamId);
         
         var gr2 = app.NewVersionedApi("Services")
             .MapGroup(BaseUrl)
@@ -28,6 +29,12 @@ public class ServiceApi : ApiEndpoint, ICarterModule
     private static async Task<IResult> GetServicesByCategoryId(ISender sender, Guid categoryId)
     {
         var result = await sender.Send(new Query.GetServiceByCategoryIdQuery(categoryId));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+    
+    private static async Task<IResult> GetDiscountServicesByLiveStreamId(ISender sender, Guid id, Guid liveStreamId)
+    {
+        var result = await sender.Send(new Query.GetDiscountServicesByLiveStreamIdQuery(id, liveStreamId));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 

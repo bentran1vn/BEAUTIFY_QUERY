@@ -3,6 +3,11 @@ using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 namespace BEAUTIFY_QUERY.CONTRACT.Services.Services;
 public static class Query
 {
+    public record GetDiscountServicesByLiveStreamIdQuery(
+        Guid ServiceId,
+        Guid LiveStreamId)
+        : IQuery<Response.GetDiscountServicesByLiveStreamIdResponse>;
+    
     public record GetServiceByClinicIdQuery(
         Guid ClinicId)
         : IQuery<List<Response.GetAllServiceByIdResponse>>;

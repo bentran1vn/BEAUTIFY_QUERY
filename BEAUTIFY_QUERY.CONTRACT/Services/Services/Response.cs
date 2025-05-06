@@ -18,7 +18,14 @@ public class Response
         ICollection<DoctorService>? DoctorServices,
         ICollection<Feedback> Feedbacks);
 
-
+    public record GetDiscountServicesByLiveStreamIdResponse(
+        Guid ServiceId,
+        Guid LiveStreamId,
+        string LiveName,
+        DateTimeOffset LiveStartDate,
+        double DiscountLivePercent
+    );
+    
     public record DoctorService(
         Guid Id,
         Guid ServiceId,
