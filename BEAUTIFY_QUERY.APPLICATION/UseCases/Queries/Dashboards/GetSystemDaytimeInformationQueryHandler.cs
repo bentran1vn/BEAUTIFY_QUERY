@@ -123,7 +123,7 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
 
                     // Only include complete weeks that fall within the range
                     if (weekEnd > endDate)
-                        break;
+                        weekEnd = endDate;
 
                     // Filter queries for this specific week
                     var systemTransactionsInWeek = systemTransactionQuery.Where(x =>
@@ -170,6 +170,11 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
                     };
 
                     listInfor.Add(weekInfo);
+                    
+                    // Break after processing the last week that includes endDate
+                    if (weekEnd >= endDate)
+                        break;
+                    
                     weekStart = weekStart.AddDays(7);
                 }
             }
@@ -185,7 +190,7 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
 
                     // Only include complete months that fall within the range
                     if (monthEnd > endDate)
-                        break;
+                        monthEnd = endDate;
 
                     // Filter queries for this specific month
                     var systemTransactionsInMonth = systemTransactionQuery.Where(x =>
@@ -232,6 +237,11 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
                     };
 
                     listInfor.Add(monthInfo);
+                    
+                    // Break after processing the last month that includes endDate
+                    if (monthEnd >= endDate)
+                        break;
+                    
                     monthStart = monthStart.AddMonths(1);
                 }
             }
