@@ -22,8 +22,7 @@ public class GetUsersQueryHandler: IQueryHandler<Query.GetUsersQuery, PagedResul
                 x => x.Email.Trim().ToLower().Contains(request.SearchTerm.Trim().ToLower()) ||
                      x.FirstName.Trim().ToLower().Contains(request.SearchTerm.Trim().ToLower()) ||
                      x.LastName.Trim().ToLower().Contains(request.SearchTerm.Trim().ToLower()) ||
-                     (x.PhoneNumber != null && x.PhoneNumber.Trim().ToLower().Contains(request.SearchTerm.Trim().ToLower())) ||
-                     (x.FullAddress != null && x.FullAddress.Trim().ToLower().Contains(request.SearchTerm.Trim().ToLower()))
+                     (x.PhoneNumber != null && x.PhoneNumber.Trim().ToLower().Contains(request.SearchTerm.Trim().ToLower()))
             )
             : query;
 
