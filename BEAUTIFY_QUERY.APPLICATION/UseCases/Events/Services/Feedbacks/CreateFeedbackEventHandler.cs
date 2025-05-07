@@ -3,7 +3,8 @@ using Feedback = BEAUTIFY_QUERY.DOMAIN.Documents.Feedback;
 using User = BEAUTIFY_QUERY.DOMAIN.Documents.User;
 
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Events.Services.Feedbacks;
-public class CreateFeedbackEventHandler(IMongoRepository<ClinicServiceProjection> clinicServiceRepository)
+public class CreateFeedbackEventHandler(
+    IMongoRepository<ClinicServiceProjection> clinicServiceRepository)
     : ICommandHandler<DomainEvents.CreateFeedback>
 {
     public async Task<Result> Handle(DomainEvents.CreateFeedback request, CancellationToken cancellationToken)
@@ -16,6 +17,7 @@ public class CreateFeedbackEventHandler(IMongoRepository<ClinicServiceProjection
                                ?? throw new Exception($"Service {serviceRequest.ServiceId} not found");
 
         var feedbacks = isServiceExisted.Feedbacks;
+        var doctor = isServiceExisted.DoctorServices;
 
         var feedback = new Feedback
         {
@@ -39,8 +41,17 @@ public class CreateFeedbackEventHandler(IMongoRepository<ClinicServiceProjection
 
         feedbacks.Add(feedback);
 
-        isServiceExisted.Feedbacks = feedbacks;
+        var doctorServiceRating = doctor.Select(x =>
+        {
+            var doctorService = serviceRequest.DoctorFeedbacks.FirstOrDefault(y => y.DoctorId == serviceRequest.User.Id);
+            x.Rating = doctorService?.NewRating ?? 0;
+            return x;
+        });
 
+        isServiceExisted.Feedbacks = feedbacks;
+        isServiceExisted.Rating = serviceRequest.NewRating;
+        isServiceExisted.DoctorServices = doctorServiceRating.ToList();
+        
         await clinicServiceRepository.ReplaceOneAsync(isServiceExisted);
 
         return Result.Success();

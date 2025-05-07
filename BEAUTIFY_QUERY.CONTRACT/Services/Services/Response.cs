@@ -29,6 +29,7 @@ public class Response
     public record DoctorService(
         Guid Id,
         Guid ServiceId,
+        double Rating,
         UserEntity Doctor);
 
     public record UserEntity(
@@ -92,7 +93,7 @@ public class Response
         public Guid ServiceId { get; set; }
         public ICollection<string> Images { get; set; }
         public string Content { get; set; }
-        public int Rating { get; set; }
+        public double Rating { get; set; }
         public User User { get; set; }
         public bool IsView { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
