@@ -18,7 +18,7 @@ internal sealed class DoctorScheduleRegisteredEventHandler(
         {
             x.DoctorId = request.DoctorId;
             x.DoctorName = request.DoctorName;
-            workingScheduleMongoRepository.ReplaceOneAsync(x);
+            await workingScheduleMongoRepository.ReplaceOneAsync(x);
         }
 
         return Result.Success();
