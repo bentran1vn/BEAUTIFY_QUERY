@@ -21,7 +21,15 @@ public static class Query
         Guid? LiveStreamId,
         bool? IsLiveStream) : IQuery<PagedResult<Response.Order>>;
 
+    
+    public record GetOrderSystems(
+        string? SearchTerm,
+        string? SortColumn,
+        SortOrder? SortOrder,
+        int PageIndex,
+        int PageSize) : IQuery<PagedResult<Response.OrderSystem>>;
 
+    
     public record GetOrderById(Guid Id) : IQuery<Response.OrderById>;
 
     public record GetClinicOrderBranchesQuery(
