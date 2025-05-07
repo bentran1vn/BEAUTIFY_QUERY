@@ -51,6 +51,7 @@ internal sealed class GetServiceByCategoryIdQueryHandler(
                 x.Branding.IsActivated,
                 x.Branding.ParentId),
             x.MaxPrice,
+            x.Rating,
             x.MinPrice,
             x.DiscountPercent.ToString(),
             x.DiscountMaxPrice,

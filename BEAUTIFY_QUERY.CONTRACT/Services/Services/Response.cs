@@ -7,6 +7,7 @@ public class Response
         Clinic Branding,
         decimal MaxPrice,
         decimal MinPrice,
+        double Rating,
         double DepositPercent,
         bool IsRefundable,
         string DiscountPercent,
@@ -77,6 +78,7 @@ public class Response
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public double Rating { get; set; }
         public decimal MaxPrice { get; set; }
         public decimal MinPrice { get; set; }
         public required double DepositPercent { get; set; }
@@ -118,6 +120,7 @@ public class Response
         string Description,
         Clinic Branding,
         decimal MaxPrice,
+        double Rating,
         decimal MinPrice,
         string DiscountPercent,
         decimal DiscountMaxPrice,

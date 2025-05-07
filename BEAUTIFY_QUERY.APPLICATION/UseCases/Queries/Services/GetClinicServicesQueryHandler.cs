@@ -54,6 +54,7 @@ public class
                     x.Branding.IsActivated,
                     x.Branding.ParentId),
                 x.MaxPrice, x.MinPrice,
+                x.Rating,
                 x.DepositPercent,
                 x.IsRefundable,
                 (x.DiscountPercent * 100).ToString(),

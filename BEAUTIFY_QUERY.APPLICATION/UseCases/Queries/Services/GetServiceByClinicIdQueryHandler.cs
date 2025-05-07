@@ -49,6 +49,7 @@ internal sealed class GetServiceByClinicIdQueryHandler(
                     x.Branding.IsActivated,
                     x.Branding.ParentId),
                 x.MaxPrice,
+                x.Rating,
                 x.MinPrice,
                 x.DiscountPercent.ToString(),
                 x.DiscountMaxPrice,
