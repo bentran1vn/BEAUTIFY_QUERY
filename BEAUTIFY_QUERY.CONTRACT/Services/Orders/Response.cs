@@ -1,6 +1,25 @@
 ﻿namespace BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 public static class Response
 {
+    public record UserQueryResponse(
+        Guid Id,
+        string Email,
+        string FirstName,
+        string LastName,
+        string? FullName,
+        DateOnly? DateOfBirth,
+        string? PhoneNumber,
+        decimal Balance,
+        string? ProfilePicture,
+        string? City,
+        string? District,
+        string? Ward,
+        string? Address,
+        string? FullAddress,
+        bool IsActivated,
+        DateTimeOffset JoinDate
+    );
+    
     public record Order(
         Guid Id,
         string CustomerName,
