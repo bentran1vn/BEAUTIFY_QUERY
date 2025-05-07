@@ -21,7 +21,8 @@ internal sealed class CustomerScheduleUpdatedDoctorNoteEventHandler(
         workingSchedule.IsNoted = true;
         workingSchedule.Note = request.DoctorNote;
         customerSchedule.DoctorNote = request.DoctorNote;
-        customerScheduleRepository.ReplaceOneAsync(customerSchedule);
+        await workingScheduleRepository.ReplaceOneAsync(workingSchedule);
+        await customerScheduleRepository.ReplaceOneAsync(customerSchedule);
         return Result.Success();
     }
 }
