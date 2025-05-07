@@ -8,7 +8,7 @@ public class Service : AggregateRoot<Guid>, IAuditableEntity
     [MaxLength(200)] public required string Description { get; set; }
     [Column(TypeName = "decimal(18,2)")] public decimal MaxPrice { get; set; }
     [Column(TypeName = "decimal(18,2)")] public decimal MinPrice { get; set; }
-    public int NumberOfCustomersUsed { get; set; } = 0;
+    public double Rating { get; set; } = 0;
 
     public Guid? CategoryId { get; set; }
     public virtual Category? Category { get; set; }

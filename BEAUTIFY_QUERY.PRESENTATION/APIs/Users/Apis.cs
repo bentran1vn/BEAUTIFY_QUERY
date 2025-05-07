@@ -20,6 +20,9 @@ public class Apis : ApiEndpoint, ICarterModule
 
         gr1.MapGet("", GetUser)
             .RequireAuthorization(Constant.Policy.POLICY_SYSTEM_ADMIN);
+
+        gr1.MapGet("doctor", () => { })
+            .RequireAuthorization(Constant.Policy.POLICY_CLINIC_ADMIN_AND_CLINIC_STAFF);;
     }
     
     private static async Task<IResult> GetUser(ISender sender, 

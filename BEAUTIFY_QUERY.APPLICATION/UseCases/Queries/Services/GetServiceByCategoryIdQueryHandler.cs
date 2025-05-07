@@ -51,6 +51,7 @@ internal sealed class GetServiceByCategoryIdQueryHandler(
                 x.Branding.IsActivated,
                 x.Branding.ParentId),
             x.MaxPrice,
+            x.Rating,
             x.MinPrice,
             x.DiscountPercent.ToString(),
             x.DiscountMaxPrice,
@@ -101,7 +102,9 @@ internal sealed class GetServiceByCategoryIdQueryHandler(
             x.DoctorServices?
                 .Select(ds => new Response.DoctorService(
                     ds.Id,
+                    ds.ClinicId,
                     ds.ServiceId,
+                    ds.Rating,
                     new Response.UserEntity(
                         ds.Doctor.Id,
                         ds.Doctor.FullName,

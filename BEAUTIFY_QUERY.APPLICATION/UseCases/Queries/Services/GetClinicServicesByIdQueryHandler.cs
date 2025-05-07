@@ -41,6 +41,7 @@ public class GetClinicServicesByIdQueryHandler(
                     isServiceExisted.Branding.IsActivated,
                     isServiceExisted.Branding.ParentId),
                 isServiceExisted.MaxPrice,
+                isServiceExisted.Rating,
                 isServiceExisted.MinPrice,
                 (isServiceExisted.DiscountPercent * 100).ToString(),
                 isServiceExisted.DiscountMaxPrice,
@@ -85,7 +86,9 @@ public class GetClinicServicesByIdQueryHandler(
                     x.IsActivated)).ToList(),
                 isServiceExisted.DoctorServices.Select(y => new Response.DoctorService(
                     y.Id,
+                    y.ClinicId,
                     y.ServiceId,
+                    y.Rating,
                     new Response.UserEntity(
                         y.Doctor.Id,
                         y.Doctor.FullName,
@@ -142,6 +145,7 @@ public class GetClinicServicesByIdQueryHandler(
                     isServiceExisted.Branding.IsActivated,
                     isServiceExisted.Branding.ParentId),
                 isServiceExisted.MaxPrice,
+                isServiceExisted.Rating,
                 isServiceExisted.MinPrice,
                 (isServiceExisted.DiscountPercent * 100).ToString(),
                 isServiceExisted.DiscountMaxPrice,
@@ -179,7 +183,9 @@ public class GetClinicServicesByIdQueryHandler(
                 null,
                 isServiceExisted.DoctorServices.Select(y => new Response.DoctorService(
                     y.Id,
+                    y.ClinicId,
                     y.ServiceId,
+                    y.Rating,
                     new Response.UserEntity(
                         y.Doctor.Id,
                         y.Doctor.FullName,

@@ -54,6 +54,7 @@ public class
                     x.Branding.IsActivated,
                     x.Branding.ParentId),
                 x.MaxPrice, x.MinPrice,
+                x.Rating,
                 x.DepositPercent,
                 x.IsRefundable,
                 (x.DiscountPercent * 100).ToString(),
@@ -64,7 +65,7 @@ public class
                     y.ProfilePictureUrl, y.IsParent, y.IsActivated, y.ParentId)).ToList(),
                 new Response.Category(x.Category.Id, x.Category.Name, x.Category.Description), x.DoctorServices
                     .Select(y =>
-                        new Response.DoctorService(y.Id, y.ServiceId,
+                        new Response.DoctorService(y.Id, y.ClinicId, y.ServiceId, y.Rating,
                             new Response.UserEntity(y.Doctor.Id, y.Doctor.FullName, y.Doctor.Email,
                                 y.Doctor.PhoneNumber,
                                 y.Doctor.ProfilePictureUrl, []))).ToList(),

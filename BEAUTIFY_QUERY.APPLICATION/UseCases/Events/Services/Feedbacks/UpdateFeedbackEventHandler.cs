@@ -12,6 +12,15 @@ public class UpdateFeedbackEventHandler(IMongoRepository<ClinicServiceProjection
         var isServiceExisted = await clinicServiceRepository
                                    .FindOneAsync(p => p.DocumentId == serviceRequest.ServiceId)
                                ?? throw new Exception($"Service {serviceRequest.ServiceId} not found");
+        
+        var doctor = isServiceExisted.DoctorServices;
+        
+        var doctorServiceRating = doctor.Select(x =>
+        {
+            var doctorService = serviceRequest.DoctorFeedbacks.FirstOrDefault(y => y.DoctorId == serviceRequest.User.Id);
+            x.Rating = doctorService?.NewRating ?? 0;
+            return x;
+        });
 
         isServiceExisted.Feedbacks = isServiceExisted.Feedbacks
             .Select(x =>
@@ -24,9 +33,11 @@ public class UpdateFeedbackEventHandler(IMongoRepository<ClinicServiceProjection
                     x.IsView = true;
                     x.UpdatedAt = serviceRequest.UpdateAt;
                 }
-
                 return x;
             }).ToList();
+        
+        isServiceExisted.Rating = serviceRequest.NewRating;
+        isServiceExisted.DoctorServices = doctorServiceRating.ToList();
 
         await clinicServiceRepository.ReplaceOneAsync(isServiceExisted);
 
