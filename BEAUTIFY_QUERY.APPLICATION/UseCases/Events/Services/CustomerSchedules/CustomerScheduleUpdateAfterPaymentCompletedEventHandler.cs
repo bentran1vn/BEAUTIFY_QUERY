@@ -13,6 +13,7 @@ internal sealed class CustomerScheduleUpdateAfterPaymentCompletedEventHandler(
         if (customerSchedule is null)
             return Result.Failure(new Error("404", "Customer Schedule Not Found !"));
         customerSchedule.Status = request.Status;
+
         await customerRepository.ReplaceOneAsync(customerSchedule);
         return Result.Success();
     }

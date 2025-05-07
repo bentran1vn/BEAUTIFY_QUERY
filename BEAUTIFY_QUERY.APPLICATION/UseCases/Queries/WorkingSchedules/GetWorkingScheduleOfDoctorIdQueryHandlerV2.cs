@@ -19,7 +19,7 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
 
         // Query for non-deleted working schedules for the current doctor with customer schedules
         var query = workingScheduleRepository.AsQueryable(x =>
-            !x.IsDeleted && x.DoctorId == doctorId && x.CustomerScheduleId != null);
+            !x.IsDeleted && x.DoctorId == doctorId /*&& x.CustomerScheduleId != null*/);
 
         // Apply search filter if provided
         if (!string.IsNullOrEmpty(searchTerm))
@@ -36,31 +36,32 @@ internal sealed class GetWorkingScheduleOfDoctorIdQueryHandlerV2(
 
         // Map to response
         var result = total.Items
-            .GroupBy(x => x.ShiftGroupId)
+            .GroupBy(x => new { x.ShiftGroupId, x.Date })
             .Select(g => new Response.ShiftGroup
             {
                 Id = g.First().ShiftGroupId ?? Guid.Empty,
                 DoctorId = g.First().DoctorId,
                 ClinicId = g.First().ClinicId,
-                Date = g.First().Date,
+                Date = g.Key.Date,
                 StartTime = g.Min(x => x.StartTime),
                 EndTime = g.Max(x => x.EndTime),
                 DoctorName = g.First().DoctorName,
-                WorkingSchedules = g.Select(x => new Response.GetWorkingScheduleResponse
-                {
-                    WorkingScheduleId = x.DocumentId,
-                    StartTime = x.StartTime,
-                    EndTime = x.EndTime,
-                    Status = x.Status,
-                    Note = x.Note,
-                    StepIndex = x.StepIndex,
-                    CustomerName = x.CustomerName,
-                    CustomerId = x.CustomerId,
-                    ServiceId = x.ServiceId,
-                    ServiceName = x.ServiceName,
-                    CustomerScheduleId = x.CustomerScheduleId,
-                    CurrentProcedureName = x.CurrentProcedureName
-                }).ToList()
+                WorkingSchedules = g.Where(x => x.CustomerScheduleId != null).Select(x =>
+                    new Response.GetWorkingScheduleResponse
+                    {
+                        WorkingScheduleId = x.DocumentId,
+                        StartTime = x.StartTime,
+                        EndTime = x.EndTime,
+                        Status = x.Status,
+                        Note = x.Note,
+                        StepIndex = x.StepIndex,
+                        CustomerName = x.CustomerName,
+                        CustomerId = x.CustomerId,
+                        ServiceId = x.ServiceId,
+                        ServiceName = x.ServiceName,
+                        CustomerScheduleId = x.CustomerScheduleId,
+                        CurrentProcedureName = x.CurrentProcedureName
+                    }).ToList()
             })
             .ToList();
 

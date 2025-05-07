@@ -10,7 +10,7 @@ public static class Response
         decimal? Amount,
         string CustomerName,
         string CustomerEmail,
-        string? Note,
+        string? DoctorNote,
         string CustomerPhoneNumber,
         string ServiceName,
         string DoctorName,

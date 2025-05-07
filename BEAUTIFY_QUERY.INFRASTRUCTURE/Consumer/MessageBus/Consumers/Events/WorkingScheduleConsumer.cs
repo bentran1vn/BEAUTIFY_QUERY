@@ -24,4 +24,7 @@ public static class WorkingScheduleConsumer
 
     public class DoctorScheduleRegisteredConsumer(ISender sender, IMongoRepository<EventProjection> repository)
         : Consumer<DomainEvents.DoctorScheduleRegistered>(sender, repository);
+
+    public class DoctorScheduleStatusChangedConsumer(ISender sender, IMongoRepository<EventProjection> repository)
+        : Consumer<DomainEvents.DoctorScheduleStatusChanged>(sender, repository);
 }
