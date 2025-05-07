@@ -2,6 +2,7 @@
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
 using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 using Microsoft.EntityFrameworkCore;
+using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
 
 /// <summary>
 ///api/v{version:apiVersion}/orders/clinic
@@ -10,6 +11,7 @@ namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Orders;
 internal sealed class GetOrdersByClinicIdHandler(
     ICurrentUserService currentUserService,
     IRepositoryBase<Order, Guid> orderRepository,
+    IRepositoryBase<Clinic, Guid> clinicRepository,
     IRepositoryBase<ClinicTransaction, Guid> clinicTransactionRepositoryBase)
     : IQueryHandler<Query.GetOrdersByClinicId, PagedResult<Response.Order>>
 {
@@ -18,9 +20,31 @@ internal sealed class GetOrdersByClinicIdHandler(
     {
         var searchTerm = request.SearchTerm?.Trim();
         
+        var isClinicAdmin = await clinicRepository
+            .FindAll(x => 
+                x.Id == currentUserService.ClinicId &&
+                x.ParentId != null &&
+                x.IsDeleted == false &&
+                x.IsParent == true)
+            .Include(x => x.Children)
+            .FirstOrDefaultAsync(cancellationToken);
+        
+        List<Guid> clinicIds = new List<Guid>();
+        
+        if (isClinicAdmin != null)
+        {
+            clinicIds = isClinicAdmin.Children
+                .Select(x => x.Id)
+                .ToList();
+        }
+        
         var tranQuery = clinicTransactionRepositoryBase.FindAll(x =>
-            x.ClinicId == currentUserService.ClinicId &&
+            // x.ClinicId == currentUserService.ClinicId &&
             x.IsDeleted == false);
+        
+        tranQuery = clinicIds.Count > 0 && isClinicAdmin != null
+            ? tranQuery.Where(x => clinicIds.Contains((Guid)x.ClinicId!))
+            : tranQuery.Where(x => x.ClinicId == currentUserService.ClinicId);
 
         var query = orderRepository.FindAll(x => x.IsDeleted == false);
         
