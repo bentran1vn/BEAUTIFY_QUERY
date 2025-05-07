@@ -23,6 +23,7 @@ public class GetDoctorClinicServicesByIdQueryV2Handler(
             isServiceExisted.DocumentId,
             isServiceExisted.DoctorServices.Select(y => new Response.DoctorService(
                 y.Id,
+                y.ClinicId,
                 y.ServiceId,
                 y.Rating,
                 new Response.UserEntity(

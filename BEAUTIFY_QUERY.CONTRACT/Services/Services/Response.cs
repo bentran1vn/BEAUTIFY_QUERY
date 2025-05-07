@@ -29,6 +29,7 @@ public class Response
     
     public record DoctorService(
         Guid Id,
+        Guid ClinicId,
         Guid ServiceId,
         double Rating,
         UserEntity Doctor);

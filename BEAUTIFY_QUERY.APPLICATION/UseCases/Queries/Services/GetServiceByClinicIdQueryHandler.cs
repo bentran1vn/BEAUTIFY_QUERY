@@ -99,6 +99,7 @@ internal sealed class GetServiceByClinicIdQueryHandler(
                     .ToList(),
                 x.DoctorServices.Select(y => new Response.DoctorService(
                     y.Id,
+                    y.ClinicId,
                     y.ServiceId,
                     y.Rating,
                     new Response.UserEntity(

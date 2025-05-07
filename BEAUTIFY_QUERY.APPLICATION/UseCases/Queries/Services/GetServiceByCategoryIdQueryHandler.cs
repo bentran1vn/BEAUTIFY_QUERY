@@ -102,6 +102,7 @@ internal sealed class GetServiceByCategoryIdQueryHandler(
             x.DoctorServices?
                 .Select(ds => new Response.DoctorService(
                     ds.Id,
+                    ds.ClinicId,
                     ds.ServiceId,
                     ds.Rating,
                     new Response.UserEntity(
