@@ -9,16 +9,27 @@ using Microsoft.EntityFrameworkCore;
 namespace BEAUTIFY_QUERY.APPLICATION.UseCases.Queries.Orders;
 internal sealed class GetOrdersByClinicIdHandler(
     ICurrentUserService currentUserService,
-    IRepositoryBase<Order, Guid> orderRepository)
+    IRepositoryBase<Order, Guid> orderRepository,
+    IRepositoryBase<ClinicTransaction, Guid> clinicTransactionRepositoryBase)
     : IQueryHandler<Query.GetOrdersByClinicId, PagedResult<Response.Order>>
 {
     public async Task<Result<PagedResult<Response.Order>>> Handle(Query.GetOrdersByClinicId request,
         CancellationToken cancellationToken)
     {
         var searchTerm = request.SearchTerm?.Trim();
+        
+        var tranQuery = clinicTransactionRepositoryBase.FindAll(x =>
+            x.ClinicId == currentUserService.ClinicId &&
+            x.IsDeleted == false);
 
-        var query = orderRepository.FindAll(x =>
-            x.Service.ClinicServices.FirstOrDefault().ClinicId == currentUserService.ClinicId);
+        var query = orderRepository.FindAll(x => x.IsDeleted == false);
+        
+        query= query.Join(
+            tranQuery,
+            order => order.Id,
+            transaction => transaction.OrderId,
+            (order, transaction) => transaction.Order!
+        );
 
         if (!string.IsNullOrEmpty(searchTerm))
         {
