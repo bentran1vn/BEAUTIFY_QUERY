@@ -16,6 +16,30 @@ public static class Response
         bool IsFromLivestream,
         string? LivestreamName
     );
+    
+    public record OrderSystem(
+        Guid Id,
+        Guid BrandId,
+        string BrandName,
+        string BrandAddress,
+        string BrandPhone,
+        Guid ClinicId,
+        string ClinicName,
+        string ClinicAddress,
+        string ClinicPhone,
+        string CustomerName,
+        string ServiceName,
+        decimal? TotalAmount,
+        decimal? Discount,
+        decimal? DepositAmount,
+        decimal? FinalAmount,
+        DateTimeOffset OrderDate,
+        string Status,
+        string CustomerPhone,
+        string CustomerEmail,
+        bool IsFromLivestream,
+        string? LivestreamName
+    );
 
     public record OrderById(
         Guid Id,

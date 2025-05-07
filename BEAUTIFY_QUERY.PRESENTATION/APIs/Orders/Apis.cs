@@ -11,6 +11,7 @@ public class Apis : ApiEndpoint, ICarterModule
         var gr1 = app.NewVersionedApi("Orders")
             .MapGroup(BaseUrl).HasApiVersion(1);
         gr1.MapGet(string.Empty, GetOrder).RequireAuthorization();
+        gr1.MapGet("system", GetOrderSystems);
         gr1.MapGet("{id}", GetOrderById);
         gr1.MapGet("clinic", GetOrderByClinicId).RequireAuthorization(Constant.Role.CLINIC_STAFF);
         gr1.MapGet("clinic/branches", GetClinicOrderBranches)
@@ -39,6 +40,16 @@ public class Apis : ApiEndpoint, ICarterModule
         var result = await sender.Send(
             new Query.GetOrdersByCustomerId(searchTerm, sortColumn,
             SortOrderExtension.ConvertStringToSortOrder(sortOrder), pageIndex, pageSize));
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
+    
+    private static async Task<IResult> GetOrderSystems(ISender sender,
+        string? searchTerm = null, string? sortColumn = null,
+        string? sortOrder = null, int pageIndex = 1, int pageSize = 10)
+    {
+        var result = await sender.Send(
+            new Query.GetOrderSystems(searchTerm, sortColumn,
+                SortOrderExtension.ConvertStringToSortOrder(sortOrder), pageIndex, pageSize));
         return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
     }
 
