@@ -14,6 +14,7 @@ public class Staff : AggregateRoot<Guid>, IAuditableEntity
     [MaxLength(255)] public required string Password { get; set; }
 
     [MaxLength(50)] public required int Status { get; set; }
+    public double Rating { get; set; } = 0;
 
     // 0 Pending 1 Approve 2 Reject 3 Banned
     public DateOnly? DateOfBirth { get; set; }

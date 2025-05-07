@@ -11,6 +11,7 @@ public class ClinicServiceProjection : Document
     public ICollection<Image> CoverImage { get; set; }
     public Clinic Branding { get; set; }
     public ICollection<EntityEvent.DoctorServiceEntity> DoctorServices { get; set; } = [];
+    public double Rating { get; set; } = 0;
     public decimal DiscountPercent { get; set; } = 0;
     public required double DepositPercent { get; set; }
     public required bool IsRefundable { get; set; }
@@ -81,7 +82,7 @@ public class Feedback
     public Guid ServiceId { get; set; }
     public ICollection<string> Images { get; set; }
     public string Content { get; set; }
-    public int Rating { get; set; }
+    public double Rating { get; set; }
     public User User { get; set; }
     public bool IsView { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
