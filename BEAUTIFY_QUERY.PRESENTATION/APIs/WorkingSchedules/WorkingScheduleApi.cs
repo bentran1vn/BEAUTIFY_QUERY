@@ -40,6 +40,7 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
         gr1.MapGet("{clinicId:guid}/working-hours", GetClinicWorkingHours)
             .WithSummary("Get clinic working hours")
             .RequireAuthorization();
+        gr1.MapGet("doctors/free-times", GetDoctorFreeTime).RequireAuthorization();
     }
 
     #region GetDoctorBusyTimeInADay
@@ -56,6 +57,16 @@ public class WorkingScheduleApi : ApiEndpoint, ICarterModule
     }
 
     #endregion
+
+    private static async Task<IResult> GetDoctorFreeTime(
+        ISender sender,
+        [FromQuery] Guid doctorId,
+        [FromQuery] DateOnly date)
+    {
+        var query = new Query.GetDoctorFreeTime(doctorId, date);
+        var result = await sender.Send(query);
+        return result.IsFailure ? HandlerFailure(result) : Results.Ok(result);
+    }
 
     private static async Task<IResult> GetClinicWorkingHours(
         ISender sender,
