@@ -120,6 +120,7 @@ public class GetClinicDetailQueryHandler(
             clinic.ProfilePictureUrl,
             clinic.TotalBranches ?? 0,
             clinic.IsActivated,
+            clinic.Status,
             clinic.BankName,
             clinic.BankAccountNumber,
             currentSubscription,

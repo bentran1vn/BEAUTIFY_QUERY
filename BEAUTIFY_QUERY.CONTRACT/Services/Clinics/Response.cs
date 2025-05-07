@@ -91,6 +91,7 @@ public static class Response
         string? ProfilePictureUrl,
         int TotalBranches,
         bool IsActivated,
+        int Status,
         string BankName,
         string BankAccountNumber,
         Subscription? currentSubscription = null,
