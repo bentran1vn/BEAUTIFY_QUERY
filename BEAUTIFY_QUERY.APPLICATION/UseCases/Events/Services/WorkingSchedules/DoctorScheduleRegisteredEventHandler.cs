@@ -18,6 +18,7 @@ internal sealed class DoctorScheduleRegisteredEventHandler(
         {
             x.DoctorId = request.DoctorId;
             x.DoctorName = request.DoctorName;
+            x.Status = "Working Shift";
             await workingScheduleMongoRepository.ReplaceOneAsync(x);
         }
 

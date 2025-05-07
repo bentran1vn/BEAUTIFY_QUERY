@@ -3,6 +3,9 @@
 namespace BEAUTIFY_QUERY.CONTRACT.Services.WorkingSchedules;
 public static class Query
 {
+    public record GetDoctorFreeTime(Guid DoctorId, DateOnly Date)
+        : IQuery<List<Response.DoctorBusyTimeInADay>>;
+
     public record GetClinicWorkingHours(Guid ClinicId)
         : IQuery<Response.GetClinicWorkingHoursResponse>;
 

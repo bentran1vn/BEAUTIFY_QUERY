@@ -170,11 +170,11 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
                     };
 
                     listInfor.Add(weekInfo);
-                    
+
                     // Break after processing the last week that includes endDate
                     if (weekEnd >= endDate)
                         break;
-                    
+
                     weekStart = weekStart.AddDays(7);
                 }
             }
@@ -237,11 +237,11 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
                     };
 
                     listInfor.Add(monthInfo);
-                    
+
                     // Break after processing the last month that includes endDate
                     if (monthEnd >= endDate)
                         break;
-                    
+
                     monthStart = monthStart.AddMonths(1);
                 }
             }
@@ -287,41 +287,41 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
 
         infor.TotalCountBronzeSubscription = await systemTransactionQuery
             .CountAsync(x =>
-                !x.IsDeleted && x.Status == 1 &&
+                !x.IsDeleted && x.Status == 2 &&
                 x.AdditionBranches == null &&
                 x.AdditionLivestreams == null &&
-                x.SubscriptionPackage.Name.Equals("Đồng"), cancellationToken);
+                x.SubscriptionPackageId.ToString() == "248BF96B-9782-4011-8BB0-B26E66658090", cancellationToken);
 
         infor.TotalCountSilverSubscription = await systemTransactionQuery
             .CountAsync(x =>
-                !x.IsDeleted && x.Status == 1 &&
+                !x.IsDeleted && x.Status == 2 &&
                 x.AdditionBranches == null &&
                 x.AdditionLivestreams == null &&
-                x.SubscriptionPackage.Name.Equals("Bạc"), cancellationToken);
+                x.SubscriptionPackageId.ToString() == "B549752A-F156-4894-90AD-AB3994FD071D", cancellationToken);
 
         infor.TotalCountGoldSubscription = await systemTransactionQuery
             .CountAsync(x =>
-                !x.IsDeleted && x.Status == 1 &&
+                !x.IsDeleted && x.Status == 2 &&
                 x.AdditionBranches == null &&
                 x.AdditionLivestreams == null &&
-                x.SubscriptionPackage.Name.Equals("Vàng"), cancellationToken);
+                x.SubscriptionPackageId.ToString() == "B5DB3EA1-F81C-465E-A23B-DA7D6D361930", cancellationToken);
 
         infor.TotalSumGoldSubscriptionRevenue = await systemTransactionQuery
             .Where(x =>
-                !x.IsDeleted && x.Status == 1 &&
-                x.SubscriptionPackage.Name.Equals("Vàng"))
+                !x.IsDeleted && x.Status == 2 &&
+                x.SubscriptionPackageId.ToString() == "B5DB3EA1-F81C-465E-A23B-DA7D6D361930")
             .SumAsync(x => x.Amount, cancellationToken);
 
         infor.TotalSumSilverSubscriptionRevenue = await systemTransactionQuery
             .Where(x =>
-                !x.IsDeleted && x.Status == 1 &&
-                x.SubscriptionPackage.Name.Equals("Bạc"))
+                !x.IsDeleted && x.Status == 2 &&
+                x.SubscriptionPackageId.ToString() == "B549752A-F156-4894-90AD-AB3994FD071D")
             .SumAsync(x => x.Amount, cancellationToken);
 
         infor.TotalSumBronzeSubscriptionRevenue = await systemTransactionQuery
             .Where(x =>
-                !x.IsDeleted && x.Status == 1 &&
-                x.SubscriptionPackage.Name.Equals("Đồng"))
+                !x.IsDeleted && x.Status == 2 &&
+                x.SubscriptionPackageId.ToString() == "248BF96B-9782-4011-8BB0-B26E66658090")
             .SumAsync(x => x.Amount, cancellationToken);
 
         infor.TotalSumClinicRevenue = await orderQuery
@@ -331,7 +331,7 @@ public class GetSystemDaytimeInformationQueryHandler : IQueryHandler<Query.GetSy
 
         // Calculate total system revenue
         infor.TotalSystemSumRevenue = await systemTransactionQuery
-            .Where(x => !x.IsDeleted && x.Status == 1)
+            .Where(x => !x.IsDeleted && x.Status == 2)
             .SumAsync(x => x.Amount, cancellationToken);
 
         // Calculate total revenue (system + clinic)
