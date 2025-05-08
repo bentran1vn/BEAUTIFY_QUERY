@@ -168,6 +168,7 @@ internal sealed class GetClinicWalletTransactionsQueryHandler(
             transaction.ClinicId,
             transaction.Clinic?.Name,
             transaction.Amount,
+            transaction.ProofImageUrl,
             transaction.TransactionType,
             transaction.Status,
             transaction.IsMakeBySystem,

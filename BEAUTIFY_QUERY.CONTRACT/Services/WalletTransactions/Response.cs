@@ -6,6 +6,7 @@ public static class Response
         Guid? ClinicId,
         string? ClinicName,
         decimal Amount,
+        string? ProofImageUrl,
         string TransactionType,
         string Status,
         bool IsMakeBySystem,

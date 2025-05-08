@@ -10,7 +10,7 @@ public class WalletTransaction : AggregateRoot<Guid>, IAuditableEntity
     public Guid? ClinicId { get; set; }
     public virtual Clinic? Clinic { get; set; }
     [Column(TypeName = "decimal(18,2)")] public decimal Amount { get; set; }
-
+    public string? ProofImageUrl { get; set; } = null;
 
     // Transaction Type: 0 = Deposit, 1 = Withdrawal, 2 = Transfer
     [MaxLength(20)] public required string TransactionType { get; set; }
