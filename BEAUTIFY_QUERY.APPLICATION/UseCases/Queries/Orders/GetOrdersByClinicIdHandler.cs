@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 using Microsoft.EntityFrameworkCore;
 using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
@@ -47,6 +48,7 @@ internal sealed class GetOrdersByClinicIdHandler(
             : tranQuery.Where(x => x.ClinicId == currentUserService.ClinicId);
 
         var query = orderRepository.FindAll(x => x.IsDeleted == false);
+        query = query.Include(x => x.CustomerSchedules);
         
         query= query.Join(
             tranQuery,
@@ -85,8 +87,11 @@ internal sealed class GetOrdersByClinicIdHandler(
 
         var orders = await PagedResult<Order>.CreateAsync(query, request.PageIndex, request.PageSize);
 
-        var mapped = orders.Items.Select(x =>
-                new Response.Order(
+        var mapped = orders.Items.Select(x => {
+                bool isFinished = x.CustomerSchedules != null && x.CustomerSchedules.Count > 0 &&
+                                  x.CustomerSchedules.All(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED);
+
+                return new Response.Order(
                     x.Id,
                     x.Customer.FullName,
                     x.Service.Name,
@@ -99,7 +104,9 @@ internal sealed class GetOrdersByClinicIdHandler(
                     x.Customer.PhoneNumber,
                     x.Customer.Email,
                     x.LivestreamRoomId != null,
-                    x.LivestreamRoomId != null ? x.LivestreamRoom?.Name : null))
+                    isFinished,
+                    x.LivestreamRoomId != null ? x.LivestreamRoom?.Name : null);
+            })
             .ToList();
 
         return Result.Success(
@@ -116,7 +123,7 @@ internal sealed class GetOrdersByClinicIdHandler(
             "discount" => x => x.Discount,
             "depositAmount" => x => x.DepositAmount,
             "finalAmount" => x => x.FinalAmount,
-            "oderDate" => x => x.OrderDate,
+            "orderDate" => x => x.OrderDate,
             _ => x => x.CreatedOnUtc,
         };
     }

@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 using Microsoft.EntityFrameworkCore;
 using Clinic = BEAUTIFY_QUERY.DOMAIN.Entities.Clinic;
@@ -91,7 +92,8 @@ public sealed class GetClinicOrderBranchesQueryHandler(
         return query
             .Include(x => x.Customer)
             .Include(x => x.Service)
-            .Include(x => x.LivestreamRoom);
+            .Include(x => x.LivestreamRoom)
+            .Include(x => x.CustomerSchedules);
     }
 
     private IQueryable<Order> ApplySorting(IQueryable<Order> query, Query.GetClinicOrderBranchesQuery request)
@@ -104,6 +106,9 @@ public sealed class GetClinicOrderBranchesQueryHandler(
 
     private static Response.Order MapOrderToResponse(Order x)
     {
+        bool isFinished = x.CustomerSchedules != null && x.CustomerSchedules.Count > 0 &&
+                          x.CustomerSchedules.All(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED);
+        
         return new Response.Order(
             x.Id,
             x.Customer.FullName,
@@ -117,6 +122,7 @@ public sealed class GetClinicOrderBranchesQueryHandler(
             x.Customer.PhoneNumber,
             x.Customer.Email,
             x.LivestreamRoomId.HasValue,
+            isFinished,
             x.LivestreamRoomId.HasValue ? x.LivestreamRoom.Name : null);
     }
 

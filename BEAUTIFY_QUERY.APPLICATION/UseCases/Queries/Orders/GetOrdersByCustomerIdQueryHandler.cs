@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.CONTRACT.Enumerations;
+using BEAUTIFY_PACKAGES.BEAUTIFY_PACKAGES.DOMAIN.Constrants;
 using BEAUTIFY_QUERY.CONTRACT.Services.Orders;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,7 +25,10 @@ public sealed class GetOrdersByCustomerIdQueryHandler(
 
         if (!string.IsNullOrWhiteSpace(request.SearchTerm)) ApplySearchFilter(ref query, request.SearchTerm.Trim());
 
-        query = query.Include(x => x.Service).Include(x => x.LivestreamRoom);
+        query = query
+            .Include(x => x.Service)
+            .Include(x => x.LivestreamRoom)
+            .Include(x => x.CustomerSchedules);
         query = ApplySorting(query, request);
 
         return query;
@@ -55,21 +59,28 @@ public sealed class GetOrdersByCustomerIdQueryHandler(
 
     private static PagedResult<Response.Order> MapToResponse(PagedResult<Order> orders)
     {
-        var mapped = orders.Items.Select(x => new Response.Order(
-                x.Id,
-                x.Customer.FullName,
-                x.Service.Name,
-                x.TotalAmount,
-                x.Discount,
-                x.DepositAmount,
-                x.FinalAmount,
-                x.CreatedOnUtc,
-                x.Status,
-                x.Customer.PhoneNumber,
-                x.Customer.Email,
-                x.LivestreamRoomId != null,
-                x.LivestreamRoomId != null ? x.LivestreamRoom.Name : null
-            ))
+        var mapped = orders.Items.Select(x =>
+            {
+                bool isFinished = x.CustomerSchedules != null && x.CustomerSchedules.Count > 0 &&
+                                  x.CustomerSchedules.All(x => x.Status == Constant.OrderStatus.ORDER_COMPLETED);
+                
+                return new Response.Order(
+                    x.Id,
+                    x.Customer.FullName,
+                    x.Service.Name,
+                    x.TotalAmount,
+                    x.Discount,
+                    x.DepositAmount,
+                    x.FinalAmount,
+                    x.CreatedOnUtc,
+                    x.Status,
+                    x.Customer.PhoneNumber,
+                    x.Customer.Email,
+                    x.LivestreamRoomId != null,
+                    isFinished,
+                    x.LivestreamRoomId != null ? x.LivestreamRoom.Name : null
+                );
+            })
             .OrderBy(x => x.Status)
             .ToList();
 
